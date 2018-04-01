@@ -1,0 +1,11 @@
+Internas al juego:
+país
+coalición
+turno
+enfrentamiento
+tirada
+puntos
+
+Externas al juego:
+Jugador
+Partida 
