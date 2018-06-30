@@ -1,4 +1,4 @@
-package es.upo.tfg.rol.model.dao;
+package es.upo.tfg.rol.model.dao.deprecated;
 
 import java.io.Serializable;
 import java.util.List;

@@ -4,17 +4,13 @@ import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.autoconfigure.SpringBootApplication; // TFG MVP
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-//import es.upo.tfg.rol.config.AppConfig;
 import es.upo.tfg.rol.controller.service.UserServiceImpl;
 import es.upo.tfg.rol.model.pojos.User;
 
-@SpringBootApplication // Spring automatically chechs application.properties file for config (@Config
+@SpringBootApplication // Spring automatically checks application.properties file for configs (@Config
 						// is included in this annotation)
 public class RolApplication {
 
@@ -41,6 +37,11 @@ public class RolApplication {
 			for (User u : userServ.findAllUsers()) {
 				System.out.println(u.toString());
 			}
+			User u3 = userServ.findByLogin("watup", "hunter2");
+			System.out.println(u3.toString());
+			
+			User u4 = userServ.findById(6L);
+			System.out.println(u4.toString());
 		};
 	}
 }
