@@ -45,17 +45,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Persistence -->
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-orm -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework</groupId> -->
-		<!-- <artifactId>spring-orm</artifactId> -->
-		<!-- </dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-<!-- 		<dependency> -->
-<!-- 		<groupId>org.hibernate</groupId> -->
-<!-- 		<artifactId>hibernate-core</artifactId> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
