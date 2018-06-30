@@ -19,7 +19,7 @@ public class UserServiceImpl {
     private UserDAOImpl dao;
      
     public void saveUser(User user) {
-        dao.save(user);
+        dao.create(user);
     }
  
     public List<User> findAllUsers() {
@@ -30,8 +30,8 @@ public class UserServiceImpl {
         dao.delete(user);
     }
  
-    public User findById(String id) {
-        return dao.findById(id);
+    public User findById(int id) {
+        return dao.find(id);
     }
  
     public void updateUser(User user){

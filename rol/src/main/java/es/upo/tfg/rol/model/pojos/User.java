@@ -9,7 +9,15 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements Serializable {
+
+	/**
+	 * Serial ID: Required for Tomcat, for classes to implement Serializable
+	 * whenever instances of those classes are been stored as an attribute of the
+	 * HttpSession. Source:
+	 * https://stackoverflow.com/questions/2294551/java-io-writeabortedexception-writing-aborted-java-io-notserializableexception
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
