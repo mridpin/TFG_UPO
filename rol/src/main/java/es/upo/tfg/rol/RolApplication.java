@@ -18,30 +18,30 @@ public class RolApplication {
 		SpringApplication.run(RolApplication.class, args);
 	}
 
-	@Bean
-	public CommandLineRunner demo(UserServiceImpl userServ) {
-		return (args) -> {
-
-			User u1 = new User();
-			u1.setName("cabesa");
-			u1.setNickname("watup");
-			u1.setAvatar("watup");
-			u1.setPassword("watup");
-
-			userServ.saveUser(u1);
-			for (User u : userServ.findAllUsers()) {
-				System.out.println(u.toString());
-			}
-			u1.setName("wwhat the duck is this");
-			userServ.saveUser(u1);
-			for (User u : userServ.findAllUsers()) {
-				System.out.println(u.toString());
-			}
-			User u3 = userServ.findByLogin("watup", "hunter2");
-			System.out.println(u3.toString());
-			
-			User u4 = userServ.findById(6L);
-			System.out.println(u4.toString());
-		};
-	}
+//	@Bean
+//	public CommandLineRunner demo(UserServiceImpl userServ) {
+//		return (args) -> {
+//
+//			User u1 = new User();
+//			u1.setName("cabesa");
+//			u1.setNickname("watup");
+//			u1.setAvatar("watup");
+//			u1.setPassword("watup");
+//
+//			userServ.saveUser(u1);
+//			for (User u : userServ.findAllUsers()) {
+//				System.out.println(u.toString());
+//			}
+//			u1.setName("wwhat the duck is this");
+//			userServ.saveUser(u1);
+//			for (User u : userServ.findAllUsers()) {
+//				System.out.println(u.toString());
+//			}
+//			User u3 = userServ.findByLogin("watup", "hunter2");
+//			System.out.println(u3.toString());
+//			
+//			User u4 = userServ.findById(6L);
+//			System.out.println(u4.toString());
+//		};
+//	}
 }
