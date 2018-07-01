@@ -1,10 +1,113 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<meta charset="utf-8">
+<meta
+	http-equiv="X-UA-Compatible"
+	content="IE=edge">
+<meta
+	name="viewport"
+	content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<link
+	rel="icon"
+	href="../../favicon.ico">
+<link
+	href="css/bootstrap.min.css"
+	rel="stylesheet">
 </head>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script type="text/javascript">
+function matchPasswords() {
+	if ($("#inputPassword").val()===$("#checkPassword").val()) {
+		return true;
+	} else {
+		alert("Passwords don't match!");
+		return false;
+	}
+}
+</script>
 <body>
-REGISTER PAGE
+	<header class="container">
+		<h1>WELCOME TO MY APP</h1>
+	</header>
+	<article class="container">
+		<form
+			class="form"
+			action="#"
+			th:action="@{/register}"
+			th:object="${user}"
+			method="post">
+			<h2 class="form-heading">Register</h2>
+			<label
+				for="nickname"
+				class="">Nickname</label>
+			<input
+				type="text"
+				name="nickname"
+				id="nickname"
+				class="form-control"
+				placeholder="Nickname"
+				required
+				autofocus>
+			<label
+				for="name"
+				class="">Name</label>
+			<input
+				type="text"
+				name="name"
+				id="name"
+				class="form-control"
+				placeholder="Name"
+				required>
+			<label
+				for="avatar"
+				class="">Avatar</label>
+			<input
+				type="text"
+				name="avatar"
+				id="avatar"
+				class="form-control"
+				placeholder="Avatar"
+				required>
+			<label
+				for="inputPassword"
+				class="">Password</label>
+			<input
+				type="password"
+				name="pass"
+				id="inputPassword"
+				class="form-control"
+				placeholder="Password"
+				required>
+			<label
+				for="checkPassword"
+				class="">Retype password</label>
+			<input
+				type="password"
+				name="checkPassword"
+				id="checkPassword"
+				class="form-control"
+				placeholder="Retype Password"
+				required>
+			<input
+				class="btn btn-lg btn-primary btn-block"
+				type="submit"
+				value="Sign up"
+				onclick="matchPasswords()">
+		</form>
+		<section class="container form">
+			<h3>Already have an account?</h3>
+			<form
+				th:action="@{/register}"
+				method="get">
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="Sign in">
+			</form>
+		</section>
+	</article>
+	<footer class="container">oc pls dont steal</footer>
 </body>
 </html>
