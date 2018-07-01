@@ -24,6 +24,8 @@
 ### Eclipse ###
 /.metadata/
 /target/
+rol/target/
+rol/.mvn/
 /.recommenders/
 /RemoteSystemsTempFiles/
 /.mvn/
