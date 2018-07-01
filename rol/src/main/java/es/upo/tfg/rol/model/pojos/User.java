@@ -26,7 +26,7 @@ public class User implements Serializable {
 	private String avatar;
 	@Column(name = "name")
 	private String name;
-	@Column(name = "nickname")
+	@Column(unique = true, name = "nickname")
 	private String nickname;
 	@Column(name = "password")
 	private String password;

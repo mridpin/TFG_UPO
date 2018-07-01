@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html
-	lang="en"
-	xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
 <meta
@@ -29,13 +27,18 @@
 		<h1>WELCOME TO MY APP</h1>
 	</header>
 	<article class="container">
-		<form class="form-signin">
+		<form
+			class="form-signin"
+			action="#"
+			th:action="@{/login}"
+			method="post">
 			<h2 class="form-signin-heading">Log in required</h2>
 			<label
 				for="nickname"
 				class="">Nickname</label>
 			<input
 				type="text"
+				name="nickname"
 				id="nickname"
 				class="form-control"
 				placeholder="Nickname"
@@ -46,14 +49,27 @@
 				class="">Password</label>
 			<input
 				type="password"
+				name="pass"
 				id="inputPassword"
 				class="form-control"
 				placeholder="Password"
 				required>
-			<button
+			<input
 				class="btn btn-lg btn-primary btn-block"
-				type="submit">Log in</button>
+				type="submit"
+				value="Log in">
 		</form>
+		<section class="container form-signin">
+			<h3>Don't have an account?</h3>
+			<form
+				th:action="@{/register}"
+				method="get">
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="Register">
+			</form>
+		</section>
 	</article>
 	<footer class="container">oc pls dont steal</footer>
 </body>
