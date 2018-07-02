@@ -44,7 +44,7 @@ function matchPasswords() {
 				class="">Nickname</label>
 			<input
 				type="text"
-				name="nickname"
+				th:field="*{nickname}"
 				id="nickname"
 				class="form-control"
 				placeholder="Nickname"
@@ -55,7 +55,7 @@ function matchPasswords() {
 				class="">Name</label>
 			<input
 				type="text"
-				name="name"
+				th:field="*{name}"
 				id="name"
 				class="form-control"
 				placeholder="Name"
@@ -65,7 +65,7 @@ function matchPasswords() {
 				class="">Avatar</label>
 			<input
 				type="text"
-				name="avatar"
+				th:field="*{avatar}"
 				id="avatar"
 				class="form-control"
 				placeholder="Avatar"
@@ -75,7 +75,7 @@ function matchPasswords() {
 				class="">Password</label>
 			<input
 				type="password"
-				name="pass"
+				th:field="*{password}"
 				id="inputPassword"
 				class="form-control"
 				placeholder="Password"
@@ -99,7 +99,7 @@ function matchPasswords() {
 		<section class="container form">
 			<h3>Already have an account?</h3>
 			<form
-				th:action="@{/register}"
+				th:action="@{/}"
 				method="get">
 				<input
 					class="btn btn-lg btn-primary btn-block"

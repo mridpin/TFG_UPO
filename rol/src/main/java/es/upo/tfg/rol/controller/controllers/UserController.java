@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -12,13 +13,29 @@ import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Controller
-public class LoginController {
+public class UserController {
 
 	@Autowired
 	UserService uServ;
 
 	@GetMapping("/")
 	public String index() {
+		return "index";
+	}
+
+	@GetMapping("/register")
+	public String register(@ModelAttribute User user) {
+		return "register";
+	}
+	
+	@GetMapping("/profile")
+	public String profile() {
+		return "profile";
+	}
+	
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		session.removeAttribute("user");
 		return "index";
 	}
 
@@ -30,12 +47,14 @@ public class LoginController {
 			return "index";
 		} else {
 			session.setAttribute("user", user);
-			return "profile";
+			return "landing";
 		}
 	}
 
-	@GetMapping("/register")
-	public String submitRegister() {
-		return "register";
+	@PostMapping("/register")
+	public String submitRegister(@ModelAttribute User user, HttpSession session) {
+		uServ.saveUser(user);
+		session.setAttribute("user", user);
+		return "landing";
 	}
 }

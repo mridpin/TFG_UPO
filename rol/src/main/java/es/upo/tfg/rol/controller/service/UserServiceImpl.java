@@ -36,14 +36,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/* (non-Javadoc)
-	 * @see es.upo.tfg.rol.controller.service.UserService#delete(es.upo.tfg.rol.model.pojos.User)
-	 */
-	@Override
-	public void delete(User user) {
-		dao.delete(user);
-	}
-
-	/* (non-Javadoc)
 	 * @see es.upo.tfg.rol.controller.service.UserService#findById(java.lang.Long)
 	 */
 	@Override
@@ -65,13 +57,5 @@ public class UserServiceImpl implements UserService {
 			return user.get();
 		}
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see es.upo.tfg.rol.controller.service.UserService#updateUser(es.upo.tfg.rol.model.pojos.User)
-	 */
-	@Override
-	public void updateUser(User user) {
-		dao.save(user);
 	}
 }

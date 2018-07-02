@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Profile</title>
 </head>
 <body>
-MY PROFDILE: <span th:text="${session.user.name}"></span>
+		<div>
+			MY PROFILE PAGE: <span th:text="${session.user.name}"></span>
+		</div>
 </body>
 </html>
