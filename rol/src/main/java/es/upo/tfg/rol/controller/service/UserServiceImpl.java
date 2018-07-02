@@ -2,7 +2,6 @@ package es.upo.tfg.rol.controller.service;
 
 import java.util.Optional;
 
-import org.assertj.core.internal.Iterables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,15 +16,24 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserDAO dao;
 
-	/* (non-Javadoc)
-	 * @see es.upo.tfg.rol.controller.service.UserService#saveUser(es.upo.tfg.rol.model.pojos.User)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * es.upo.tfg.rol.controller.service.UserService#saveUser(es.upo.tfg.rol.model.
+	 * pojos.User)
 	 */
 	@Override
 	public void saveUser(User user) {
-		dao.save(user);
+		// Check if the nickname is already in the database to reject the save
+		if (!dao.findByNickname(user.getNickname()).isPresent()) {
+			dao.save(user);
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see es.upo.tfg.rol.controller.service.UserService#findAllUsers()
 	 */
 	@Override
@@ -35,7 +43,9 @@ public class UserServiceImpl implements UserService {
 		// false).collect(Collectors.toList());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see es.upo.tfg.rol.controller.service.UserService#findById(java.lang.Long)
 	 */
 	@Override
@@ -47,8 +57,12 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see es.upo.tfg.rol.controller.service.UserService#findByLogin(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * es.upo.tfg.rol.controller.service.UserService#findByLogin(java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
 	public User findByLogin(String nickname, String password) {

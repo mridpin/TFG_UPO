@@ -1,12 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
+<head>
+<meta charset="utf-8">
+<meta
+	http-equiv="X-UA-Compatible"
+	content="IE=edge">
+<meta
+	name="viewport"
+	content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<link
+	rel="icon"
+	href="../../favicon.ico">
+<link
+	href="css/bootstrap.min.css"
+	rel="stylesheet">
 <title>Profile</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+	function makeEditable() {
+		$(".editable").removeAttr("disabled");
+		$(".editable").removeAttr("readonly");
+	}
+	function matchPasswords() {
+		var pass = $("#inputPassword").val();
+		var checkPass = $("#checkPassword").val();
+		if (pass.length > 0 && checkPass.length > 0 && pass === checkPass) {
+			alert("Passwords match!");
+			return true;
+		} else {
+			alert("Passwords don't match!");
+			return false;
+		}
+	}
+	$(document).ready(function() {
+		$("#editButton").on("click", function() {
+			makeEditable();
+			return false;
+		});
+
+		$("#saveChanges").click(function() {
+			matchPasswords();
+		});
+	});
+</script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script type="text/javascript">
+	function matchPasswords() {
+		if ($("#inputPassword").val() === $("#checkPassword").val()) {
+			return true;
+		} else {
+			alert("Passwords don't match!");
+			return false;
+		}
+	}
+</script>
 </head>
 <body>
-		<div>
-			MY PROFILE PAGE: <span th:text="${session.user.name}"></span>
-		</div>
+	<div>
+		MY PROFILE PAGE: <span th:text="${session.user.name}"></span>
+	</div>
+	<div>
+		<button id="editButton">Click to Edit</button>
+		<form
+			class="form"
+			action="#"
+			th:action="@{/updateUser}"
+			th:object="${user}"
+			method="post">
+			<h2 class="form-heading">Profile</h2>
+			<label
+				for="nickname"
+				class="">Nickname</label>
+			<input
+				type="text"
+				th:field="*{nickname}"
+				id="nickname"
+				class="form-control editable"
+				th:placeholder="*{nickname}"
+				required
+				disabled="disabled"
+				readonly="readonly">
+			<label
+				for="name"
+				class="">Name</label>
+			<input
+				type="text"
+				th:field="*{name}"
+				id="name"
+				class="form-control editable"
+				th:placeholder="*{name}"
+				required
+				disabled="disabled"
+				readonly="readonly">
+			<label
+				for="avatar"
+				class="">Avatar</label>
+			<input
+				type="text"
+				th:field="*{avatar}"
+				id="avatar"
+				class="form-control editable"
+				th:placeholder="*{avatar}"
+				required
+				disabled="disabled"
+				readonly="readonly">
+			<label
+				for="inputPassword"
+				class="">Password</label>
+			<input
+				type="password"
+				th:field="*{password}"
+				id="inputPassword"
+				class="form-control editable"
+				placeholder="Insert password to confirm"
+				required
+				disabled="disabled"
+				readonly="readonly">
+			<label
+				for="checkPassword"
+				class="">Retype password</label>
+			<input
+				type="password"
+				name="checkPassword"
+				id="checkPassword"
+				class="form-control editable"
+				placeholder="Retype password for security"
+				required
+				disabled="disabled"
+				readonly="readonly">
+			<input
+				class="btn btn-lg btn-primary btn-block editable"
+				type="submit"
+				id="saveChanges"
+				value="Save Changes"
+				disabled="disabled">
+		</form>
+	</div>
 </body>
 </html>
