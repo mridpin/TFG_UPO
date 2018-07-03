@@ -1,26 +1,22 @@
 package es.upo.tfg.rol.controller.controllers;
 
-import java.awt.Image;
 import java.io.IOException;
-import java.util.Base64;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
@@ -31,8 +27,6 @@ public class UserController {
 	@Autowired
 	UserService uServ;
 
-	String encodedImage;
-	
 	@GetMapping("/")
 	public String index() {
 		return "index";
@@ -73,36 +67,39 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public String submitRegister(@ModelAttribute User user, HttpSession session, HttpServletResponse response,
-			HttpServletRequest request) throws IOException {
-		if (user.getAvatar().length > 1024) {
-			uServ.saveUser(user);
-			encodedImage = Base64.getEncoder().encodeToString(user.getAvatar());
+	public String submitRegister(@ModelAttribute User user, HttpSession session,
+			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+		String filename = System.currentTimeMillis() + "-" + StringUtils.cleanPath(avatar.getOriginalFilename());
+		Path avatarPath = Paths.get("userImages");
+		try (InputStream inputStream = avatar.getInputStream()) {
+			Files.copy(inputStream, avatarPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		session.setAttribute("user", user);
-		return "landing";
-	}
-
-	@InitBinder
-	protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws ServletException {
-		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());
-	}
-
-	@PostMapping("/updateUser")
-	public String submitUpdate(@ModelAttribute User user, HttpSession session) {
-		user.setId(((User) session.getAttribute("user")).getId());
+		user.setAvatar(filename);
 		uServ.saveUser(user);
 		session.setAttribute("user", user);
 		return "landing";
 	}
 
-	public String getEncodedImage() {
-		return encodedImage;
+	@PostMapping("/updateUser")
+	public String submitUpdate(@ModelAttribute User user, HttpSession session,
+			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+		user.setId(((User) session.getAttribute("user")).getId());
+		if (!"".equals(avatar.getOriginalFilename())) {
+			String filename = ((User) session.getAttribute("user")).getAvatar();
+			Path avatarPath = Paths.get("userImages");
+			try (InputStream inputStream = avatar.getInputStream()) {
+				Files.copy(inputStream, avatarPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			user.setAvatar(filename);
+		} else {
+			user.setAvatar(((User) session.getAttribute("user")).getAvatar());
+		}
+		uServ.saveUser(user);
+		session.setAttribute("user", user);
+		return "landing";
 	}
-
-	public void setEncodedImage(String encodedImage) {
-		this.encodedImage = encodedImage;
-	}
-	
-	
 }

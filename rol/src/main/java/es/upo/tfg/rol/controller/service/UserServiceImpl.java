@@ -25,10 +25,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public void saveUser(User user) {
-		// Check if the nickname is already in the database to reject the save
-		if (!dao.findByNickname(user.getNickname()).isPresent()) {
-			dao.save(user);
-		}
+		dao.save(user);
 	}
 
 	/*

@@ -8,7 +8,7 @@
 	<div>
 		<div>
 			HELLO: <span th:text="${session.user.name}"></span>
-			<img src="data:image/jpeg;base64,${encodedImage}">
+			<img width="200px" th:src="@{/} + ${session.user.avatar}">
 		</div>
 		<div>
 			<form

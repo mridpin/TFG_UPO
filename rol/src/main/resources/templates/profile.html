@@ -19,22 +19,10 @@
 <title>Profile</title>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="js/customjs.js"
+	type="text/javascript"></script>
 <script type="text/javascript">
-	function makeEditable() {
-		$(".editable").removeAttr("disabled");
-		$(".editable").removeAttr("readonly");
-	}
-	function matchPasswords() {
-		var pass = $("#inputPassword").val();
-		var checkPass = $("#checkPassword").val();
-		if (pass.length > 0 && checkPass.length > 0 && pass === checkPass) {
-			alert("Passwords match!");
-			return true;
-		} else {
-			alert("Passwords don't match!");
-			return false;
-		}
-	}
 	$(document).ready(function() {
 		$("#editButton").on("click", function() {
 			makeEditable();
@@ -42,20 +30,9 @@
 		});
 
 		$("#saveChanges").click(function() {
-			matchPasswords();
+			return matchPasswords();
 		});
 	});
-</script>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script type="text/javascript">
-	function matchPasswords() {
-		if ($("#inputPassword").val() === $("#checkPassword").val()) {
-			return true;
-		} else {
-			alert("Passwords don't match!");
-			return false;
-		}
-	}
 </script>
 </head>
 <body>
@@ -69,8 +46,7 @@
 			method="get">
 			<input
 				type="submit"
-				value="Return to landing page"
-				>
+				value="Return to landing page">
 		</form>
 		<button id="editButton">Click to Edit</button>
 		<form
@@ -78,7 +54,8 @@
 			action="#"
 			th:action="@{/updateUser}"
 			th:object="${user}"
-			method="post">
+			method="post"
+			enctype="multipart/form-data">
 			<h2 class="form-heading">Profile</h2>
 			<label
 				for="nickname"
@@ -108,12 +85,11 @@
 				for="avatar"
 				class="">Avatar</label>
 			<input
-				type="text"
-				th:field="*{avatar}"
+				type="file"
+				name="avatar_image"
 				id="avatar"
+				accept="image/*"
 				class="form-control editable"
-				th:placeholder="*{avatar}"
-				required
 				disabled="disabled"
 				readonly="readonly">
 			<label

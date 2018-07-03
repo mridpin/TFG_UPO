@@ -24,9 +24,8 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@Lob
 	@Column(name = "avatar")	
-	private byte[] avatar;
+	private String avatar;
 	@Column(name = "name")
 	private String name;
 	@Column(unique = true, name = "nickname")
@@ -45,11 +44,11 @@ public class User implements Serializable {
 		this.id = id;
 	}
 
-	public byte[] getAvatar() {
+	public String getAvatar() {
 		return this.avatar;
 	}
 
-	public void setAvatar(byte[] avatar) {
+	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
 
