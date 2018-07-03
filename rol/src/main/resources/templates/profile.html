@@ -63,6 +63,15 @@
 		MY PROFILE PAGE: <span th:text="${session.user.name}"></span>
 	</div>
 	<div>
+		<form
+			action="#"
+			th:action="@{/landing}"
+			method="get">
+			<input
+				type="submit"
+				value="Return to landing page"
+				>
+		</form>
 		<button id="editButton">Click to Edit</button>
 		<form
 			class="form"

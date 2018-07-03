@@ -37,6 +37,7 @@ function matchPasswords() {
 			action="#"
 			th:action="@{/register}"
 			th:object="${user}"
+			enctype="multipart/form-data"
 			method="post">
 			<h2 class="form-heading">Register</h2>
 			<label
@@ -48,7 +49,7 @@ function matchPasswords() {
 				id="nickname"
 				class="form-control"
 				placeholder="Nickname"
-				required
+		required
 				autofocus>
 			<label
 				for="name"
@@ -64,11 +65,11 @@ function matchPasswords() {
 				for="avatar"
 				class="">Avatar</label>
 			<input
-				type="text"
+				type="file"
 				th:field="*{avatar}"
 				id="avatar"
+				accept="image/*"
 				class="form-control"
-				placeholder="Avatar"
 				required>
 			<label
 				for="inputPassword"

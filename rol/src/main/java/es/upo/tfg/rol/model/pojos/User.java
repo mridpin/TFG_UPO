@@ -3,6 +3,8 @@ package es.upo.tfg.rol.model.pojos;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.mysql.jdbc.Blob;
+
 /**
  * The persistent class for the user database table.
  * 
@@ -22,8 +24,9 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@Column(name = "avatar")
-	private String avatar;
+	@Lob
+	@Column(name = "avatar")	
+	private byte[] avatar;
 	@Column(name = "name")
 	private String name;
 	@Column(unique = true, name = "nickname")
@@ -42,11 +45,11 @@ public class User implements Serializable {
 		this.id = id;
 	}
 
-	public String getAvatar() {
+	public byte[] getAvatar() {
 		return this.avatar;
 	}
 
-	public void setAvatar(String avatar) {
+	public void setAvatar(byte[] avatar) {
 		this.avatar = avatar;
 	}
 
