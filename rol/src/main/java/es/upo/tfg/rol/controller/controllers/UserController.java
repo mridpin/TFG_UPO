@@ -7,22 +7,32 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Controller
-public class UserController {
+public class UserController implements WebMvcConfigurer {
+
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/landing").setViewName("landing");
+	}
 
 	@Autowired
 	UserService uServ;
@@ -67,8 +77,11 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public String submitRegister(@ModelAttribute User user, HttpSession session,
+	public String submitRegister(@ModelAttribute @Valid User user, BindingResult bindingResult, HttpSession session,
 			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+		if (bindingResult.hasErrors()) {
+			return "register";
+		}
 		String filename = System.currentTimeMillis() + "-" + StringUtils.cleanPath(avatar.getOriginalFilename());
 		Path avatarPath = Paths.get("userImages");
 		try (InputStream inputStream = avatar.getInputStream()) {
@@ -79,11 +92,11 @@ public class UserController {
 		user.setAvatar(filename);
 		uServ.saveUser(user);
 		session.setAttribute("user", user);
-		return "landing";
+		return "redirect:/landing";
 	}
 
 	@PostMapping("/updateUser")
-	public String submitUpdate(@ModelAttribute User user, HttpSession session,
+	public String submitUpdate(@ModelAttribute @Valid User user, HttpSession session,
 			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
 		user.setId(((User) session.getAttribute("user")).getId());
 		if (!"".equals(avatar.getOriginalFilename())) {

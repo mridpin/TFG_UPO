@@ -2,6 +2,8 @@ package es.upo.tfg.rol.model.pojos;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.mysql.jdbc.Blob;
 
@@ -26,10 +28,16 @@ public class User implements Serializable {
 	private Long id;
 	@Column(name = "avatar")	
 	private String avatar;
+	@NotNull
+	@Size(min=2, max=64)
 	@Column(name = "name")
 	private String name;
+	@NotNull
+	@Size(min=2, max=32)
 	@Column(unique = true, name = "nickname")
 	private String nickname;
+	@NotNull
+	@Size(min=5, max=64)
 	@Column(name = "password")
 	private String password;
 
