@@ -27,12 +27,7 @@ import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Controller
-public class UserController implements WebMvcConfigurer {
-
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/landing").setViewName("landing");
-	}
+public class UserController {
 
 	@Autowired
 	UserService uServ;
