@@ -9,6 +9,8 @@ public interface UserService {
 	User findById(Long id);
 
 	User findByLogin(String nickname, String password);
+	
+	User findByNickname(String nickname);
 
 	void saveUser(User user);
 

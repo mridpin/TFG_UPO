@@ -60,7 +60,8 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public String submitLogin(@RequestParam(name = "nickname", required = true, defaultValue = "") String name,
+	public String submitLogin(
+			@RequestParam(name = "nickname", required = true, defaultValue = "") String name,
 			@RequestParam(name = "pass", required = true, defaultValue = "") String pass, HttpSession session) {
 		User user = uServ.findByLogin(name, pass);
 		if (user == null) {
@@ -72,18 +73,29 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public String submitRegister(@ModelAttribute @Valid User user, BindingResult bindingResult, HttpSession session,
+	public String submitRegister(@ModelAttribute @Valid User user,
+			BindingResult bindingResult, HttpSession session,
 			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+		// Check if the nickname is in use
+		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
+		if (nicknameExists) {
+			bindingResult.rejectValue("nickname", "nickname.unavailable", "Nickname is not available");
+		}
+		// Reject used nicknames or bad formats
 		if (bindingResult.hasErrors()) {
 			return "register";
 		}
-		String filename = System.currentTimeMillis() + "-" + StringUtils.cleanPath(avatar.getOriginalFilename());
+		// Store user image in file system and save its path and name
+		String filename = System.currentTimeMillis() + "-"
+				+ StringUtils.cleanPath(avatar.getOriginalFilename());
 		Path avatarPath = Paths.get("userImages");
 		try (InputStream inputStream = avatar.getInputStream()) {
-			Files.copy(inputStream, avatarPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(inputStream, avatarPath.resolve(filename),
+					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		// Save user to database and session
 		user.setAvatar(filename);
 		uServ.saveUser(user);
 		session.setAttribute("user", user);
@@ -91,14 +103,23 @@ public class UserController {
 	}
 
 	@PostMapping("/updateUser")
-	public String submitUpdate(@ModelAttribute @Valid User user, HttpSession session,
+	public String submitUpdate(@ModelAttribute @Valid User user,
+			BindingResult bindingResult, HttpSession session,
 			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
+		if (nicknameExists) {
+			bindingResult.rejectValue("nickname", "nickname.unavailable", "Nickname is not available");
+		}
+		if (bindingResult.hasErrors()) {
+			return "register";
+		}
 		user.setId(((User) session.getAttribute("user")).getId());
 		if (!"".equals(avatar.getOriginalFilename())) {
 			String filename = ((User) session.getAttribute("user")).getAvatar();
 			Path avatarPath = Paths.get("userImages");
 			try (InputStream inputStream = avatar.getInputStream()) {
-				Files.copy(inputStream, avatarPath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(inputStream, avatarPath.resolve(filename),
+						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

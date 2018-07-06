@@ -69,4 +69,13 @@ public class UserServiceImpl implements UserService {
 		}
 		return null;
 	}
+
+	@Override
+	public User findByNickname(String nickname) {
+		Optional<User> user = dao.findByNickname(nickname);
+		if (user.isPresent()) {
+			return user.get();
+		}
+		return null;		
+	}
 }
