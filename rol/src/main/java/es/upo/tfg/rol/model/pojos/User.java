@@ -5,8 +5,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.mysql.jdbc.Blob;
-
 /**
  * The persistent class for the user database table.
  * 

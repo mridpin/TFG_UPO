@@ -7,8 +7,9 @@
 <body>
 	<div>
 		<div>
-			HELLO: <span th:text="${session.user.name}"></span>
-			<img width="200px" th:src="@{/} + ${session.user.avatar}">
+			HELLO: <span th:text="${session.user.name}"></span> <img
+				width="200px"
+				th:src="@{/} + ${session.user.avatar}">
 		</div>
 		<div>
 			<form
@@ -28,6 +29,16 @@
 					value="Logout">
 			</form>
 		</div>
+	</div>
+	<div>
+		<form
+			action="#"
+			th:action="@{/create_game}"
+			method="get">
+			<input
+				type="submit"
+				value="Crear Partida">
+		</form>
 	</div>
 </body>
 </html>
