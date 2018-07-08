@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.upo.tfg.rol.model.dao.UserDAO;
+import es.upo.tfg.rol.model.dao.UserRepository;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Service("userService")
@@ -14,7 +14,7 @@ import es.upo.tfg.rol.model.pojos.User;
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	private UserDAO dao;
+	private UserRepository dao;
 
 	/*
 	 * (non-Javadoc)

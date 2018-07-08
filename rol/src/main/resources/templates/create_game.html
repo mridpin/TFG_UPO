@@ -12,39 +12,46 @@
 <body>
 	<article>
 		<form
+			action="#"
+			th:action="@{/landing}"
+			method="get">
+			<input
+				type="submit"
+				value="Volver a la p&aacute;gina principal">
+		</form>
+		<form
 			class="form"
 			action="#"
 			th:action="@{/submitGame}"
-			th:object="${game}"
 			method="post">
 			<label
 				for="name"
 				class="">Nombre</label>
 			<input
 				type="text"
-				th:field="*{name}"
 				id="name"
+				name="name"
 				class="form-control"
 				placeholder="Nombre"
 				required
 				autofocus>
-			<span
-				th:if="${#fields.hasErrors('name')}"
-				th:errors="*{name}">Errores en nombre</span>
+			<!-- 			<span -->
+			<!-- 				th:if="${#fields.hasErrors('name')}" -->
+			<!-- 				th:errors="*{name}">Errores en nombre</span> -->
 			<label
 				for="scenario"
 				class="">Escenario</label>
 			<input
 				type="text"
-				th:field="*{scenario}"
 				id="scenario"
+				name="scenario"
 				class="form-control"
 				placeholder="Escenario"
 				required
 				autofocus>
-			<span
-				th:if="${#fields.hasErrors('scenario')}"
-				th:errors="*{scenario}">Errores en el escenario</span>
+			<!-- 			<span -->
+			<!-- 				th:if="${#fields.hasErrors('scenario')}" -->
+			<!-- 				th:errors="*{scenario}">Errores en el escenario</span> -->
 			<input
 				class="btn btn-lg btn-primary btn-block"
 				type="submit"
@@ -54,6 +61,25 @@
 			<tr>
 				<th>Jugador</th>
 				<th>Pa&iacute;s</th>
+				<th></th>
+			</tr>
+			<tr th:each="country, countryStat : ${session.countries}">
+				<td th:text="${country.player.nickname}"></td>
+				<td th:text="${country.name}"></td>
+				<td>
+					<form
+						action="#"
+						th:action="@{/removePlayer}"
+						method="post">
+						<input
+							type="hidden"
+							name="countryIndex"
+							th:value="${countryStat.index}">
+						<input
+							type="submit"
+							value="Quitar jugador">
+					</form>
+				</td>
 			</tr>
 		</table>
 		<form
@@ -68,6 +94,7 @@
 			<input
 				type="text"
 				id="player_nickname"
+				name="player_nickname"
 				class="form-control"
 				placeholder="Apodo..."
 				required
@@ -78,13 +105,14 @@
 			<input
 				type="file"
 				id="country_data"
+				name="country_data"
 				class="form-control"
 				accept=".csv"
 				required>
 			<input
 				class="btn btn-lg btn-primary btn-block"
 				type="submit"
-				value="Crear Partida">
+				value="A&ntilde;adir Jugador">
 		</form>
 	</article>
 </body>

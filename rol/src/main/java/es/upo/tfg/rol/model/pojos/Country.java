@@ -1,6 +1,8 @@
 package es.upo.tfg.rol.model.pojos;
 
 import java.io.Serializable;
+import java.util.Map;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -35,10 +37,19 @@ public class Country implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "player")
 	private User player;
-	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "game")
 	private Game game;
+
+	/*
+	 * Two levels of nesting:
+	 * Outer map is <Year, Map>
+	 * Inner map is <Attribute, Value>
+	 * It's basically a matrix but we access it with keys instead of indices 
+	 * @Transient so its not persistent, as all is stored in the csv file
+	 */
+	@Transient
+	private Map<String, Map<String, Double>> attributes;
 
 	public Country() {
 	}
@@ -91,6 +102,14 @@ public class Country implements Serializable {
 
 	public void setGame(Game game) {
 		this.game = game;
+	}
+
+	public Map<String, Map<String, Double>> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Map<String, Double>> attributes) {
+		this.attributes = attributes;
 	}
 
 	@Override
