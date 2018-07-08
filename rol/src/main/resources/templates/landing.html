@@ -5,13 +5,15 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<div>
-		<div>
-			HELLO: <span th:text="${session.user.name}"></span> <img
+	<article>
+		<nav>
+			<h4>
+				HELLO: <span th:text="${session.user.name}"></span>
+			</h4>
+			<img
 				width="200px"
 				th:src="@{/} + ${session.user.avatar}">
-		</div>
-		<div>
+
 			<form
 				action="#"
 				th:action="@{/profile}"
@@ -28,17 +30,63 @@
 					type="submit"
 					value="Logout">
 			</form>
-		</div>
-	</div>
-	<div>
-		<form
-			action="#"
-			th:action="@{/create_game}"
-			method="get">
-			<input
-				type="submit"
-				value="Crear Partida">
-		</form>
-	</div>
+		</nav>
+		<section>
+			<form
+				action="#"
+				th:action="@{/create_game}"
+				method="get">
+				<input
+					type="submit"
+					value="Crear Partida">
+			</form>
+		</section>
+		<section>
+			<h3>Partidas en curso</h3>
+			<table border="2">
+				<tr>
+					<th>Nombre</th>
+					<th>Escenario</th>
+					<th>Fecha apertura</th>
+					<th>Game Master</th>
+					<th>Tu rol</th>
+					<th></th>
+				<tr>
+				<tr th:each="game, gameStat : ${games}">
+					<td th:text="${game.name}"></td>
+					<td th:text="${game.scenario}"></td>
+					<td th:text="${game.startDate}"></td>
+					<td th:text="${game.master.nickname}"></td>
+					<td>Not supported yet</td>
+					<td>
+						<form
+							action="#"
+							th:action="@{/openGame}"
+							method="get">
+							<input
+								type="hidden"
+								name="gameIndex"
+								th:value="${gameStat.index}">
+							<input
+								type="submit"
+								value="Abrir partida">
+						</form>
+					</td>
+				</tr>
+			</table>
+		</section>
+		<section>
+			<h3>Partidas jugadas</h3>
+			<table border="2">
+				<tr>
+					<th>Nombre</th>
+					<th>Fecha apertura</th>
+					<th>Fecha cierre</th>
+					<th>Game Master</th>
+					<th>Tu rol</th>
+				<tr>
+			</table>
+		</section>
+	</article>
 </body>
 </html>

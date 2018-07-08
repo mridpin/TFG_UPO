@@ -8,16 +8,22 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.upo.tfg.rol.model.dao.CountryRepository;
+import es.upo.tfg.rol.model.dao.UserRepository;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Service("countryService")
 @Transactional
 public class CountryServiceImpl implements CountryService {
+	
+	@Autowired
+	private CountryRepository countryRep;
 
 	@Override
 	public Country assembleCountry(User player, MultipartFile data) {
@@ -54,6 +60,11 @@ public class CountryServiceImpl implements CountryService {
 		}
 		country.setAttributes(attributes);
 		return country;
+	}
+
+	@Override
+	public void saveCountry(Country country) {
+		countryRep.save(country);		
 	}
 
 }

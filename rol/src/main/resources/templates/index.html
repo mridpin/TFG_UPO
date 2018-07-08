@@ -22,7 +22,7 @@
 		<h1>WELCOME TO MY APP</h1>
 	</header>
 	<article class="container">
-		<div th:text="${param.fail}">Login Failed: </div>
+		<div th:text="${param.fail}">Login Failed:</div>
 		<form
 			class="form-signin"
 			action="#"
@@ -31,22 +31,26 @@
 			<h2 class="form-signin-heading">Log in required</h2>
 			<label
 				for="nickname"
-				class="">Nickname</label> <input
+				class="">Nickname</label>
+			<input
 				type="text"
 				name="nickname"
 				id="nickname"
 				class="form-control"
 				placeholder="Nickname"
 				required
-				autofocus> <label
+				autofocus>
+			<label
 				for="inputPassword"
-				class="">Password</label> <input
+				class="">Password</label>
+			<input
 				type="password"
 				name="pass"
 				id="inputPassword"
 				class="form-control"
 				placeholder="Password"
-				required> <input
+				required>
+			<input
 				class="btn btn-lg btn-primary btn-block"
 				type="submit"
 				value="Log in">

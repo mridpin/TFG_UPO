@@ -8,5 +8,7 @@ import es.upo.tfg.rol.model.pojos.User;
 public interface CountryService {
 
 	Country assembleCountry(User player, MultipartFile data);
+	
+	void saveCountry(Country country);
 
 }

@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
+import es.upo.tfg.rol.model.pojos.Game;
 
 @Controller
 public class UserController {
@@ -48,10 +51,10 @@ public class UserController {
 		return "profile";
 	}
 
-	@GetMapping("/landing")
-	public String landing() {
-		return "landing";
-	}
+//	@GetMapping("/landing")
+//	public String landing(HttpSession session, Model model) {
+//		return "landing";
+//	}
 
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
@@ -68,7 +71,7 @@ public class UserController {
 			return "index";
 		} else {
 			session.setAttribute("user", user);
-			return "landing";
+			return "redirect:/landing";
 		}
 	}
 
@@ -129,6 +132,6 @@ public class UserController {
 		}
 		uServ.saveUser(user);
 		session.setAttribute("user", user);
-		return "landing";
+		return "redirect:/landing";
 	}
 }
