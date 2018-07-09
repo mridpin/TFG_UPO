@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.upo.tfg.rol.model.dao.GameRepository;
-import es.upo.tfg.rol.model.dao.UserRepository;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.comparators.GameByDateComparator;
@@ -32,9 +31,15 @@ public class GameServiceImpl implements GameService {
 
 	@Override
 	public List<Game> findOpenGames(User user) {
-		// TODO : RETOMAR AQUI: COGER LAS PARTIDAS ABIERTAS DE UN JUGADOR
-		List<Game> masteredGames = gameRep.findByMaster(user);	
-		return masteredGames;
+		// TODO: optimize by combining both queries into one?
+		List<Game> masteredOpenGames = gameRep.findOpenByMaster(user);
+		List<Game> playedOpenGames = gameRep.findOpenByPlayer(user);
+		List<Game> gamesParticipated = new ArrayList<>();
+		gamesParticipated.addAll(masteredOpenGames);
+		gamesParticipated.addAll(playedOpenGames);
+		Comparator<Game> c = new GameByDateComparator();
+		Collections.sort(gamesParticipated, c);
+		return gamesParticipated;
 	}
 
 
@@ -54,8 +59,8 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public List<Game> findClosedGames(User user) {
 		// TODO: optimize by combining both queries into one?
-		List<Game> masteredClosedGames = gameRep.findByMaster(user);
-		List<Game> playedClosedGames = gameRep.findByPlayer(user);
+		List<Game> masteredClosedGames = gameRep.findClosedByMaster(user);
+		List<Game> playedClosedGames = gameRep.findClosedByPlayer(user);
 		List<Game> gamesParticipated = new ArrayList<>();
 		gamesParticipated.addAll(masteredClosedGames);
 		gamesParticipated.addAll(playedClosedGames);

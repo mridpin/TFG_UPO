@@ -52,27 +52,27 @@
 					<th>Tu rol</th>
 					<th></th>
 				<tr>
-<!-- 				<tr th:each="game, gameStat : ${games}"> -->
-<!-- 					<td th:text="${game.name}"></td> -->
-<!-- 					<td th:text="${game.scenario}"></td> -->
-<!-- 					<td th:text="${game.startDate}"></td> -->
-<!-- 					<td th:text="${game.master.nickname}"></td> -->
-<!-- 					<td>Not supported yet</td> -->
-<!-- 					<td> -->
-<!-- 						<form -->
-<!-- 							action="#" -->
-<!-- 							th:action="@{/openGame}" -->
-<!-- 							method="post"> -->
-<!-- 							<input -->
-<!-- 								type="hidden" -->
-<!-- 								name="gameIndex" -->
-<!-- 								th:value="${game.id}"> -->
-<!-- 							<input -->
-<!-- 								type="submit" -->
-<!-- 								value="Abrir partida"> -->
-<!-- 						</form> -->
-<!-- 					</td> -->
-<!-- 				</tr> -->
+				<tr th:each="game, gameStat : ${openGames}">
+					<td th:text="${game.name}"></td>
+					<td th:text="${game.scenario}"></td>
+					<td th:text="${game.startDate}"></td>
+					<td th:text="${game.master.nickname}"></td>
+					<td th:text="${game.master == session.user} ? 'GM' : 'J'"></td>
+					<td>
+						<form
+							action="#"
+							th:action="@{/openGame}"
+							method="post">
+							<input
+								type="hidden"
+								name="gameIndex"
+								th:value="${game.id}">
+							<input
+								type="submit"
+								value="Abrir partida">
+						</form>
+					</td>
+				</tr>
 			</table>
 		</section>
 		<section>
@@ -80,6 +80,7 @@
 			<table border="2">
 				<tr>
 					<th>Nombre</th>
+					<th>Escenario</th>
 					<th>Fecha apertura</th>
 					<th>Fecha cierre</th>
 					<th>Game Master</th>
@@ -89,8 +90,9 @@
 					<td th:text="${game.name}"></td>
 					<td th:text="${game.scenario}"></td>
 					<td th:text="${game.startDate}"></td>
+					<td th:text="${game.endDate}"></td>
 					<td th:text="${game.master.nickname}"></td>
-					<td th:text="${game.master == session.user} ? 'M' : 'J'"></td>
+					<td th:text="${game.master == session.user} ? 'GM' : 'J'"></td>
 					<td>
 						<form
 							action="#"

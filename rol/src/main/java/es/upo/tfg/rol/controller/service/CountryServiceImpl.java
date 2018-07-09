@@ -1,7 +1,6 @@
 package es.upo.tfg.rol.controller.service;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.upo.tfg.rol.model.dao.CountryRepository;
-import es.upo.tfg.rol.model.dao.UserRepository;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.User;

@@ -2,6 +2,11 @@ package es.upo.tfg.rol.exceptions;
 
 public class NotAuthorized extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public NotAuthorized() {
 		// TODO Auto-generated constructor stub
 	}

@@ -194,42 +194,6 @@
 
 			</ul>
 		</section>
-		<section th:if="${game.endDate == null}">
-			<h3>Crear enfrentamientos</h3>
-			<ol>
-				<li>Aqu&iacute; va un men&uacute; para crear coaliciones para empezar
-					guerras</li>
-				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las coalici&oacute;n
-					creada</li>
-				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las tiradas</li>
-				<li>Y un bot&oacute;n para dar por terminadas las guerras antes de la
-					tercera tirada</li>
-			</ol>
-		</section>
-		<section th:if="${game.endDate == null}">
-			<h3>Cerrar partida</h3>
-			<form
-				class="form"
-				action="#"
-				th:action="@{/closeGame}"
-				method="post">
-				<label
-					for="password"
-					class="">Contrase&ntilde;a del Game Master:</label>
-				<input
-					type="password"
-					name="pass"
-					id="password"
-					class="form-control"
-					placeholder="Password..."
-					required>
-				<input
-					class="btn btn-lg btn-primary btn-block"
-					type="submit"
-					value="Autorizar"
-					onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
-			</form>
-		</section>
 	</article>
 </body>
 </html>

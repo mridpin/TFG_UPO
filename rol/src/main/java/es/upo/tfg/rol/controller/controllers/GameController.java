@@ -48,8 +48,6 @@ public class GameController {
 	@PostMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
 			@RequestParam(name = "gameIndex", required = true) String stat) {
-		// TODO: RETOMAR AQUÍ: Hay que identificar qué partida se ha abierto para
-		// consultar sus paises
 		User user = (User) session.getAttribute("user");
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
@@ -61,15 +59,17 @@ public class GameController {
 				throw new NotAuthorized("Recurso no encontrado");
 			}
 			User master = game.getMaster();
-			boolean access = Objects.equals(user, master);
-			if (!access) {
-				throw new NotAuthorized("Recurso no encontrado");
-			}
 			// Add relevant info to the model
 			model.addAttribute("game", game);
 			session.setAttribute("game", game);
 			List<Country> countries = cServ.findCountries(game);
 			model.addAttribute("countries", countries);
+			boolean access = Objects.equals(user, master);
+			if (!access) {
+				return "game_player";
+			} else {
+				return "game_main";
+			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return Access.reject();
@@ -77,15 +77,14 @@ public class GameController {
 			e.printStackTrace();
 			return Access.reject();
 		}
-		return "game_main";
 	}
 
 	@GetMapping("/landing")
 	public String landing(HttpSession session, Model model) {
 		User user = (User) session.getAttribute("user");
-		//List<Game> playedGames = gServ.findOpenGames(user);
+		List<Game> playedGames = gServ.findOpenGames(user);
 		List<Game> closedGames = gServ.findClosedGames(user);
-		//model.addAttribute("games", playedGames);
+		model.addAttribute("openGames", playedGames);
 		model.addAttribute("closedGames", closedGames);
 		return "landing";
 	}

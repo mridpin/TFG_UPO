@@ -9,14 +9,64 @@ import org.springframework.data.repository.query.Param;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.User;
 
-public interface GameRepository extends CrudRepository<Game, Long>  {
-	
-	public List<Game> findByMaster(User user);
+public interface GameRepository extends CrudRepository<Game, Long> {
 
-	@Query(value = "SELECT Game FROM Country c " + 
-			"JOIN c.player u " + 
-			"JOIN c.game g " +
-			"WHERE u=user AND " +
-			"g.endDate is not null")
+	/**
+	 * Finds all the games where the user participated as a game master
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	public List<Game> findByMaster(User user);
+	
+	/**
+	 * Finds all the games still open where the user participated as a game master
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	@Query(value = "FROM Game g where g.endDate is null and g.master = :user")
+	public List<Game> findOpenByMaster(@Param("user") User user);
+	
+	/**
+	 * Finds all the games already closed where the user participated as a game master
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	@Query(value = "FROM Game g where g.endDate is not null and g.master = :user")
+	public List<Game> findClosedByMaster(@Param("user") User user);
+
+	/**
+	 * Finds all the games where the user participated as a player
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	@Query(value = "select g FROM Country c join c.player u join c.game g where u = :user")
 	public List<Game> findByPlayer(@Param("user") User user);
+	
+	/**
+	 * Finds all the games still open where the user participated as a player
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	@Query(value = "select g FROM Country c join c.player u join c.game g where g.endDate is null and u = :user")
+	public List<Game> findOpenByPlayer(@Param("user") User user);
+	
+	/**
+	 * Finds all the games already closed where the user participated as a player
+	 * 
+	 * @param user
+	 *            the user in question
+	 * @return list of games
+	 */
+	@Query(value = "select g FROM Country c join c.player u join c.game g where g.endDate is not null and u = :user")
+	public List<Game> findClosedByPlayer(@Param("user") User user);
 }
