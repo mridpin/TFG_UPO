@@ -40,7 +40,7 @@ public class Game implements Serializable {
 	@Column(name = "end_date")
 	private Date endDate;
 	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "master")
 	private User master;
 

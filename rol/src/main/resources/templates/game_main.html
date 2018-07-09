@@ -22,38 +22,214 @@
 		</form>
 	</nav>
 	<article>
-		<h2>GAME NAME - GAME MASTER</h2>
-		<table border="2">
-			<tr>
-				<th>Jugador</th>
-				<th>Pa&iacute;s</th>
-			</tr>
-			<tr th:each="country, countryStat : ${countries}">
-				<td th:text="${country.player.nickname}"></td>
-				<td th:text="${country.name}"></td>
-			</tr>
-		</table>
-		<form
-			class="form"
-			action="#"
-			th:action="@{/closeGame}"
-			method="get">
-			<label
-				for="password"
-				class="">Contrase&ntilde;a del Game Master:</label>
-			<input
-				type="password"
-				name="pass"
-				id="password"
-				class="form-control"
-				placeholder="Password..."
-				required>
-			<input
-				class="btn btn-lg btn-primary btn-block"
-				type="submit"
-				value="Autorizar"
-				onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
-		</form>
+		<h2><span th:text="${game.name}"></span> - <span th:text="${game.master.nickname}"></span></h2>
+		<section>
+			<h3>Participantes</h3>
+			<table border="2">
+				<tr>
+					<th>Jugador</th>
+					<th>Pa&iacute;s</th>
+				</tr>
+				<tr th:each="country, countryStat : ${countries}">
+					<td th:text="${country.player.nickname}"></td>
+					<td th:text="${country.name}"></td>
+				</tr>
+			</table>
+		</section>
+		<section>
+			<h3>Enfrentamientos [ejemplo visual, l&oacute;gica no
+				implementada a&uacute;n]</h3>
+			<ul>
+				<li><h4>1860</h4></li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong><u>Coalici&oacute;n Anglo-Francesa</u></strong>
+							vs <strong>Coalici&oacute;n Rusa</strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+								<li style="list-style-type: none;">
+									<table border="1">
+										<tr>
+											<td>Reino Unido</td>
+											<td rowspan="3">vs</td>
+											<td rowspan="2">Rusia</td>
+										</tr>
+										<tr>
+											<td>Francia</td>
+										</tr>
+										<tr>
+											<td>30 pts</td>
+											<td>25 pts</td>
+										</tr>
+									</table>
+								</li>
+								<li>Batalla 2</li>
+								<li style="list-style-type: none;">
+									<table border="1">
+										<tr>
+											<td>Reino Unido</td>
+											<td rowspan="3">vs</td>
+											<td>Rusia</td>
+										</tr>
+										<tr>
+											<td>Francia</td>
+											<td>Austria-Hungr&iacute;a</td>
+										</tr>
+										<tr>
+											<td>32 pts</td>
+											<td>28 pts</td>
+										</tr>
+									</table>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><h4>1870</h4></li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong>Coalici&oacute;n Francesa</strong> vs <strong><u>Federaci&oacute;n
+									de Alemania del Norte</u></strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+								<li style="list-style-type: none;">
+									<table border="1">
+										<tr>
+											<td>Francia</td>
+											<td rowspan="2">vs</td>
+											<td>Alemania</td>
+										</tr>
+										<tr>
+											<td>17 pts</td>
+											<td>16 pts</td>
+										</tr>
+									</table>
+								</li>
+								<li>Batalla 2</li>
+								<li style="list-style-type: none;">
+									<table border="1">
+										<tr>
+											<td>Francia</td>
+											<td rowspan="2">vs</td>
+											<td>Alemania</td>
+										</tr>
+										<tr>
+											<td>15 pts</td>
+											<td>14 pts</td>
+										</tr>
+									</table>
+								</li>
+								<li>Batalla 3</li>
+								<li style="list-style-type: none;">
+									<table border="1">
+										<tr>
+											<td>Francia</td>
+											<td rowspan="2">vs</td>
+											<td>Alemania</td>
+										</tr>
+										<tr>
+											<td>17 pts</td>
+											<td>20 pts</td>
+										</tr>
+									</table>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><h4>1880</h4></li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong>Coalici&oacute;n A</strong> vs <strong><u>Federaci&oacute;n
+									B</u></strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+
+								<li>Batalla 2</li>
+
+								<li>Batalla 3</li>
+
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong>Coalici&oacute;n A</strong> vs <strong>Coalici&oacute;n
+								C</strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong>Coalici&oacute;n n ...</strong> vs <strong>Coalici&oacute;n
+								m ...</strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+								<li>Batalla n ...</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><h4>1890</h4></li>
+				<li style="list-style-type: none;">
+					<ul>
+						<li><strong>[...m&aacute;s guerras aqu&iacute;...]</strong></li>
+						<li style="list-style-type: none;">
+							<ul>
+								<li>Batalla 1</li>
+								<li>Batalla n ...</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+
+			</ul>
+		</section>
+		<section>
+			<h3>Crear enfrentamientos</h3>
+			<ol>
+				<li>Aqu&iacute; va un men&uacute; para crear coaliciones para empezar
+					guerras</li>
+				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las coalici&oacute;n
+					creada</li>
+				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las tiradas</li>
+				<li>Y un bot&oacute;n para dar por terminadas las guerras antes de la
+					tercera tirada</li>
+			</ol>
+		</section>
+		<section th:if="${game.endDate == null}">
+			<h3>Cerrar partida</h3>
+			<form
+				class="form"
+				action="#"
+				th:action="@{/closeGame}"
+				method="post">
+				<label
+					for="password"
+					class="">Contrase&ntilde;a del Game Master:</label>
+				<input
+					type="password"
+					name="pass"
+					id="password"
+					class="form-control"
+					placeholder="Password..."
+					required>
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="Autorizar"
+					onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
+			</form>
+		</section>
 	</article>
 </body>
 </html>

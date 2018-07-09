@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.upo.tfg.rol.model.dao.CountryRepository;
 import es.upo.tfg.rol.model.dao.UserRepository;
 import es.upo.tfg.rol.model.pojos.Country;
+import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Service("countryService")
@@ -65,6 +67,11 @@ public class CountryServiceImpl implements CountryService {
 	@Override
 	public void saveCountry(Country country) {
 		countryRep.save(country);		
+	}
+
+	@Override
+	public List<Country> findCountries(Game game) {		
+		return countryRep.findByGame(game);
 	}
 
 }

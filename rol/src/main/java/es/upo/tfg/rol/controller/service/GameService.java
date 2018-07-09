@@ -9,6 +9,12 @@ public interface GameService {
 
 	void saveGame(Game game);
 
-	List<Game> findMasteredGames(User user);
+	List<Game> findOpenGames(User user);
+	
+	Game findById(Long id);
+
+	void closeGame(Game game);
+
+	List<Game> findClosedGames(User user);
 
 }

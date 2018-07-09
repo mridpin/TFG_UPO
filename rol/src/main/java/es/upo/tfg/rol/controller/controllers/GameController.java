@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
 import es.upo.tfg.rol.controller.service.UserService;
+import es.upo.tfg.rol.exceptions.NotAuthorized;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.User;
@@ -43,19 +45,48 @@ public class GameController {
 		return "create_game";
 	}
 
-	@GetMapping("/openGame")
+	@PostMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
 			@RequestParam(name = "gameIndex", required = true) String stat) {
-		// TODO: RETOMAR AQUÍ: Hay que identificar qué partida se ha abierto para consultar sus paises
-		//List<Country> countries = gServ.findCountries();
+		// TODO: RETOMAR AQUÍ: Hay que identificar qué partida se ha abierto para
+		// consultar sus paises
+		User user = (User) session.getAttribute("user");
+		try {
+			// Prevents users from spying or modifying other user's games by guessing
+			// values in the url, or F12 and changing the html. If they do, they'll be
+			// redirected to an error page
+			Long id = Long.parseLong(stat); // throws NumberFormatException
+			Game game = gServ.findById(id);
+			if (game == null) {
+				throw new NotAuthorized("Recurso no encontrado");
+			}
+			User master = game.getMaster();
+			boolean access = Objects.equals(user, master);
+			if (!access) {
+				throw new NotAuthorized("Recurso no encontrado");
+			}
+			// Add relevant info to the model
+			model.addAttribute("game", game);
+			session.setAttribute("game", game);
+			List<Country> countries = cServ.findCountries(game);
+			model.addAttribute("countries", countries);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return Access.reject();
+		} catch (NotAuthorized e) {
+			e.printStackTrace();
+			return Access.reject();
+		}
 		return "game_main";
 	}
 
 	@GetMapping("/landing")
 	public String landing(HttpSession session, Model model) {
 		User user = (User) session.getAttribute("user");
-		List<Game> playedGames = gServ.findMasteredGames(user);
-		model.addAttribute("games", playedGames);
+		//List<Game> playedGames = gServ.findOpenGames(user);
+		List<Game> closedGames = gServ.findClosedGames(user);
+		//model.addAttribute("games", playedGames);
+		model.addAttribute("closedGames", closedGames);
 		return "landing";
 	}
 
@@ -169,7 +200,16 @@ public class GameController {
 	}
 
 	@PostMapping("/closeGame")
-	public String closeGame() {
-		return "create_game";
+	public String closeGame(@RequestParam(name = "pass", required = true) String pass,
+			HttpSession session) {
+		// TODO: Show error message if incorrect password
+		User user = (User) session.getAttribute("user");
+		if (Objects.equals(pass, user.getPassword())) {
+			Game game = (Game) session.getAttribute("game");
+			gServ.closeGame(game);
+			session.removeAttribute("game");
+			return "redirect:/landing";
+		}
+		return "game_main";
 	}
 }

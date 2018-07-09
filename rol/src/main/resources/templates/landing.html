@@ -52,27 +52,27 @@
 					<th>Tu rol</th>
 					<th></th>
 				<tr>
-				<tr th:each="game, gameStat : ${games}">
-					<td th:text="${game.name}"></td>
-					<td th:text="${game.scenario}"></td>
-					<td th:text="${game.startDate}"></td>
-					<td th:text="${game.master.nickname}"></td>
-					<td>Not supported yet</td>
-					<td>
-						<form
-							action="#"
-							th:action="@{/openGame}"
-							method="get">
-							<input
-								type="hidden"
-								name="gameIndex"
-								th:value="${gameStat.index}">
-							<input
-								type="submit"
-								value="Abrir partida">
-						</form>
-					</td>
-				</tr>
+<!-- 				<tr th:each="game, gameStat : ${games}"> -->
+<!-- 					<td th:text="${game.name}"></td> -->
+<!-- 					<td th:text="${game.scenario}"></td> -->
+<!-- 					<td th:text="${game.startDate}"></td> -->
+<!-- 					<td th:text="${game.master.nickname}"></td> -->
+<!-- 					<td>Not supported yet</td> -->
+<!-- 					<td> -->
+<!-- 						<form -->
+<!-- 							action="#" -->
+<!-- 							th:action="@{/openGame}" -->
+<!-- 							method="post"> -->
+<!-- 							<input -->
+<!-- 								type="hidden" -->
+<!-- 								name="gameIndex" -->
+<!-- 								th:value="${game.id}"> -->
+<!-- 							<input -->
+<!-- 								type="submit" -->
+<!-- 								value="Abrir partida"> -->
+<!-- 						</form> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
 			</table>
 		</section>
 		<section>
@@ -85,6 +85,27 @@
 					<th>Game Master</th>
 					<th>Tu rol</th>
 				<tr>
+				<tr th:each="game, gameStat : ${closedGames}">
+					<td th:text="${game.name}"></td>
+					<td th:text="${game.scenario}"></td>
+					<td th:text="${game.startDate}"></td>
+					<td th:text="${game.master.nickname}"></td>
+					<td th:text="${game.master == session.user} ? 'M' : 'J'"></td>
+					<td>
+						<form
+							action="#"
+							th:action="@{/openGame}"
+							method="post">
+							<input
+								type="hidden"
+								name="gameIndex"
+								th:value="${game.id}">
+							<input
+								type="submit"
+								value="Ver partida">
+						</form>
+					</td>
+				</tr>
 			</table>
 		</section>
 	</article>
