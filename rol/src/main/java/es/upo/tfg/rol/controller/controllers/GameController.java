@@ -195,7 +195,7 @@ public class GameController {
 			}
 			i++;
 		}
-		return "game_main";
+		return "redirect:/landing";
 	}
 
 	@PostMapping("/closeGame")

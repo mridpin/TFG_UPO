@@ -66,8 +66,8 @@
 				<th></th>
 			</tr>
 			<tr th:each="country, countryStat : ${session.countries}">
-				<td th:text="${country.player.nickname}"></td>
-				<td th:text="${country.name}"></td>
+				<td th:text="${country?.player?.nickname}"></td>
+				<td th:text="${country?.name}"></td>
 				<td>
 					<form
 						action="#"
