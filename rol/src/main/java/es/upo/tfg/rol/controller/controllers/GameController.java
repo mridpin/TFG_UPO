@@ -130,22 +130,25 @@ public class GameController {
 		// possible
 		// Assemble country with data from file
 		User player = uServ.findByNickname(nickname);
-		Country country = cServ.assembleCountry(player, data);
-		List<Country> countries = (List<Country>) session.getAttribute("countries");
-		List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
-		// Create lists in session if they dont exist. if they do, store the data there
-		if (countries == null) {
-			countries = new ArrayList<>();
-			countries.add(country);
-			files = new ArrayList<>();
-			files.add(data);
-		} else {
-			countries.add(country);
-			files.add(data);
+		if (player != null) { // TODO: Mostrar mensaje de error aqui 
+			Country country = cServ.assembleCountry(player, data);
+			List<Country> countries = (List<Country>) session.getAttribute("countries");
+			List<MultipartFile> files = (List<MultipartFile>) session
+					.getAttribute("files");
+			// Create lists in session if they dont exist. if they do, store the data
+			// there
+			if (countries == null) {
+				countries = new ArrayList<>();
+				countries.add(country);
+				files = new ArrayList<>();
+				files.add(data);
+			} else {
+				countries.add(country);
+				files.add(data);
+			}
+			session.setAttribute("countries", countries);
+			session.setAttribute("files", files);
 		}
-		session.setAttribute("countries", countries);
-		session.setAttribute("files", files);
-
 		return "create_game";
 	}
 

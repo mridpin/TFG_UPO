@@ -23,7 +23,7 @@
 </script>
 <body>
 	<header class="container">
-		<h1>WELCOME TO MY APP</h1>
+		<h1>BIENVENIDO A "APP"</h1>
 	</header>
 	<article class="container">
 		<form
@@ -33,10 +33,10 @@
 			th:object="${user}"
 			enctype="multipart/form-data"
 			method="post">
-			<h2 class="form-heading">Register</h2>
+			<h2 class="form-heading">Registro</h2>
 			<label
 				for="nickname"
-				class="">Nickname</label>
+				class="">Apodo</label>
 			<input
 				type="text"
 				th:field="*{nickname}"
@@ -48,7 +48,7 @@
 				<span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">Nickname error</span>
 			<label
 				for="name"
-				class="">Name</label>
+				class="">Nombre</label>
 			<input
 				type="text"
 				th:field="*{name}"
@@ -68,7 +68,7 @@
 				class="form-control">
 			<label
 				for="inputPassword"
-				class="">Password</label>
+				class="">Contrase&ntilde;a</label>
 				<span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</span>
 			<input
 				type="password"
@@ -79,7 +79,7 @@
 				required>
 			<label
 				for="checkPassword"
-				class="">Retype password</label>
+				class="">Repite contrase&ntilde;a</label>
 			<input
 				type="password"
 				name="checkPassword"
@@ -90,18 +90,18 @@
 			<input
 				class="btn btn-lg btn-primary btn-block"
 				type="submit"
-				value="Sign up"
+				value="Registrarse"
 				onclick="return matchPasswords()">
 		</form>
 		<section class="container form">
-			<h3>Already have an account?</h3>
+			<h3>Ya tienes una cuenta?</h3>
 			<form
 				th:action="@{/}"
 				method="get">
 				<input
 					class="btn btn-lg btn-primary btn-block"
 					type="submit"
-					value="Sign in">
+					value="Log in">
 			</form>
 		</section>
 	</article>

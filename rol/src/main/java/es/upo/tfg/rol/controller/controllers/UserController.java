@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -51,10 +52,10 @@ public class UserController {
 		return "profile";
 	}
 
-//	@GetMapping("/landing")
-//	public String landing(HttpSession session, Model model) {
-//		return "landing";
-//	}
+	// @GetMapping("/landing")
+	// public String landing(HttpSession session, Model model) {
+	// return "landing";
+	// }
 
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
@@ -65,7 +66,8 @@ public class UserController {
 	@PostMapping("/login")
 	public String submitLogin(
 			@RequestParam(name = "nickname", required = true, defaultValue = "") String name,
-			@RequestParam(name = "pass", required = true, defaultValue = "") String pass, HttpSession session) {
+			@RequestParam(name = "pass", required = true, defaultValue = "") String pass,
+			HttpSession session) {
 		User user = uServ.findByLogin(name, pass);
 		if (user == null) {
 			return "index";
@@ -82,7 +84,8 @@ public class UserController {
 		// Check if the nickname is in use
 		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
 		if (nicknameExists) {
-			bindingResult.rejectValue("nickname", "nickname.unavailable", "Nickname is not available");
+			bindingResult.rejectValue("nickname", "nickname.unavailable",
+					"Nickname is not available");
 		}
 		// Reject used nicknames or bad formats
 		if (bindingResult.hasErrors()) {
@@ -109,12 +112,16 @@ public class UserController {
 	public String submitUpdate(@ModelAttribute @Valid User user,
 			BindingResult bindingResult, HttpSession session,
 			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
-		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
-		if (nicknameExists) {
-			bindingResult.rejectValue("nickname", "nickname.unavailable", "Nickname is not available");
+		User currentUser = (User) session.getAttribute("user");
+		if (!Objects.equals(user.getNickname(), currentUser.getNickname())) {
+			boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
+			if (nicknameExists) {
+				bindingResult.rejectValue("nickname", "nickname.unavailable",
+						"Nickname is not available");
+			}
 		}
 		if (bindingResult.hasErrors()) {
-			return "register";
+			return "profile";
 		}
 		user.setId(((User) session.getAttribute("user")).getId());
 		if (!"".equals(avatar.getOriginalFilename())) {

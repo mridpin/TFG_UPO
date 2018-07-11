@@ -12,26 +12,26 @@
 <link
 	rel="icon"
 	href="../../favicon.ico">
-<title>Signin Template for Bootstrap</title>
+<title>Login</title>
 <!-- Bootstrap core CSS -->
 <link
 	href="css/bootstrap.min.css"
 	rel="stylesheet">
 <body>
 	<header class="container">
-		<h1>WELCOME TO MY APP</h1>
+		<h1>BIENVENIDO A "APP"</h1>
 	</header>
 	<article class="container">
-		<div th:text="${param.fail}">Login Failed:</div>
+		<div th:text="${param.fail}">Error de login:</div>
 		<form
 			class="form-signin"
 			action="#"
 			th:action="@{/login}"
 			method="post">
-			<h2 class="form-signin-heading">Log in required</h2>
+			<h2 class="form-signin-heading">Login requerido</h2>
 			<label
 				for="nickname"
-				class="">Nickname</label>
+				class="">Apodo</label>
 			<input
 				type="text"
 				name="nickname"
@@ -42,7 +42,7 @@
 				autofocus>
 			<label
 				for="inputPassword"
-				class="">Password</label>
+				class="">Contrase&ntilde;a</label>
 			<input
 				type="password"
 				name="pass"
@@ -56,17 +56,17 @@
 				value="Log in">
 		</form>
 		<section class="container form-signin">
-			<h3>Don't have an account?</h3>
+			<h3>No te has registrado?</h3>
 			<form
 				th:action="@{/register}"
 				method="get">
 				<input
 					class="btn btn-lg btn-primary btn-block"
 					type="submit"
-					value="Register">
+					value="Registrarse">
 			</form>
 		</section>
 	</article>
-	<footer class="container">oc pls dont steal</footer>
+	<footer class="container"></footer>
 </body>
 </html>
