@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
+<meta charset="utf-8">
 <title>Partida en curso</title>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -22,7 +22,10 @@
 		</form>
 	</nav>
 	<article>
-		<h2><span th:text="${game.name}"></span> - <span th:text="${game.master.nickname}"></span></h2>
+		<h2>
+			<span th:text="${game.name}"></span> - <span
+				th:text="${game.master.nickname}"></span>
+		</h2>
 		<section>
 			<h3>Participantes</h3>
 			<table border="2">
@@ -196,15 +199,16 @@
 		</section>
 		<section th:if="${game.endDate == null}">
 			<h3>Crear enfrentamientos</h3>
-			<ol>
-				<li>Aqu&iacute; va un men&uacute; para crear coaliciones para empezar
-					guerras</li>
-				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las coalici&oacute;n
-					creada</li>
-				<li>Aqu&iacute; va un men&uacute; para a&ntilde;adir pa&iacute;ses a las tiradas</li>
-				<li>Y un bot&oacute;n para dar por terminadas las guerras antes de la
-					tercera tirada</li>
-			</ol>
+			<form
+				class="form"
+				action="#"
+				th:action="@{/createWar}"
+				method="post">
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="Comenzar Enfrentamiento">
+			</form>
 		</section>
 		<section th:if="${game.endDate == null}">
 			<h3>Cerrar partida</h3>
@@ -227,7 +231,7 @@
 					class="btn btn-lg btn-primary btn-block"
 					type="submit"
 					value="Autorizar"
-					onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
+					onclick="return confirm('!!! CUIDADO !!! \n Â¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
 			</form>
 		</section>
 	</article>

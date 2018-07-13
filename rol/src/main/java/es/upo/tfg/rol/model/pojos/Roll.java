@@ -19,10 +19,10 @@ public class Roll implements Serializable {
 	private Long id;
 	@NotNull
 	@Column(name = "attacker_score")
-	private Long attackerScore;
+	private Double attackerScore;
 	@NotNull
 	@Column(name = "defender_score")
-	private Long defenderScore;
+	private Double defenderScore;
 	@NotNull
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "attacker")

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,14 @@ public class CountryServiceImpl implements CountryService {
 
 	@Override
 	public Country assembleCountry(User player, MultipartFile data) {
+		// TODO: Raise exceptions with non valid csvs or non utf8 ones
 		Country country = new Country();
 		country.setPlayer(player);
 		// Parse CSV file
 		String line;
 		String subscenario;
+		List<List<Double>> attributeList = new ArrayList<List<Double>>();
+		List<Double> subscenarioAttributeList = new ArrayList<Double>();
 		Map<String, Map<String, Double>> attributes = new HashMap<>();
 		Map<String, Double> subscenarioAttributes = new HashMap<>();
 		
@@ -47,10 +51,13 @@ public class CountryServiceImpl implements CountryService {
 					break;
 				case "subescenario":
 					subscenario=dataline[1];
+					subscenarioAttributeList = new ArrayList<Double>();
 					subscenarioAttributes = new HashMap<>();
+					attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
 				default:
+					subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
 					subscenarioAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
 					break;
 				}
@@ -58,6 +65,7 @@ public class CountryServiceImpl implements CountryService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		//country.setAttributes(attributeList);
 		country.setAttributes(attributes);
 		return country;
 	}
