@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,7 @@ import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.exceptions.NotAuthorized;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
+import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Controller
@@ -39,9 +42,11 @@ public class GameController {
 	GameService gServ;
 	@Autowired
 	UserService uServ;
+	
 
 	@GetMapping("/create_game")
-	public String createGame() {
+		public String createGame(Model model) {
+		model.addAttribute("turn", new Turn());
 		return "create_game";
 	}
 
@@ -100,7 +105,7 @@ public class GameController {
 		files.remove(index);
 		session.setAttribute("countries", countries);
 		session.setAttribute("files", files);
-		return "create_game";
+		return "redirect:/create_game";
 	}
 
 	/**
@@ -130,12 +135,12 @@ public class GameController {
 		// possible
 		// Assemble country with data from file
 		User player = uServ.findByNickname(nickname);
-		if (player != null) { // TODO: Mostrar mensaje de error aqui 
+		if (player != null) { // TODO: Mostrar mensaje de error aqui si no existe
 			Country country = cServ.assembleCountry(player, data);
 			List<Country> countries = (List<Country>) session.getAttribute("countries");
 			List<MultipartFile> files = (List<MultipartFile>) session
 					.getAttribute("files");
-			// Create lists in session if they dont exist. if they do, store the data
+			// Create lists in session if they don't exist. if they do, store the data
 			// there
 			if (countries == null) {
 				countries = new ArrayList<>();
@@ -149,7 +154,42 @@ public class GameController {
 			session.setAttribute("countries", countries);
 			session.setAttribute("files", files);
 		}
-		return "create_game";
+		return "redirect:/create_game";
+	}
+
+	@PostMapping("/removeTurn")
+	public String removeTurn(
+			@RequestParam(name = "turnIndex", required = true) String stat,
+			HttpSession session) {
+		// TODO: Throw error if index is tampered with
+		int index = Integer.parseInt(stat);
+		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
+		turns.remove(index);
+		session.setAttribute("turns", turns);
+		return "redirect:/create_game";
+	}
+
+	/**
+	 * Stores turns in the session. By storing in the session we don't need to
+	 * persist until the game is created, therefore avoiding orphan database entries
+	 * in case of browser closing or some other premature exit. You can keep adding
+	 * turns until the VM runs out of memory and crashes
+	 * 
+	 * @param turn
+	 *            data of the turn we are creating
+	 * @param session
+	 *            http session
+	 * @return to the same page to keep adding turns or players
+	 */
+	@PostMapping("/addTurn")
+	public String createTurn(HttpSession session, @ModelAttribute Turn turn) {
+		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
+		if (turns == null) {
+			turns = new ArrayList<>();
+		}
+		turns.add(turn);
+		session.setAttribute("turns", turns);
+		return "redirect:/create_game";
 	}
 
 	/**
@@ -165,6 +205,7 @@ public class GameController {
 			HttpSession session) {
 		// TODO: post-redirect-get
 		// Create and persist the game
+		// TODO: Create game in gameservice
 		Game game = new Game();
 		game.setMaster((User) session.getAttribute("user"));
 		game.setName(name);
@@ -197,6 +238,12 @@ public class GameController {
 				e.printStackTrace();
 			}
 			i++;
+		}
+		// Persist the turns
+		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
+		for (Turn t : turns) {
+			t.setGame(game);
+			gServ.saveTurn(t); // TODO: this is provisional, should be on gServ createGame method
 		}
 		return "redirect:/landing";
 	}

@@ -21,101 +21,169 @@
 		</form>
 	</nav>
 	<article>
-		<form
-			class="form"
-			action="#"
-			th:action="@{/submitGame}"
-			method="post">
-			<label
-				for="name"
-				class="">Nombre</label>
-			<input
-				type="text"
-				id="name"
-				name="name"
-				class="form-control"
-				placeholder="Nombre"
-				required
-				autofocus>
-			<!-- 			<span -->
-			<!-- 				th:if="${#fields.hasErrors('name')}" -->
-			<!-- 				th:errors="*{name}">Errores en nombre</span> -->
-			<label
-				for="scenario"
-				class="">Escenario</label>
-			<input
-				type="text"
-				id="scenario"
-				name="scenario"
-				class="form-control"
-				placeholder="Escenario"
-				required
-				autofocus>
-			<!-- 			<span -->
-			<!-- 				th:if="${#fields.hasErrors('scenario')}" -->
-			<!-- 				th:errors="*{scenario}">Errores en el escenario</span> -->
-			<input
-				class="btn btn-lg btn-primary btn-block"
-				type="submit"
-				value="Crear Partida">
-		</form>
-		<table border="2">
-			<tr>
-				<th>Jugador</th>
-				<th>Pa&iacute;s</th>
-				<th></th>
-			</tr>
-			<tr th:each="country, countryStat : ${session.countries}">
-				<td th:text="${country?.player?.nickname}"></td>
-				<td th:text="${country?.name}"></td>
-				<td>
-					<form
-						action="#"
-						th:action="@{/removePlayer}"
-						method="post">
-						<input
-							type="hidden"
-							name="countryIndex"
-							th:value="${countryStat.index}">
-						<input
-							type="submit"
-							value="Quitar jugador">
-					</form>
-				</td>
-			</tr>
-		</table>
-		<form
-			class="form"
-			action="#"
-			th:action="@{/addCountry}"
-			method="post"
-			enctype="multipart/form-data">
-			<label
-				for="playerName"
-				class="">Apodo del jugador</label>
-			<input
-				type="text"
-				id="player_nickname"
-				name="player_nickname"
-				class="form-control"
-				placeholder="Apodo..."
-				required
-				autofocus>
-			<label
-				for="countryData"
-				class="">Datos del pa&iacute;s</label>
-			<input
-				type="file"
-				id="country_data"
-				name="country_data"
-				class="form-control"
-				accept=".csv"
-				required>
-			<input
-				class="btn btn-lg btn-primary btn-block"
-				type="submit"
-				value="A&ntilde;adir Jugador">
-		</form>
+		<h2>Crear partida</h2>
+		<section>
+			<h3>Crea una nueva partida</h3>
+			<form
+				class="form"
+				action="#"
+				th:action="@{/submitGame}"
+				method="post">
+				<label
+					for="name"
+					class="">Nombre</label>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="form-control"
+					placeholder="Nombre"
+					required
+					autofocus>
+				<!-- 			<span -->
+				<!-- 				th:if="${#fields.hasErrors('name')}" -->
+				<!-- 				th:errors="*{name}">Errores en nombre</span> -->
+				<label
+					for="scenario"
+					class="">Escenario</label>
+				<input
+					type="text"
+					id="scenario"
+					name="scenario"
+					class="form-control"
+					placeholder="Escenario"
+					required
+					autofocus>
+				<!-- 			<span -->
+				<!-- 				th:if="${#fields.hasErrors('scenario')}" -->
+				<!-- 				th:errors="*{scenario}">Errores en el escenario</span> -->
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="Crear Partida">
+			</form>
+		</section>
+		<section>
+			<h3>Jugadores</h3>
+			<div>
+				<h4>Jugadores a&ntilde;adidos</h4>
+				<table border="2">
+					<tr>
+						<th>Jugador</th>
+						<th>Pa&iacute;s</th>
+						<th></th>
+					</tr>
+					<tr th:each="country, countryStat : ${session.countries}">
+						<td th:text="${country?.player?.nickname}"></td>
+						<td th:text="${country?.name}"></td>
+						<td>
+							<form
+								action="#"
+								th:action="@{/removePlayer}"
+								method="post">
+								<input
+									type="hidden"
+									name="countryIndex"
+									th:value="${countryStat.index}">
+								<input
+									type="submit"
+									value="Quitar jugador">
+							</form>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<h4>A&ntilde;ade un nuevo jugador</h4>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/addCountry}"
+					method="post"
+					enctype="multipart/form-data">
+					<label
+						for="playerName"
+						class="">Apodo del jugador</label>
+					<input
+						type="text"
+						id="player_nickname"
+						name="player_nickname"
+						class="form-control"
+						placeholder="Apodo..."
+						required
+						autofocus>
+					<label
+						for="countryData"
+						class="">Datos del pa&iacute;s</label>
+					<input
+						type="file"
+						id="country_data"
+						name="country_data"
+						class="form-control"
+						accept=".csv"
+						required>
+					<input
+						class="btn btn-lg btn-primary btn-block"
+						type="submit"
+						value="A&ntilde;adir Jugador">
+				</form>
+			</div>
+		</section>
+		<section>
+			<h3>Turnos</h3>
+			<div>
+				<h4>Turnos creados</h4>
+				<table border="2">
+					<tr>
+						<th>Turno</th>
+						<th>Nombre del subescenario</th>
+						<th></th>
+					</tr>
+					<tr th:each="turn, turnStat : ${session.turns}">
+						<td th:text="${turnStat?.index + 1}"></td>
+						<td th:text="${turn?.subscenario}"></td>
+						<td>
+							<form
+								action="#"
+								th:action="@{/removeTurn}"
+								method="post">
+								<input
+									type="hidden"
+									name="turnIndex"
+									th:value="${turnStat.index}">
+								<input
+									type="submit"
+									value="Quitar turno">
+							</form>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<h4>Crea un nuevo turno</h4>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/addTurn}"
+					th:object="${turn}"
+					method="post">
+					<label
+						for="turnSubscenario"
+						class="">Nombre del subescenario que representa el turno</label>
+					<input
+						type="text"
+						id="turn_subscenario"
+						th:field="*{subscenario}"
+						class="form-control"
+						placeholder="Subescenario..."
+						required>
+					<input
+						class="btn btn-lg btn-primary btn-block"
+						type="submit"
+						value="A&ntilde;adir Turno">
+				</form>
+			</div>
+		</section>
 	</article>
 </body>
 </html>

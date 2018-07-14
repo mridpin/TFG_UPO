@@ -10,6 +10,124 @@
 	type="text/javascript"></script>
 </head>
 <body>
-
+	<article>
+		<h2>Crear un enfrentamiento</h2>
+		<section>
+			<h3>Nombre</h3>
+			<form id="war_form">
+				<label>Nombre:</label>
+				<input
+					type="text"
+					name="name">
+			</form>
+		</section>
+		<section>
+			<h3>Subescenario</h3>
+			<label>1870</label>
+			<input
+				type="checkbox"
+				name="1870"
+				form="war_form">
+		</section>
+		<section>
+			<h3>Coaliciones</h3>
+			<div>
+				<p>Coalici&oacute;n 1</p>
+				<div
+					id="coal1_box"
+					style="border: solid 2px; width: 300px">
+					<br> <br>
+				</div>
+				<label>Nombre coalici&oacute;n atacante</label>
+				<input
+					type="text"
+					name="coal1_name"
+					form="war_form">
+				<p>Coalici&oacute;n 2</p>
+				<div
+					id="coal2_box"
+					style="border: solid 2px; width: 300px">
+					<br> <br>
+				</div>
+				<label>Nombre coalici&oacute;n defensora</label>
+				<input
+					type="text"
+					name="coal2_name"
+					form="war_form">
+			</div>
+			<div>
+				<ul>
+					<li>Country 1<input
+							type="range"
+							name="country1_percent"
+							form="war_form"></li>
+				</ul>
+			</div>
+			<div>
+				<form>
+					<input
+						type="submit"
+						value="Terminar Enfrentamiento">
+				</form>
+			</div>
+		</section>
+		<section>
+			<h3>Armadas</h3>
+			<table border="2">
+				<tr>
+					<td>Potencias navales</td>
+					<td>Porcentaje coalici&oacute;n atacante</td>
+					<td>Porcentaje coalici&oacute;n defensora</td>
+				</tr>
+			</table>
+			<table border="2">
+				<tr>
+					<td>Potencias navales</td>
+					<td>Country 1</td>
+				</tr>
+			</table>
+		</section>
+		<section>
+			<h3>Puntos disponibles para la tirada actual</h3>
+			<table border="2">
+				<tr>
+					<td>Economicos</td>
+					<td>Atacante</td>
+					<td>Defensor</td>
+				</tr>
+			</table>
+			<input
+				type="submit"
+				value="Tirar dado"
+				form="war_form">
+		</section>
+		<section>
+			<h3>Puntos acumulados</h3>
+			<table border="2">
+				<tr>
+					<td>Puntos</td>
+					<td>Atacante</td>
+					<td>Defensor</td>
+				</tr>
+			</table>
+		</section>
+		<section>
+			<h3>Tiradas anteriores</h3>
+			<table border="2">
+				<tr>
+					<td>Tirada 1</td>
+					<td>Atacante</td>
+					<td>Defensor</td>
+				</tr>
+			</table>
+			<table border="2">
+				<tr>
+					<td>Economicos</td>
+					<td>Atacante</td>
+					<td>Defensor</td>
+				</tr>
+			</table>
+		</section>
+	</article>
 </body>
 </html>

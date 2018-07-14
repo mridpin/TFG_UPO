@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.upo.tfg.rol.model.dao.GameRepository;
+import es.upo.tfg.rol.model.dao.TurnRepository;
 import es.upo.tfg.rol.model.pojos.Game;
+import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.comparators.GameByDateComparator;
 
@@ -22,6 +24,8 @@ public class GameServiceImpl implements GameService {
 
 	@Autowired
 	private GameRepository gameRep;
+	@Autowired
+	private TurnRepository turnRep;
 
 	@Override
 	public void saveGame(Game game) {
@@ -67,6 +71,12 @@ public class GameServiceImpl implements GameService {
 		Comparator<Game> c = new GameByDateComparator();
 		Collections.sort(gamesParticipated, c);
 		return gamesParticipated;
+	}
+
+
+	@Override
+	public void saveTurn(Turn t) {
+		turnRep.save(t);	
 	}
 
 }
