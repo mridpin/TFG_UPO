@@ -5,11 +5,55 @@
 <title>Partida en curso</title>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script
 	src="js/customjs.js"
 	type="text/javascript"></script>
+<style>
+.ui-state-highlight {
+	height: 1.5em;
+	line-height: 1.2em;
+	background-color: lightgray;
+}
+
+.coalition_lists {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 60%;
+	min-height: 100px
+}
+
+.coalition_lists li {
+	margin: 0 5px 5px 5px;
+	padding: 5px;
+	font-size: 1.2em;
+	height: 1.5em;
+}
+</style>
+<script type="text/javascript">
+	function updateTextInput(val, id) {
+		id += "_input";
+		$("#" + id).val(val);
+	}
+
+	$(document).ready(function() {
+		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
+			connectWith : ".coalition_lists",
+			dropOnEmpty : true,
+			placeholder : "ui-state-highlight",
+		});
+		//$("li.country_selectable").selectable();
+		$("ul.coalition_lists").disableSelection();
+	});
+</script>
 </head>
 <body>
+	<h3>TODO: Mejoras UX y validacion</h3>
+	<ol class='example'>
+		<li>Las listas de coaliciones no pueden estar vacias: desactivar
+			campos de nombres y botones si lo estan</li>
+	</ol>
 	<article>
 		<h2>Crear un enfrentamiento</h2>
 		<section>
@@ -23,20 +67,28 @@
 		</section>
 		<section>
 			<h3>Subescenario</h3>
-			<label>1870</label>
-			<input
-				type="checkbox"
-				name="1870"
-				form="war_form">
+			<ul id="subscenario_list">
+				<li th:each="turn : ${turns}">
+					<label th:text="${turn.subscenario}"></label>
+					<input
+						type="radio"
+						th:name="subscenario"
+						th:id="${turn.subscenario}"
+						th:value="${turn.subscenario}"
+						form="war_form">
+				</li>
+			</ul>
 		</section>
-		<section>
+		<section id="coalition_section">
 			<h3>Coaliciones</h3>
 			<div>
 				<p>Coalici&oacute;n 1</p>
 				<div
 					id="coal1_box"
-					style="border: solid 2px; width: 300px">
-					<br> <br>
+					style="border: solid 2px;">
+					<ul
+						id="attacker_list"
+						class="coalition_lists"></ul>
 				</div>
 				<label>Nombre coalici&oacute;n atacante</label>
 				<input
@@ -46,8 +98,10 @@
 				<p>Coalici&oacute;n 2</p>
 				<div
 					id="coal2_box"
-					style="border: solid 2px; width: 300px">
-					<br> <br>
+					style="border: solid 2px;">
+					<ul
+						id="defender_list"
+						class="coalition_lists"></ul>
 				</div>
 				<label>Nombre coalici&oacute;n defensora</label>
 				<input
@@ -56,15 +110,52 @@
 					form="war_form">
 			</div>
 			<div>
-				<ul>
-					<li>Country 1<input
+				<ul
+					id="country_list"
+					class="coalition_lists">
+					<li
+						class="country_selectable"
+						th:each="country : ${countries}">
+						<span th:text="${country.name}"></span>
+						<input
 							type="range"
-							name="country1_percent"
-							form="war_form"></li>
+							min=0
+							max=1
+							step=0.01
+							value=1
+							th:name="${#strings.replace(country.name, ' ', '') + '_percent'}"
+							th:id="${#strings.replace(country.name, ' ', '') + '_percent'}"
+							form="war_form"
+							oninput="updateTextInput(this.value, this.id)"
+							onchange="updateTextInput(this.value, this.id)">
+						<input
+							type="number"
+							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
+							th:id="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
+							form="war_form"
+							min=0
+							max=1
+							step=0.01
+							value=1>
+						<input
+							type="hidden"
+							th:name="${country.name + '_coalition'}"
+							value=""
+							form="war_form">
+					</li>
+				</ul>
+				<ul
+					id="test_list"
+					class="coalition_lists">
+					<li>test1</li>
+					<li>test2</li>
 				</ul>
 			</div>
 			<div>
-				<form>
+				<form
+					action="#"
+					th:action="@{/endWar}"
+					method="post">
 					<input
 						type="submit"
 						value="Terminar Enfrentamiento">
@@ -72,6 +163,7 @@
 			</div>
 		</section>
 		<section>
+		<h1>RETOMAR AQUI: AJAX</h1>
 			<h3>Armadas</h3>
 			<table border="2">
 				<tr>

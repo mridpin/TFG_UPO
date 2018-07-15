@@ -21,6 +21,8 @@ public class War implements Serializable {
 	@Size(min = 0, max = 256)
 	@Column(name = "name")
 	private String name;
+	@Column(name = "status")
+	private String status;
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "turn")
@@ -29,12 +31,13 @@ public class War implements Serializable {
 	public War() {
 		// TODO Auto-generated constructor stub
 	}
-
-	public War(Long id, @NotNull @Size(min = 0, max = 256) String name,
+	
+	public War(Long id, @NotNull @Size(min = 0, max = 256) String name, String status,
 			@NotNull Turn turn) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.status = status;
 		this.turn = turn;
 	}
 
@@ -52,6 +55,14 @@ public class War implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Turn getTurn() {
@@ -68,6 +79,7 @@ public class War implements Serializable {
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result + ((turn == null) ? 0 : turn.hashCode());
 		return result;
 	}
@@ -91,6 +103,11 @@ public class War implements Serializable {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (status == null) {
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
+			return false;
 		if (turn == null) {
 			if (other.turn != null)
 				return false;
@@ -101,7 +118,8 @@ public class War implements Serializable {
 
 	@Override
 	public String toString() {
-		return "War [id=" + id + ", name=" + name + ", turn=" + turn + "]";
+		return "War [id=" + id + ", name=" + name + ", status=" + status + ", turn="
+				+ turn + "]";
 	}
 
 }

@@ -7,4 +7,6 @@ public interface WarService {
 
 	War createWar(Game game);
 
+	void endWar(War war);
+
 }
