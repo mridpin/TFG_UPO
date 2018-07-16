@@ -37,14 +37,139 @@
 		$("#" + id).val(val);
 	}
 
+	function setupCoalitionNavies() {
+		$("#coalition_navies").find("tr:gt(0)").remove();
+		for ( var key in countries) {
+			var row = $("<tr>");
+			for ( var turn in countries[key]) {
+				// TODO: download a "dictionary" of keys for every scenario (priority = 3)
+				var selectedTurn = $(".subscenario_radio").val();
+				if (selectedTurn === turn) {
+					if (countries[key][turn]["naval_power"] === 1.0) {
+						var cell = $("<td>");
+						$(cell).append(key);
+						$(row).append(cell);
+						$("#coalition_navies").append(row);
+					}
+				}
+			}
+		}
+	}
+
+	function updateCoalitionNavies(updatedTurn) {
+		$("#coalition_navies").find("tr:gt(0)").remove();
+		for ( var key in countries) {
+			var row = $("<tr>");
+			for ( var turn in countries[key]) {
+				// TODO: download a "dictionary" of keys for every scenario (priority = 3)
+				var selectedTurn = $(updatedTurn).val();
+				if (selectedTurn === turn) {
+					if (countries[key][turn]["naval_power"] === 1.0) {
+						var cell = $("<td>");
+						$(cell).append(key);
+						$(row).append(cell);
+						$("#coalition_navies").append(row);
+					}
+				}
+			}
+		}
+	}
+
+	// Updates the table with the new info
+	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
+		// TODO: navalPowernavy e input is the same numbers
+		$("#coalition_navies").find("tr:gt(0)").remove();
+		for ( var key in countries) {
+			var row = $("<tr>");
+			if (countries[key][turn]["naval_power"] === 1.0) {
+				var intervention = countries[key][turn];
+				// TODO: Download via ajax a mapping of this
+				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
+						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+				var c1percent = 0.0
+				c1percent += attackerNavy / navalPowerNavy;
+				var c2percent = 0.0 
+				c2percent += defenderNavy / navalPowerNavy;
+				var npcell = $("<td>");
+				$(npcell).append(key);
+				var c1cell = $("<td>");
+				$(c1cell).append(c1percent);
+				var c2cell = $("<td>");
+				$(c2cell).append(c2percent);
+				$(row).append(npcell);
+				$(row).append(c1cell);
+				$(row).append(c2cell);
+				$("#coalition_navies").append(row);
+			}
+		}
+	}
+
+	// Gets the turn selected from the radio buttons via iteration
+	function getSelectedTurn() {
+		var radioList = $("#subscenario_list").find("input:checked");
+		var selectedTurn = $(radioList).val();
+		return selectedTurn;
+	}
+
+	// Calculates the power of navies between coalitions and naval powers
+	function updateCoalitionNavies() {
+		var attackerNavy = 0.0;
+		var defenderNavy = 0.0;
+		var attackerCountries = $("#coal1_box").find("span.country_names",
+				"li.ui-sortable-handle");
+		var defenderCountries = $("#coal2_box").find("span.country_names",
+				"li.ui-sortable-handle");
+		var turn = getSelectedTurn();
+		for (var key = 0; key<attackerCountries.length; key++) {					
+// 		if (attackerCountries.length > 0) {
+// 			for ( var key in attackerCountries) {
+// 				if (attackerCountries[key] !== "") {
+					var name = $(attackerCountries[key]).text();
+					var intervention = countries[name][turn];
+					// TODO: Download via ajax a mapping of this
+					attackerNavy += intervention["Tonelaje desplazado por la Armada (Tm)"]
+							+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+// 				}
+// 			}
+		}
+		for (var key = 0; key<defenderCountries.length; key++) {	
+// 		if (defenderCountries.length > 0) {
+// 			for ( var key in defenderCountries) {
+// 				if (defenderCountries[key] !== "") {
+					var name = $(defenderCountries[key]).text();
+					// TODO: RETOMAR AQUI: PETA AQUI ALGO QUE HAY ADEMAS DEL PAIS EN EL ARRAY Y NO DEBERIA
+					var intervention = countries[name][turn];
+					// TODO: Download via ajax a mapping of this
+					defenderNavy += intervention["Tonelaje desplazado por la Armada (Tm)"]
+							+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+// 				}
+// 			}
+		}
+		drawCoalitionNavies(turn, attackerNavy, defenderNavy);
+	}
+
 	$(document).ready(function() {
+		// Sortable list to drag countries to coalitions
 		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
 			connectWith : ".coalition_lists",
 			dropOnEmpty : true,
 			placeholder : "ui-state-highlight",
+			update : function() {
+				updateCoalitionNavies();
+			},
 		});
 		//$("li.country_selectable").selectable();
 		$("ul.coalition_lists").disableSelection();
+
+		// Ajax call to get all country data to display in tables dynamically
+		$.ajax({
+			type : "POST",
+			url : "/mapCountries",
+			success : function(response) {
+				countries = response;
+				setupCoalitionNavies();
+			}
+		});
 	});
 </script>
 </head>
@@ -68,14 +193,17 @@
 		<section>
 			<h3>Subescenario</h3>
 			<ul id="subscenario_list">
-				<li th:each="turn : ${turns}">
+				<li th:each="turn, turnStat : ${turns}">
 					<label th:text="${turn.subscenario}"></label>
 					<input
 						type="radio"
 						th:name="subscenario"
+						th:class="subscenario_radio"
 						th:id="${turn.subscenario}"
 						th:value="${turn.subscenario}"
-						form="war_form">
+						th:checked="${turnStat.index==0}"
+						form="war_form"
+						onclick="updateCoalitionNavies(this)">
 				</li>
 			</ul>
 		</section>
@@ -116,7 +244,9 @@
 					<li
 						class="country_selectable"
 						th:each="country : ${countries}">
-						<span th:text="${country.name}"></span>
+						<span
+							class="country_names"
+							th:text="${country.name}"></span>
 						<input
 							type="range"
 							min=0
@@ -144,12 +274,6 @@
 							form="war_form">
 					</li>
 				</ul>
-				<ul
-					id="test_list"
-					class="coalition_lists">
-					<li>test1</li>
-					<li>test2</li>
-				</ul>
 			</div>
 			<div>
 				<form
@@ -163,16 +287,20 @@
 			</div>
 		</section>
 		<section>
-		<h1>RETOMAR AQUI: AJAX</h1>
+			<h1>RETOMAR AQUI: AJAX</h1>
 			<h3>Armadas</h3>
-			<table border="2">
+			<table
+				id="coalition_navies"
+				border="2">
 				<tr>
 					<td>Potencias navales</td>
 					<td>Porcentaje coalici&oacute;n atacante</td>
 					<td>Porcentaje coalici&oacute;n defensora</td>
 				</tr>
 			</table>
-			<table border="2">
+			<table
+				id="country_navies"
+				border="2">
 				<tr>
 					<td>Potencias navales</td>
 					<td>Country 1</td>

@@ -1,6 +1,7 @@
 package es.upo.tfg.rol.controller.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,5 +16,7 @@ public interface CountryService {
 	void saveCountry(Country country);
 
 	List<Country> findCountries(Game game);
+
+	Map<String, Map<String, Double>> mapCountry(Country c);
 
 }

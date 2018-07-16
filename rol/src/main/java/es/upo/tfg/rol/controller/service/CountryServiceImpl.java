@@ -1,9 +1,13 @@
 package es.upo.tfg.rol.controller.service;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +26,7 @@ import es.upo.tfg.rol.model.pojos.User;
 @Service("countryService")
 @Transactional
 public class CountryServiceImpl implements CountryService {
-	
+
 	@Autowired
 	private CountryRepository countryRep;
 
@@ -34,11 +38,11 @@ public class CountryServiceImpl implements CountryService {
 		// Parse CSV file
 		String line;
 		String subscenario;
-		List<List<Double>> attributeList = new ArrayList<List<Double>>();
-		List<Double> subscenarioAttributeList = new ArrayList<Double>();
+		// List<List<Double>> attributeList = new ArrayList<List<Double>>();
+		// List<Double> subscenarioAttributeList = new ArrayList<Double>();
 		Map<String, Map<String, Double>> attributes = new HashMap<>();
 		Map<String, Double> subscenarioAttributes = new HashMap<>();
-		
+
 		try {
 			InputStream is = data.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -50,34 +54,79 @@ public class CountryServiceImpl implements CountryService {
 					country.setName(dataline[1]);
 					break;
 				case "subescenario":
-					subscenario=dataline[1];
-					subscenarioAttributeList = new ArrayList<Double>();
+					subscenario = dataline[1];
+					// subscenarioAttributeList = new ArrayList<Double>();
 					subscenarioAttributes = new HashMap<>();
-					attributeList.add(subscenarioAttributeList);
+					// attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
 				default:
-					subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-					subscenarioAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
+					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
+					subscenarioAttributes.put(dataline[0],
+							Double.parseDouble(dataline[1]));
 					break;
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//country.setAttributes(attributeList);
+		// country.setAttributes(attributeList);
 		country.setAttributes(attributes);
 		return country;
 	}
 
 	@Override
 	public void saveCountry(Country country) {
-		countryRep.save(country);		
+		countryRep.save(country);
 	}
 
 	@Override
-	public List<Country> findCountries(Game game) {		
+	public List<Country> findCountries(Game game) {
 		return countryRep.findByGame(game);
+	}
+
+	@Override
+	public Map<String, Map<String, Double>> mapCountry(Country country) {
+		String line;
+		String subscenario;
+		Map<String, Map<String, Double>> attributes = new HashMap<>();
+		Map<String, Double> subscenarioAttributes = new HashMap<>();
+		try {
+			String filename = "countryData" + File.separator + country.getData();
+			InputStream is = new FileInputStream(filename);
+			BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String whatDo = dataline[0].trim().toLowerCase();
+				switch (whatDo) {
+				case "nombre":
+					break;
+				case "subescenario":
+					subscenario = dataline[1];
+					subscenarioAttributes = new HashMap<>();
+					attributes.put(subscenario, subscenarioAttributes);
+					break;
+				case "naval_power":
+					String power = dataline[1];
+					if ("true".equals(power)) {
+						subscenarioAttributes.put(dataline[0], 1.0);
+					} else {
+						subscenarioAttributes.put(dataline[0], 0.0);
+					}
+					break;
+				default:
+					subscenarioAttributes.put(dataline[0],
+							Double.parseDouble(dataline[1]));
+					break;
+				}
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			// TODO: Throw a file corruption exception and ask to manually upload the
+			// country file again (priority=3)
+		}
+		return attributes;
 	}
 
 }
