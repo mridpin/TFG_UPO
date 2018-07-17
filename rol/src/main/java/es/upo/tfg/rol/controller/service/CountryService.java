@@ -17,6 +17,6 @@ public interface CountryService {
 
 	List<Country> findCountries(Game game);
 
-	Map<String, Map<String, Double>> mapCountry(Country c);
+	Map<String, Map<String, Map<String, Double>>> mapCountry(Country c);
 
 }

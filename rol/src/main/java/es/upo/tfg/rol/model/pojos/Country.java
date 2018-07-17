@@ -17,8 +17,8 @@ public class Country implements Serializable {
 
 	/**
 	 * Serial ID: Required for Tomcat, for classes to implement Serializable
-	 * whenever instances of those classes are been stored as an attribute of
-	 * the HttpSession. Source:
+	 * whenever instances of those classes are been stored as an attribute of the
+	 * HttpSession. Source:
 	 * https://stackoverflow.com/questions/2294551/java-io-writeabortedexception-writing-aborted-java-io-notserializableexception
 	 */
 	private static final long serialVersionUID = 1L;
@@ -42,14 +42,15 @@ public class Country implements Serializable {
 	private Game game;
 
 	/*
-	 * Two levels of nesting:
-	 * Outer map is <Year, Map>
-	 * Inner map is <Attribute, Value>
-	 * It's basically a matrix but we access it with keys instead of indices 
+	 * Three levels of nesting: Outer map is <Year, Map> Mid map is <Type, Map>
+	 * Inner map is <Attribute, Value> It's basically a tree, but implemented as an
+	 * assortment of maps to use later in javascript. Might want to change it to
+	 * TreeMap later for undetstandability
+	 * 
 	 * @Transient so its not persistent, as all is stored in the csv file
 	 */
 	@Transient
-	private Map<String, Map<String, Double>> attributes;
+	private Map<String, Map<String, Map<String, Double>>> attributes;
 
 	public Country() {
 	}
@@ -104,11 +105,11 @@ public class Country implements Serializable {
 		this.game = game;
 	}
 
-	public Map<String, Map<String, Double>> getAttributes() {
+	public Map<String, Map<String, Map<String, Double>>> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Map<String, Map<String, Double>> attributes) {
+	public void setAttributes(Map<String, Map<String, Map<String, Double>>> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -163,8 +164,8 @@ public class Country implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Country [id=" + id + ", name=" + name + ", data=" + data
-				+ ", player=" + player + ", game=" + game + "]";
+		return "Country [id=" + id + ", name=" + name + ", data=" + data + ", player="
+				+ player + ", game=" + game + "]";
 	}
 
 }

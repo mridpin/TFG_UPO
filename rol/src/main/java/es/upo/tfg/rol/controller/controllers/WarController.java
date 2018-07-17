@@ -67,12 +67,12 @@ public class WarController {
 	 */
 	@PostMapping(value = "/mapCountries", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Map<String, Map<String, Double>>> mapCountry(HttpSession session) {
+	public Map<String, Map<String, Map<String, Map<String, Double>>>> mapCountry(HttpSession session) {
 		Game game = (Game) session.getAttribute("game");
 		List<Country> countries = cServ.findCountries(game);
-		Map<String, Map<String, Map<String, Double>>> maps = new HashMap<>();
+		Map<String, Map<String, Map<String, Map<String, Double>>>> maps = new HashMap<>();
 		for (Country c : countries) {
-			Map<String, Map<String, Double>> cmap = cServ.mapCountry(c);
+			Map<String, Map<String, Map<String, Double>>> cmap = cServ.mapCountry(c);
 			maps.put(c.getName(), cmap);
 		}
 		return maps;

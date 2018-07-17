@@ -38,10 +38,12 @@ public class CountryServiceImpl implements CountryService {
 		// Parse CSV file
 		String line;
 		String subscenario;
+		String type;
 		// List<List<Double>> attributeList = new ArrayList<List<Double>>();
 		// List<Double> subscenarioAttributeList = new ArrayList<Double>();
-		Map<String, Map<String, Double>> attributes = new HashMap<>();
-		Map<String, Double> subscenarioAttributes = new HashMap<>();
+		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
+		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
+		Map<String, Double> typeAttributes = new HashMap<>();
 
 		try {
 			InputStream is = data.getInputStream();
@@ -60,9 +62,14 @@ public class CountryServiceImpl implements CountryService {
 					// attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
+				case "type":
+					type = dataline[1];
+					typeAttributes = new HashMap<>();
+					subscenarioAttributes.put(type, typeAttributes);
+					break;
 				default:
 					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-					subscenarioAttributes.put(dataline[0],
+					typeAttributes.put(dataline[0],
 							Double.parseDouble(dataline[1]));
 					break;
 				}
@@ -86,11 +93,14 @@ public class CountryServiceImpl implements CountryService {
 	}
 
 	@Override
-	public Map<String, Map<String, Double>> mapCountry(Country country) {
+	public Map<String, Map<String, Map<String, Double>>> mapCountry(Country country) {
+		// TODO: RETOMAR AQUÍ: REPARAR EL CSV PARA QUE REFLEJE ESTO, QUITANDO LOS INDICADORES QUE NO SE USEN Y CLASIFICANDO LOS TIPOS
 		String line;
 		String subscenario;
-		Map<String, Map<String, Double>> attributes = new HashMap<>();
-		Map<String, Double> subscenarioAttributes = new HashMap<>();
+		String type;
+		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
+		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
+		Map<String, Double> typeAttributes = new HashMap<>();
 		try {
 			String filename = "countryData" + File.separator + country.getData();
 			InputStream is = new FileInputStream(filename);
@@ -100,22 +110,23 @@ public class CountryServiceImpl implements CountryService {
 				String whatDo = dataline[0].trim().toLowerCase();
 				switch (whatDo) {
 				case "nombre":
+					country.setName(dataline[1]);
 					break;
 				case "subescenario":
 					subscenario = dataline[1];
+					// subscenarioAttributeList = new ArrayList<Double>();
 					subscenarioAttributes = new HashMap<>();
+					// attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
-				case "naval_power":
-					String power = dataline[1];
-					if ("true".equals(power)) {
-						subscenarioAttributes.put(dataline[0], 1.0);
-					} else {
-						subscenarioAttributes.put(dataline[0], 0.0);
-					}
+				case "type":
+					type = dataline[1];
+					typeAttributes = new HashMap<>();
+					subscenarioAttributes.put(type, typeAttributes);
 					break;
 				default:
-					subscenarioAttributes.put(dataline[0],
+					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
+					typeAttributes.put(dataline[0],
 							Double.parseDouble(dataline[1]));
 					break;
 				}

@@ -32,52 +32,60 @@
 }
 </style>
 <script type="text/javascript">
+	/* Functions that sync input and slider together */
 	function updateTextInput(val, id) {
 		id += "_input";
 		$("#" + id).val(val);
 	}
 
-	function setupCoalitionNavies() {
-		$("#coalition_navies").find("tr:gt(0)").remove();
-		for ( var key in countries) {
-			var row = $("<tr>");
-			for ( var turn in countries[key]) {
-				// TODO: download a "dictionary" of keys for every scenario (priority = 3)
-				var selectedTurn = $(".subscenario_radio").val();
-				if (selectedTurn === turn) {
-					if (countries[key][turn]["naval_power"] === 1.0) {
-						var cell = $("<td>");
-						$(cell).append(key);
-						$(row).append(cell);
-						$("#coalition_navies").append(row);
-					}
-				}
-			}
-		}
+	function updateSliderInput(val, id) {
+		id += "_percent";
+		$("#" + id).val(val);
 	}
 
-	function updateCoalitionNavies(updatedTurn) {
-		$("#coalition_navies").find("tr:gt(0)").remove();
-		for ( var key in countries) {
-			var row = $("<tr>");
-			for ( var turn in countries[key]) {
-				// TODO: download a "dictionary" of keys for every scenario (priority = 3)
-				var selectedTurn = $(updatedTurn).val();
-				if (selectedTurn === turn) {
-					if (countries[key][turn]["naval_power"] === 1.0) {
-						var cell = $("<td>");
-						$(cell).append(key);
-						$(row).append(cell);
-						$("#coalition_navies").append(row);
-					}
-				}
-			}
-		}
-	}
-
-	// Updates the table with the new info
+	/* This function gets called on the initial load of the page only */
+	// function setupCoalitionNavies() {
+	// $("#coalition_navies").find("tr:gt(0)").remove();
+	// for ( var key in countries) {
+	// var row = $("<tr>");
+	// for ( var turn in countries[key]) {
+	// // TODO: download a "dictionary" of keys for every scenario
+	// // (priority =
+	// // 3)
+	// var selectedTurn = $(".subscenario_radio").val();
+	// if (selectedTurn === turn) {
+	// if (countries[key][turn]["naval_power"] === 1.0) {
+	// var cell = $("<td>");
+	// $(cell).append(key);
+	// $(row).append(cell);
+	// $("#coalition_navies").append(row);
+	// }
+	// }
+	// }
+	// }
+	// }
+	/* This function gets called when the turn is updated */
+	// function updateCoalitionNavies(updatedTurn) {
+	// $("#coalition_navies").find("tr:gt(0)").remove();
+	// for ( var key in countries) {
+	// var row = $("<tr>");
+	// for ( var turn in countries[key]) {
+	// // TODO: download a "dictionary" of keys for every scenario
+	// // (priority = 3)
+	// var selectedTurn = $(updatedTurn).val();
+	// if (selectedTurn === turn) {
+	// if (countries[key][turn]["naval_power"] === 1.0) {
+	// var cell = $("<td>");
+	// $(cell).append(key);
+	// $(row).append(cell);
+	// $("#coalition_navies").append(row);
+	// }
+	// }
+	// }
+	// }
+	// }
+	/* Updates the table with the new info */
 	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
-		// TODO: navalPowernavy e input is the same numbers
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>");
@@ -88,14 +96,14 @@
 						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 				var c1percent = 0.0
 				c1percent += attackerNavy / navalPowerNavy;
-				var c2percent = 0.0 
+				var c2percent = 0.0
 				c2percent += defenderNavy / navalPowerNavy;
 				var npcell = $("<td>");
 				$(npcell).append(key);
 				var c1cell = $("<td>");
-				$(c1cell).append(c1percent);
+				$(c1cell).append((c1percent * 100).toFixed(2));
 				var c2cell = $("<td>");
-				$(c2cell).append(c2percent);
+				$(c2cell).append((c2percent * 100).toFixed(2));
 				$(row).append(npcell);
 				$(row).append(c1cell);
 				$(row).append(c2cell);
@@ -103,15 +111,52 @@
 			}
 		}
 	}
+	
+	function drawCountryNavies(turn, countryNavies) {
+		// Set up table and first row
+		$("#country_navies").find("tr:gt(0)").remove();
+		var firstRow = $("<tr>");
+		var tableName = $("<th>");
+		tableName.append("Potencias Navales");
+		$(firstRow).append(tableName);
+		$("#country_navies").append(firstRow);
+		// Iterate once per country
+		for ( var key in countries) {
+			// Add a header per country
+			var countryHeader = $("<th>");
+			$(countryHeader).append(key);
+			$(firstRow).append(countryHeader);
+			// If the country is a naval power, add a row for it
+			if (countries[key][turn]["naval_power"] === 1.0) {
+				var intervention = countries[key][turn];
+				// TODO: Download via ajax a mapping of this
+				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
+						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+				var row = $("<tr>");
+				var npcell = $("<td>");
+				$(npcell).append(key);
+				$(row).append(npcell);
+				for (var c in countryNavies) {
+					var cpercent = 0.0;
+					cpercent += countryNavies[c] / navalPowerNavy;					
+					var ccell = $("<td>");
+					$(ccell).append((cpercent * 100).toFixed(2));
+					$(row).append(ccell);
+				}
+				$("#country_navies").append(row);
+			}
+		}
+	}
 
-	// Gets the turn selected from the radio buttons via iteration
+	/* Gets the turn selected from the radio buttons via iteration */
 	function getSelectedTurn() {
 		var radioList = $("#subscenario_list").find("input:checked");
 		var selectedTurn = $(radioList).val();
 		return selectedTurn;
 	}
 
-	// Calculates the power of navies between coalitions and naval powers
+	/* Calculates the power of navies between coalitions and naval powers */
+	/* This function is VIP */
 	function updateCoalitionNavies() {
 		var attackerNavy = 0.0;
 		var defenderNavy = 0.0;
@@ -120,32 +165,47 @@
 		var defenderCountries = $("#coal2_box").find("span.country_names",
 				"li.ui-sortable-handle");
 		var turn = getSelectedTurn();
-		for (var key = 0; key<attackerCountries.length; key++) {					
-// 		if (attackerCountries.length > 0) {
-// 			for ( var key in attackerCountries) {
-// 				if (attackerCountries[key] !== "") {
-					var name = $(attackerCountries[key]).text();
-					var intervention = countries[name][turn];
-					// TODO: Download via ajax a mapping of this
-					attackerNavy += intervention["Tonelaje desplazado por la Armada (Tm)"]
-							+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-// 				}
-// 			}
+		for (var key = 0; key < attackerCountries.length; key++) {
+			var name = $(attackerCountries[key]).text();
+			var intervention = countries[name][turn];
+			// TODO: Download via ajax a mapping of this
+			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
+					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+					.val();
+			attackerNavy += navies * commitment;
 		}
-		for (var key = 0; key<defenderCountries.length; key++) {	
-// 		if (defenderCountries.length > 0) {
-// 			for ( var key in defenderCountries) {
-// 				if (defenderCountries[key] !== "") {
-					var name = $(defenderCountries[key]).text();
-					// TODO: RETOMAR AQUI: PETA AQUI ALGO QUE HAY ADEMAS DEL PAIS EN EL ARRAY Y NO DEBERIA
-					var intervention = countries[name][turn];
-					// TODO: Download via ajax a mapping of this
-					defenderNavy += intervention["Tonelaje desplazado por la Armada (Tm)"]
-							+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-// 				}
-// 			}
+		for (var key = 0; key < defenderCountries.length; key++) {
+			var name = $(defenderCountries[key]).text();
+			var intervention = countries[name][turn];
+			// TODO: Download via ajax a mapping of this
+			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
+					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+					.val();
+			defenderNavy += navies * commitment;
 		}
 		drawCoalitionNavies(turn, attackerNavy, defenderNavy);
+	}
+	
+	/* Calculates the power of navies between naval powers and countries */
+	/* This function is VIP */
+	function updateCountryNavies() {
+		// TODO: RETOMAR AQUI PORQUE NO FUNCIONA
+		var turn = getSelectedTurn();
+		var countryNavies = {};
+		// Grab the names of all the countries from the table
+		for (var key in countries) {
+			var name = key;
+			var intervention = countries[name][turn];
+			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
+			+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			.val();
+			var finalNavy = navies * commitment;
+			countryNavies[name] = finalNavy;
+		}
+		drawCountryNavies(turn, countryNavies);
 	}
 
 	$(document).ready(function() {
@@ -156,9 +216,10 @@
 			placeholder : "ui-state-highlight",
 			update : function() {
 				updateCoalitionNavies();
+				updateCountryNavies();
 			},
 		});
-		//$("li.country_selectable").selectable();
+		// $("li.country_selectable").selectable();
 		$("ul.coalition_lists").disableSelection();
 
 		// Ajax call to get all country data to display in tables dynamically
@@ -167,7 +228,9 @@
 			url : "/mapCountries",
 			success : function(response) {
 				countries = response;
-				setupCoalitionNavies();
+				// setupCoalitionNavies();
+				updateCoalitionNavies();
+				updateCountryNavies();
 			}
 		});
 	});
@@ -203,7 +266,7 @@
 						th:value="${turn.subscenario}"
 						th:checked="${turnStat.index==0}"
 						form="war_form"
-						onclick="updateCoalitionNavies(this)">
+						onclick="updateCoalitionNavies();updateCountryNavies()">
 				</li>
 			</ul>
 		</section>
@@ -237,7 +300,7 @@
 					name="coal2_name"
 					form="war_form">
 			</div>
-			<div>
+			<div style="border: solid 2px;">
 				<ul
 					id="country_list"
 					class="coalition_lists">
@@ -256,8 +319,8 @@
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							form="war_form"
-							oninput="updateTextInput(this.value, this.id)"
-							onchange="updateTextInput(this.value, this.id)">
+							oninput="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies()"
+							onchange="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies()">
 						<input
 							type="number"
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
@@ -266,7 +329,10 @@
 							min=0
 							max=1
 							step=0.01
-							value=1>
+							value=1
+							oninput="updateCoalitionNavies();updateCountryNavies()"
+							onchange="updateCoalitionNavies();updateCountryNavies()">
+						<!--						TODO: JQUERY validate this to max 1  -->
 						<input
 							type="hidden"
 							th:name="${country.name + '_coalition'}"
@@ -289,23 +355,29 @@
 		<section>
 			<h1>RETOMAR AQUI: AJAX</h1>
 			<h3>Armadas</h3>
-			<table
-				id="coalition_navies"
-				border="2">
-				<tr>
-					<td>Potencias navales</td>
-					<td>Porcentaje coalici&oacute;n atacante</td>
-					<td>Porcentaje coalici&oacute;n defensora</td>
-				</tr>
-			</table>
-			<table
-				id="country_navies"
-				border="2">
-				<tr>
-					<td>Potencias navales</td>
-					<td>Country 1</td>
-				</tr>
-			</table>
+			<div>
+				<h4>Potencias navales vs. Coaliciones</h4>
+				<table
+					id="coalition_navies"
+					border="2">
+					<tr>
+						<th>Potencias navales</th>
+						<th>Porcentaje coalici&oacute;n atacante</th>
+						<th>Porcentaje coalici&oacute;n defensora</th>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<h4>Potencias navales vs. Pa&iacute;ses</h4>
+				<table
+					id="country_navies"
+					border="2">
+					<tr>
+<!-- 						<th>Potencias navales</td> -->
+<!-- 						<th th:each="country : ${countries}" th:text="${country.name}"></th> -->
+					</tr>
+				</table>
+			</div>
 		</section>
 		<section>
 			<h3>Puntos disponibles para la tirada actual</h3>
