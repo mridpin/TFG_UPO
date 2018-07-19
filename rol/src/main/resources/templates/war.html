@@ -42,55 +42,37 @@
 		id += "_percent";
 		$("#" + id).val(val);
 	}
+	
+	// Sums an array of country objects
+	function sumCoalition(coalition) {
+		var sum  = $.extend(true, {}, coalition[0]);
+		// Iterate countries
+		for (var i = 1; i<coalition.length; i++) {
+			// Iterate each type
+			$.each(coalition[i], function(type, types) {
+				// Iterate each attribute
+				$.each(types, function(attribute, value) {
+					sum[type][attribute] += value;					
+				});
+			});
+		}
+		return sum;
+	}
+	
+	/* Gets the turn selected from the radio buttons via iteration */
+	function getSelectedTurn() {
+		var radioList = $("#subscenario_list").find("input:checked");
+		var selectedTurn = $(radioList).val();
+		return selectedTurn;
+	}
 
-	/* This function gets called on the initial load of the page only */
-	// function setupCoalitionNavies() {
-	// $("#coalition_navies").find("tr:gt(0)").remove();
-	// for ( var key in countries) {
-	// var row = $("<tr>");
-	// for ( var turn in countries[key]) {
-	// // TODO: download a "dictionary" of keys for every scenario
-	// // (priority =
-	// // 3)
-	// var selectedTurn = $(".subscenario_radio").val();
-	// if (selectedTurn === turn) {
-	// if (countries[key][turn]["naval_power"] === 1.0) {
-	// var cell = $("<td>");
-	// $(cell).append(key);
-	// $(row).append(cell);
-	// $("#coalition_navies").append(row);
-	// }
-	// }
-	// }
-	// }
-	// }
-	/* This function gets called when the turn is updated */
-	// function updateCoalitionNavies(updatedTurn) {
-	// $("#coalition_navies").find("tr:gt(0)").remove();
-	// for ( var key in countries) {
-	// var row = $("<tr>");
-	// for ( var turn in countries[key]) {
-	// // TODO: download a "dictionary" of keys for every scenario
-	// // (priority = 3)
-	// var selectedTurn = $(updatedTurn).val();
-	// if (selectedTurn === turn) {
-	// if (countries[key][turn]["naval_power"] === 1.0) {
-	// var cell = $("<td>");
-	// $(cell).append(key);
-	// $(row).append(cell);
-	// $("#coalition_navies").append(row);
-	// }
-	// }
-	// }
-	// }
-	// }
 	/* Updates the table with the new info */
 	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>");
-			if (countries[key][turn]["naval_power"] === 1.0) {
-				var intervention = countries[key][turn];
+			if (countries[key][turn]["navales"]["naval_power"] === 1.0) {
+				var intervention = countries[key][turn]["navales"];
 				// TODO: Download via ajax a mapping of this
 				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
 						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
@@ -127,8 +109,8 @@
 			$(countryHeader).append(key);
 			$(firstRow).append(countryHeader);
 			// If the country is a naval power, add a row for it
-			if (countries[key][turn]["naval_power"] === 1.0) {
-				var intervention = countries[key][turn];
+			if (countries[key][turn]["navales"]["naval_power"] === 1.0) {
+				var intervention = countries[key][turn]["navales"];
 				// TODO: Download via ajax a mapping of this
 				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
 						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
@@ -148,13 +130,26 @@
 		}
 	}
 
-	/* Gets the turn selected from the radio buttons via iteration */
-	function getSelectedTurn() {
-		var radioList = $("#subscenario_list").find("input:checked");
-		var selectedTurn = $(radioList).val();
-		return selectedTurn;
+	function drawCountryPoints(attackerPoints, defenderPoints) {
+		var table = $("#stat_table");
+		$(table).find("tr").remove();
+		// Iterate the types of attributes
+		$.each(attributeValuesTemplate, function (type, attributes){
+			var header = $("<tr>");
+			$(header).append($("<th>").append(type));
+			$(header).append($("<th>").append("Atacante"));
+			$(header).append($("<th>").append("Defensor"));
+			$(table).append(header);
+			// Iterate the attributes
+			$.each(attributes, function(name, value) {
+				var row = $("<tr>");
+				$(row).append($("<td>").append(attributeValuesTemplate[type][name]));
+				$(row).append($("<td>").append(attackerPoints[type]==null ? 0 : attackerPoints[type][name]));
+				$(row).append($("<td>").append(defenderPoints[type]==null ? 0 : defenderPoints[type][name]));
+				$(table).append(row);
+			});
+		});
 	}
-
 	/* Calculates the power of navies between coalitions and naval powers */
 	/* This function is VIP */
 	function updateCoalitionNavies() {
@@ -167,7 +162,7 @@
 		var turn = getSelectedTurn();
 		for (var key = 0; key < attackerCountries.length; key++) {
 			var name = $(attackerCountries[key]).text();
-			var intervention = countries[name][turn];
+			var intervention = countries[name][turn]["navales"];
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
@@ -177,7 +172,7 @@
 		}
 		for (var key = 0; key < defenderCountries.length; key++) {
 			var name = $(defenderCountries[key]).text();
-			var intervention = countries[name][turn];
+			var intervention = countries[name][turn]["navales"];
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
@@ -191,13 +186,12 @@
 	/* Calculates the power of navies between naval powers and countries */
 	/* This function is VIP */
 	function updateCountryNavies() {
-		// TODO: RETOMAR AQUI PORQUE NO FUNCIONA
 		var turn = getSelectedTurn();
 		var countryNavies = {};
 		// Grab the names of all the countries from the table
 		for (var key in countries) {
 			var name = key;
-			var intervention = countries[name][turn];
+			var intervention = countries[name][turn]["navales"];
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 			+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
@@ -208,6 +202,58 @@
 		drawCountryNavies(turn, countryNavies);
 	}
 
+	function downloadPointsTemplate() {
+		// TODO: Download template via ajax to do this (only once per page load)
+		// Reference table with points per attribute.
+		attributeValuesTemplate = {
+				"Económicos": {
+					"PIB/p.c ($ Geary-Khamis de 1990)": 8.0,
+					"Población total": 8.0,
+					"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)": 8.0,
+					"Producción acero (Tm.)": 8.0,
+					"Producción carbón (Tm.)": 8.0,
+				},
+				"Militares": 
+				{
+					"Densidad ferroviaria (km/km2)": 8.0,
+					"Soldados -de todos los ejércitos-": 11.0,
+					"Reservistas -de todos los ejércitos-": 11.0,
+				},
+				"Navales": {
+					"Tonelaje desplazado por la Armada (Tm)": 5.0,
+					"Tonelaje desplazado por la marina mercante (Tm)": 3.0,
+				},
+		};
+	}
+	
+	function updateCountryPoints() {
+		var attackerPoints = {};
+		var defenderPoints = {};
+		var attackerCountries = $("#coal1_box").find("span.country_names",
+		"li.ui-sortable-handle");
+		var defenderCountries = $("#coal2_box").find("span.country_names",
+		"li.ui-sortable-handle");
+		var turn = getSelectedTurn();
+		// Add up the power of coalitions
+		var defenders = [];
+		var attackers = [];
+		for (var key = 0; key < defenderCountries.length; key++) {
+			var name = $(defenderCountries[key]).text();
+			defenders.push(countries[name][turn]);
+		}
+		for (var key = 0; key < attackerCountries.length; key++) {
+			var name = $(attackerCountries[key]).text();
+			attackers.push(countries[name][turn]);
+		}
+		var attackerStats = sumCoalition(attackers);
+		var defenderStats = sumCoalition(defenders);
+		
+		// Calculate the points
+		// TODO: REMOTAR AQUI: CALCULAR LOS PUNTOS
+				
+		drawCountryPoints(attackerStats, defenderStats);
+	}
+	
 	$(document).ready(function() {
 		// Sortable list to drag countries to coalitions
 		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
@@ -217,6 +263,7 @@
 			update : function() {
 				updateCoalitionNavies();
 				updateCountryNavies();
+				updateCountryPoints();
 			},
 		});
 		// $("li.country_selectable").selectable();
@@ -231,8 +278,10 @@
 				// setupCoalitionNavies();
 				updateCoalitionNavies();
 				updateCountryNavies();
+				updateCountryPoints();
 			}
 		});
+		downloadPointsTemplate();
 	});
 </script>
 </head>
@@ -266,7 +315,7 @@
 						th:value="${turn.subscenario}"
 						th:checked="${turnStat.index==0}"
 						form="war_form"
-						onclick="updateCoalitionNavies();updateCountryNavies()">
+						onclick="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 				</li>
 			</ul>
 		</section>
@@ -319,8 +368,8 @@
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							form="war_form"
-							oninput="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies()"
-							onchange="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies()">
+							oninput="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies();updateCountryPoints()"
+							onchange="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 						<input
 							type="number"
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
@@ -330,8 +379,8 @@
 							max=1
 							step=0.01
 							value=1
-							oninput="updateCoalitionNavies();updateCountryNavies()"
-							onchange="updateCoalitionNavies();updateCountryNavies()">
+							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()"
+							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 						<!--						TODO: JQUERY validate this to max 1  -->
 						<input
 							type="hidden"
@@ -381,12 +430,7 @@
 		</section>
 		<section>
 			<h3>Puntos disponibles para la tirada actual</h3>
-			<table border="2">
-				<tr>
-					<td>Economicos</td>
-					<td>Atacante</td>
-					<td>Defensor</td>
-				</tr>
+			<table id="stat_table" border="2">
 			</table>
 			<input
 				type="submit"
@@ -396,11 +440,6 @@
 		<section>
 			<h3>Puntos acumulados</h3>
 			<table border="2">
-				<tr>
-					<td>Puntos</td>
-					<td>Atacante</td>
-					<td>Defensor</td>
-				</tr>
 			</table>
 		</section>
 		<section>

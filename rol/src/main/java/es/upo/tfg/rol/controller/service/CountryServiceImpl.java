@@ -69,8 +69,7 @@ public class CountryServiceImpl implements CountryService {
 					break;
 				default:
 					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-					typeAttributes.put(dataline[0],
-							Double.parseDouble(dataline[1]));
+					typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
 					break;
 				}
 			}
@@ -94,8 +93,7 @@ public class CountryServiceImpl implements CountryService {
 
 	@Override
 	public Map<String, Map<String, Map<String, Double>>> mapCountry(Country country) {
-		// TODO: RETOMAR AQUÍ: REPARAR EL CSV PARA QUE REFLEJE ESTO, QUITANDO LOS INDICADORES QUE NO SE USEN Y CLASIFICANDO LOS TIPOS
-		String line;
+		String line = null;
 		String subscenario;
 		String type;
 		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
@@ -119,16 +117,22 @@ public class CountryServiceImpl implements CountryService {
 					// attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
-				case "type":
+				case "tipo":
 					type = dataline[1];
 					typeAttributes = new HashMap<>();
 					subscenarioAttributes.put(type, typeAttributes);
 					break;
 				default:
 					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-					typeAttributes.put(dataline[0],
-							Double.parseDouble(dataline[1]));
-					break;
+					if ("true".equals(dataline[1]) || "sí".equals(dataline[1])
+							|| "si".equals(dataline[1]) || "yes".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 1.0);
+					} else if ("false".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 0.0);
+					} else {
+						typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
+						break;
+					}
 				}
 			}
 			br.close();
@@ -136,6 +140,9 @@ public class CountryServiceImpl implements CountryService {
 			e.printStackTrace();
 			// TODO: Throw a file corruption exception and ask to manually upload the
 			// country file again (priority=3)
+		} catch (NumberFormatException e) {
+			System.err.print(country.getName());
+			e.printStackTrace();
 		}
 		return attributes;
 	}
