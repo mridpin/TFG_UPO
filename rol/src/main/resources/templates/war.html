@@ -32,6 +32,14 @@
 }
 </style>
 <script type="text/javascript">
+	function isEmpty(obj) {
+	    for(var key in obj) {
+	        if(obj.hasOwnProperty(key))
+	            return false;
+	    }
+	    return true;
+	}
+	
 	/* Functions that sync input and slider together */
 	function updateTextInput(val, id) {
 		id += "_input";
@@ -43,16 +51,43 @@
 		$("#" + id).val(val);
 	}
 	
-	// Sums an array of country objects
+	/* Sums an array of country objects */
 	function sumCoalition(coalition) {
-		var sum  = $.extend(true, {}, coalition[0]);
+		var x = 0;
+		var sum;
+		do {
+			sum  = $.extend(true, {}, coalition[x]);
+		} while (isEmpty(coalition[x++]) && x<coalition.length);
 		// Iterate countries
-		for (var i = 1; i<coalition.length; i++) {
+		for (var i = x; i<coalition.length; i++) {
+			if (!isEmpty(coalition[i])){
+				// Iterate each type
+				$.each(coalition[i], function(type, types) {
+					// Iterate each attribute
+					// sum[type] = {};
+					$.each(types, function(attribute, value) {
+						sum[type][attribute] += value;					
+					});
+				});
+			}
+		}
+		return sum;
+	}
+	
+	/**
+	 * Sums all the points of a coalition, before rolling the dice
+	 * 
+	 * @param: a coalition object to sum its points
+	 * @returns: the total sum of points
+	 */
+	function sumTotalPoints(coalition) {
+		var sum = 0.0;
+		if (!isEmpty(coalition)){
 			// Iterate each type
-			$.each(coalition[i], function(type, types) {
+			$.each(coalition, function(type, types) {
 				// Iterate each attribute
 				$.each(types, function(attribute, value) {
-					sum[type][attribute] += value;					
+					sum += value;					
 				});
 			});
 		}
@@ -143,12 +178,19 @@
 			// Iterate the attributes
 			$.each(attributes, function(name, value) {
 				var row = $("<tr>");
-				$(row).append($("<td>").append(attributeValuesTemplate[type][name]));
-				$(row).append($("<td>").append(attackerPoints[type]==null ? 0 : attackerPoints[type][name]));
-				$(row).append($("<td>").append(defenderPoints[type]==null ? 0 : defenderPoints[type][name]));
+				$(row).append($("<td>").append(name + " &#10005; " + attributeValuesTemplate[type][name] + " pts."));
+				var at = (attackerPoints[type] == null) || isEmpty(attackerPoints[type]);
+				$(row).append($("<td>").append((attackerPoints[type] == null) || isEmpty(attackerPoints[type]) ? 0 : attackerPoints[type][name].toFixed(2)));
+				$(row).append($("<td>").append((defenderPoints[type] == null) || isEmpty(defenderPoints[type]) ? 0 : defenderPoints[type][name].toFixed(2)));
 				$(table).append(row);
 			});
 		});
+		// Add the sum row:
+		var sumrow = $("<tr>");
+		$(sumrow).append($("<th>").append("Puntos totales"));
+		$(sumrow).append($("<th>").append(sumTotalPoints(attackerPoints)));
+		$(sumrow).append($("<th>").append(sumTotalPoints(defenderPoints)));
+		$(table).append(sumrow);
 	}
 	/* Calculates the power of navies between coalitions and naval powers */
 	/* This function is VIP */
@@ -206,20 +248,20 @@
 		// TODO: Download template via ajax to do this (only once per page load)
 		// Reference table with points per attribute.
 		attributeValuesTemplate = {
-				"Económicos": {
+				"economicos": {
 					"PIB/p.c ($ Geary-Khamis de 1990)": 8.0,
 					"Población total": 8.0,
 					"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)": 8.0,
-					"Producción acero (Tm.)": 8.0,
-					"Producción carbón (Tm.)": 8.0,
+					"Producción acero (Tm)": 8.0,
+					"Producción carbón (Tm)": 8.0,
 				},
-				"Militares": 
+				"militares": 
 				{
 					"Densidad ferroviaria (km/km2)": 8.0,
 					"Soldados -de todos los ejércitos-": 11.0,
 					"Reservistas -de todos los ejércitos-": 11.0,
 				},
-				"Navales": {
+				"navales": {
 					"Tonelaje desplazado por la Armada (Tm)": 5.0,
 					"Tonelaje desplazado por la marina mercante (Tm)": 3.0,
 				},
@@ -227,8 +269,6 @@
 	}
 	
 	function updateCountryPoints() {
-		var attackerPoints = {};
-		var defenderPoints = {};
 		var attackerCountries = $("#coal1_box").find("span.country_names",
 		"li.ui-sortable-handle");
 		var defenderCountries = $("#coal2_box").find("span.country_names",
@@ -237,6 +277,7 @@
 		// Add up the power of coalitions
 		var defenders = [];
 		var attackers = [];
+		// TODO: REMOTAR AQUI: CALCULAR EL PORCENTAJE IMPLICADO
 		for (var key = 0; key < defenderCountries.length; key++) {
 			var name = $(defenderCountries[key]).text();
 			defenders.push(countries[name][turn]);
@@ -249,9 +290,33 @@
 		var defenderStats = sumCoalition(defenders);
 		
 		// Calculate the points
-		// TODO: REMOTAR AQUI: CALCULAR LOS PUNTOS
-				
-		drawCountryPoints(attackerStats, defenderStats);
+		var attackerPoints = {};
+		var defenderPoints = {};
+		// First, calculate the total
+		var totalStats = sumCoalition([attackerStats, defenderStats]);
+		// Iterate the total and create an object with attacker and defender
+		// points
+		$.each(attributeValuesTemplate, function(type, types) {
+			attackerPoints[type] = {};
+			defenderPoints[type] = {};
+			$.each(types, function(name, attribute) {
+				if (!isEmpty(totalStats[type])) {
+					var total = totalStats[type][name];
+					var points = attributeValuesTemplate[type][name];
+					if (!isEmpty(attackerStats)) {
+						var at = attackerStats[type][name];
+						attackerPoints[type][name] = (total===0) ? 1 : (attackerStats[type][name]/total);
+						attackerPoints[type][name] *= points;
+					}	
+					if (!isEmpty(defenderStats)) {
+						defenderPoints[type][name] = (total===0) ? 1 : (defenderStats[type][name]/total);
+						defenderPoints[type][name] *= points;
+						var def = defenderStats[type][name];
+					}
+				}
+			});
+		});				
+		drawCountryPoints(attackerPoints, defenderPoints);
 	}
 	
 	$(document).ready(function() {

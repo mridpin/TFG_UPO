@@ -21,3 +21,7 @@ function matchPasswords() {
 		return false;
 	}
 }
+
+/**
+ * Add property function isEmpty() to objects
+ */
