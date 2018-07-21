@@ -32,6 +32,13 @@
 }
 </style>
 <script type="text/javascript">
+
+	// TODO: AJAX download this ruleset into a constant of arrays
+	const BLOCKADE_PENALTY = 0.75;
+	const INLAND_BATTLE_PENALTY = 0.75;
+	const BLOCKABLE_ATTRIBUTES = "economicos";
+	const INLAND_ATTRIBUTES = "navales";
+	
 	function isEmpty(obj) {
 	    for(var key in obj) {
 	        if(obj.hasOwnProperty(key))
@@ -75,7 +82,7 @@
 	}
 	
 	/**
-	 * Sums all the points of a coalition, before rolling the dice
+	 * Sums all the points of a coalition, before rolling the dice.
 	 * 
 	 * @param: a coalition object to sum its points
 	 * @returns: the total sum of points
@@ -94,6 +101,43 @@
 		return sum;
 	}
 	
+	/**
+	 * Returns a country object with all its attributes multiplied by its
+	 * commitment value. Also checks if the coalition is being blockaded and
+	 * applies penalties
+	 * 
+	 * @param country:
+	 *            the country in question
+	 * @param c:
+	 *            its resource commitment value
+	 * @return: the intervention value of said country
+	 */
+	function calculateCommitment(country, c, blockaded) {
+		var res = $.extend(true, {}, country);
+		$.each(res, function(type, types) {
+			$.each(types, function(name, value) {
+				res[type][name] *= c;				
+				if (blockaded && type===BLOCKABLE_ATTRIBUTES) {
+					res[type][name] *= BLOCKADE_PENALTY;
+				}
+			});
+		});
+		return res;
+	}
+	
+	function isBlockaded(country, coalition) {
+		var res = false;
+		var countryCheckboxes = $("[name="+country+"]");
+		var coalitionCheckboxes = $("[name="+coalition+"]");
+		for(var i = 0; i<countryCheckboxes.length; i++) {
+			res = res || $(countryCheckboxes[i]).prop("checked");
+		}
+		for(var i = 0; i<coalitionCheckboxes.length; i++) {
+			res = res || $(coalitionCheckboxes[i]).prop("checked");
+		}
+		return res;
+	}
+	
 	/* Gets the turn selected from the radio buttons via iteration */
 	function getSelectedTurn() {
 		var radioList = $("#subscenario_list").find("input:checked");
@@ -103,6 +147,7 @@
 
 	/* Updates the table with the new info */
 	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
+		// TODO: REMOTAR AQUI: MAKE BLOCKADE CHECKBOX WORK
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>");
@@ -117,10 +162,28 @@
 				c2percent += defenderNavy / navalPowerNavy;
 				var npcell = $("<td>");
 				$(npcell).append(key);
+				var blockadeAttackerCheckbox = $("<input>");
+				$(blockadeAttackerCheckbox).attr({
+					type: "checkbox",
+					form: "war_form",
+					name: "block_attacker",
+					value: key.replace(" ", "") + "_blocks_" + "attacker",
+					onchange: "updateCountryPoints();",
+				});
 				var c1cell = $("<td>");
-				$(c1cell).append((c1percent * 100).toFixed(2));
+				$(c1cell).append((c1percent * 100).toFixed(2) + ": ");
+				$(c1cell).append(blockadeAttackerCheckbox);
+				var blockadeDefenderCheckbox = $("<input>");
+				$(blockadeDefenderCheckbox).attr({
+					type: "checkbox",
+					form: "war_form",
+					name: "block_defender",
+					value: key.replace(" ", "") + "_blocks_" + "defender",
+					onchange: "updateCountryPoints();",
+				});
 				var c2cell = $("<td>");
-				$(c2cell).append((c2percent * 100).toFixed(2));
+				$(c2cell).append((c2percent * 100).toFixed(2) + ": ");
+				$(c2cell).append(blockadeDefenderCheckbox);
 				$(row).append(npcell);
 				$(row).append(c1cell);
 				$(row).append(c2cell);
@@ -155,9 +218,18 @@
 				$(row).append(npcell);
 				for (var c in countryNavies) {
 					var cpercent = 0.0;
-					cpercent += countryNavies[c] / navalPowerNavy;					
-					var ccell = $("<td>");
-					$(ccell).append((cpercent * 100).toFixed(2));
+					cpercent += countryNavies[c] / navalPowerNavy;
+					var blockadeCheckbox = $("<input>");
+					$(blockadeCheckbox).attr({
+						type: "checkbox",
+						form: "war_form",
+						name: "block_" + c.replace(" ", ""),
+						value: key.replace(" ", "") + "_blocks_" + c.replace(" ", ""),
+						onchange: "updateCountryPoints();",
+					});
+					var ccell = $("<td>");					
+					$(ccell).append((cpercent * 100).toFixed(2) + ": ");
+					$(ccell).append(blockadeCheckbox);
 					$(row).append(ccell);
 				}
 				$("#country_navies").append(row);
@@ -188,8 +260,8 @@
 		// Add the sum row:
 		var sumrow = $("<tr>");
 		$(sumrow).append($("<th>").append("Puntos totales"));
-		$(sumrow).append($("<th>").append(sumTotalPoints(attackerPoints)));
-		$(sumrow).append($("<th>").append(sumTotalPoints(defenderPoints)));
+		$(sumrow).append($("<th>").append(sumTotalPoints(attackerPoints).toFixed(2)));
+		$(sumrow).append($("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
 		$(table).append(sumrow);
 	}
 	/* Calculates the power of navies between coalitions and naval powers */
@@ -277,14 +349,27 @@
 		// Add up the power of coalitions
 		var defenders = [];
 		var attackers = [];
-		// TODO: REMOTAR AQUI: CALCULAR EL PORCENTAJE IMPLICADO
+		/*
+		 * To build the coalition, iterate all its countries, and for each: 1.
+		 * Get its name 2. Get the commitment 3. Get whether the coalition, or
+		 * the country, is being blockaded (blockades don't stack) 4. Build an
+		 * "intervention", ie a temporary version of the country, and and that
+		 * to the coalition
+		 */
 		for (var key = 0; key < defenderCountries.length; key++) {
+			// TODO: Refactor name.replace() to name
 			var name = $(defenderCountries[key]).text();
-			defenders.push(countries[name][turn]);
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input").val();
+			var blockaded = isBlockaded("block_" + name.replace(" ", ""), "block_defender");
+			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded);
+			defenders.push(intervention);			
 		}
 		for (var key = 0; key < attackerCountries.length; key++) {
 			var name = $(attackerCountries[key]).text();
-			attackers.push(countries[name][turn]);
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input").val();
+			var blockaded = isBlockaded("block_" + name.replace(" ", ""), "block_attacker");
+			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded);
+			attackers.push(intervention);
 		}
 		var attackerStats = sumCoalition(attackers);
 		var defenderStats = sumCoalition(defenders);
@@ -329,6 +414,7 @@
 				updateCoalitionNavies();
 				updateCountryNavies();
 				updateCountryPoints();
+				$(this).clone()
 			},
 		});
 		// $("li.country_selectable").selectable();
@@ -387,7 +473,7 @@
 		<section id="coalition_section">
 			<h3>Coaliciones</h3>
 			<div>
-				<p>Coalici&oacute;n 1</p>
+				<h4>Coalici&oacute;n Atacante</h4>
 				<div
 					id="coal1_box"
 					style="border: solid 2px;">
@@ -400,7 +486,7 @@
 					type="text"
 					name="coal1_name"
 					form="war_form">
-				<p>Coalici&oacute;n 2</p>
+				<h4>Coalici&oacute;n Defensora</h4>
 				<div
 					id="coal2_box"
 					style="border: solid 2px;">
@@ -414,6 +500,7 @@
 					name="coal2_name"
 					form="war_form">
 			</div>
+			<h4>Pa&iacute;ses</h4>
 			<div style="border: solid 2px;">
 				<ul
 					id="country_list"
@@ -422,7 +509,7 @@
 						class="country_selectable"
 						th:each="country : ${countries}">
 						<span
-							class="country_names"
+							th:class="'country_names ' + ${country.name}"
 							th:text="${country.name}"></span>
 						<input
 							type="range"
@@ -439,6 +526,7 @@
 							type="number"
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
+							th:class="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
 							form="war_form"
 							min=0
 							max=1
