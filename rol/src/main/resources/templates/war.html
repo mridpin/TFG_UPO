@@ -32,55 +32,123 @@
 }
 </style>
 <script type="text/javascript">
-
 	// TODO: AJAX download this ruleset into a constant of arrays
 	const BLOCKADE_PENALTY = 0.75;
 	const INLAND_BATTLE_PENALTY = 0.75;
 	const BLOCKABLE_ATTRIBUTES = "economicos";
 	const INLAND_ATTRIBUTES = "navales";
-	
+
 	function isEmpty(obj) {
-	    for(var key in obj) {
-	        if(obj.hasOwnProperty(key))
-	            return false;
-	    }
-	    return true;
-	}
-	
-	/* Functions that sync input and slider together */
-	function updateTextInput(val, id) {
-		id += "_input";
-		$("#" + id).val(val);
+		for ( var key in obj) {
+			if (obj.hasOwnProperty(key))
+				return false;
+		}
+		return true;
 	}
 
-	function updateSliderInput(val, id) {
-		id += "_percent";
+//	/* Functions that sync input and slider together */
+//	function restrictIfDuplicate(inpt, clazz) {
+//		if ($(inpt).attr("type") == "range") {
+//			var inputs = $("input." + clazz);
+//			for (var i = 0; i<inputs.length; i++) {
+//				if (inputs[i] !== inpt) {
+//					$(inpt).attr("max", 1 - $(inputs[i]).val());
+//				}
+//			}
+//		} else {
+//			var inputs = $("input." + clazz + "_input");
+//			for (var i = 0; i<inputs.length; i++) {
+//				if (inputs[i] !== inpt) {
+//					$(inpt).attr("max", 1 - $(inputs[i]).val());
+//				}
+//			}
+//		}		
+//	}
+	
+	function updateTextInput(input, val, id) {
+		$("#" + id + "_input").val(val);
+	}
+
+	function updateSliderInput(input, val, id) {
+		var id = id.replace("_input", "");
 		$("#" + id).val(val);
 	}
 	
+	/**
+	 * Splits a country into two factions
+	 * 
+	 * @param: name of the country
+	 */
+	function splitCountry(name) {
+		// Split the countries
+		var escapedName = name.replace(" ", "");
+		var item = $("#"+escapedName+"_listitem");
+		var list = $(item).parent("ul");
+		var clone = $(item).clone().appendTo(list);
+		// Balance the commitment
+		var newPercentInput = $(clone).find("input."+escapedName+"_percent_input");
+		var originalPercentInput = $(item).find("input."+escapedName+"_percent_input");
+		var originalPercent = $(originalPercentInput).val();
+		var newPercent = 1 - originalPercent;
+		$(originalPercentInput).val(newPercent.toFixed(2));
+		$(newPercentInput).val(newPercent.toFixed(2));		
+		balanceCommitment(name, originalPercent, newPercent);
+		// Replace the buttons
+		// swapButton(item);
+		// swapButton(clone);
+		// Rename the ids of the new country
+		$(clone).attr("id", escapedName + "2_listitem");	
+		$(clone).find("input#" + escapedName + "_percent").attr("id", escapedName + "2_percent");	
+		$(clone).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "2_percent_input");	
+		//$(clone).find("input#" + escapedName + "_listitem").attr("id", escapedName + "2_listitem");	
+		// Limit the max commitment UI elements
+		$("#" + escapedName + "2_percent").attr("max", newPercent);
+		$("#" + escapedName + "2_percent_input").attr("max", newPercent);
+		$("#" + escapedName + "_percent").attr("max", originalPercent);
+		$("#" + escapedName + "_percent_input").attr("max", originalPercent);
+		// TODO: RETOMAR COALITIONS NOT ADDING PARTITION PROPERLY
+	}
+	
+	function balanceCommitment(name, op, np) {
+		var newCountry = $.extend(true, {}, countries[name]);
+		var oldCountry = countries[name];
+		$.each(oldCountry, function(turn, turns) {
+			$.each(turns, function(type, types) {
+				$.each (types, function(name, attribute) {
+					if (!isNaN(attribute)) {
+						newCountry[turn][type][name] *= np;
+						oldCountry[turn][type][name] *= op;
+					}
+				});			
+			})
+		});
+		countries[name] = oldCountry;
+		countries[name + " 2"] = newCountry;		
+	}
+
 	/* Sums an array of country objects */
 	function sumCoalition(coalition) {
 		var x = 0;
 		var sum;
 		do {
-			sum  = $.extend(true, {}, coalition[x]);
-		} while (isEmpty(coalition[x++]) && x<coalition.length);
+			sum = $.extend(true, {}, coalition[x]);
+		} while (isEmpty(coalition[x++]) && x < coalition.length);
 		// Iterate countries
-		for (var i = x; i<coalition.length; i++) {
-			if (!isEmpty(coalition[i])){
+		for (var i = x; i < coalition.length; i++) {
+			if (!isEmpty(coalition[i])) {
 				// Iterate each type
 				$.each(coalition[i], function(type, types) {
 					// Iterate each attribute
 					// sum[type] = {};
 					$.each(types, function(attribute, value) {
-						sum[type][attribute] += value;					
+						sum[type][attribute] += value;
 					});
 				});
 			}
 		}
 		return sum;
 	}
-	
+
 	/**
 	 * Sums all the points of a coalition, before rolling the dice.
 	 * 
@@ -89,18 +157,18 @@
 	 */
 	function sumTotalPoints(coalition) {
 		var sum = 0.0;
-		if (!isEmpty(coalition)){
+		if (!isEmpty(coalition)) {
 			// Iterate each type
 			$.each(coalition, function(type, types) {
 				// Iterate each attribute
 				$.each(types, function(attribute, value) {
-					sum += value;					
+					sum += value;
 				});
 			});
 		}
 		return sum;
 	}
-	
+
 	/**
 	 * Returns a country object with all its attributes multiplied by its
 	 * commitment value. Also checks if the coalition is being blockaded and
@@ -116,28 +184,28 @@
 		var res = $.extend(true, {}, country);
 		$.each(res, function(type, types) {
 			$.each(types, function(name, value) {
-				res[type][name] *= c;				
-				if (blockaded && type===BLOCKABLE_ATTRIBUTES) {
+				res[type][name] *= c;
+				if (blockaded && type === BLOCKABLE_ATTRIBUTES) {
 					res[type][name] *= BLOCKADE_PENALTY;
 				}
 			});
 		});
 		return res;
 	}
-	
+
 	function isBlockaded(country, coalition) {
 		var res = false;
-		var countryCheckboxes = $("[name="+country+"]");
-		var coalitionCheckboxes = $("[name="+coalition+"]");
-		for(var i = 0; i<countryCheckboxes.length; i++) {
+		var countryCheckboxes = $("[name=" + country + "]");
+		var coalitionCheckboxes = $("[name=" + coalition + "]");
+		for (var i = 0; i < countryCheckboxes.length; i++) {
 			res = res || $(countryCheckboxes[i]).prop("checked");
 		}
-		for(var i = 0; i<coalitionCheckboxes.length; i++) {
+		for (var i = 0; i < coalitionCheckboxes.length; i++) {
 			res = res || $(coalitionCheckboxes[i]).prop("checked");
 		}
 		return res;
 	}
-	
+
 	/* Gets the turn selected from the radio buttons via iteration */
 	function getSelectedTurn() {
 		var radioList = $("#subscenario_list").find("input:checked");
@@ -164,22 +232,22 @@
 				$(npcell).append(key);
 				var blockadeAttackerCheckbox = $("<input>");
 				$(blockadeAttackerCheckbox).attr({
-					type: "checkbox",
-					form: "war_form",
-					name: "block_attacker",
-					value: key.replace(" ", "") + "_blocks_" + "attacker",
-					onchange: "updateCountryPoints();",
+					type : "checkbox",
+					form : "war_form",
+					name : "block_attacker",
+					value : key.replace(" ", "") + "_blocks_" + "attacker",
+					onchange : "updateCountryPoints();",
 				});
 				var c1cell = $("<td>");
 				$(c1cell).append((c1percent * 100).toFixed(2) + ": ");
 				$(c1cell).append(blockadeAttackerCheckbox);
 				var blockadeDefenderCheckbox = $("<input>");
 				$(blockadeDefenderCheckbox).attr({
-					type: "checkbox",
-					form: "war_form",
-					name: "block_defender",
-					value: key.replace(" ", "") + "_blocks_" + "defender",
-					onchange: "updateCountryPoints();",
+					type : "checkbox",
+					form : "war_form",
+					name : "block_defender",
+					value : key.replace(" ", "") + "_blocks_" + "defender",
+					onchange : "updateCountryPoints();",
 				});
 				var c2cell = $("<td>");
 				$(c2cell).append((c2percent * 100).toFixed(2) + ": ");
@@ -191,7 +259,7 @@
 			}
 		}
 	}
-	
+
 	function drawCountryNavies(turn, countryNavies) {
 		// Set up table and first row
 		$("#country_navies").find("tr:gt(0)").remove();
@@ -216,18 +284,20 @@
 				var npcell = $("<td>");
 				$(npcell).append(key);
 				$(row).append(npcell);
-				for (var c in countryNavies) {
+				for ( var c in countryNavies) {
 					var cpercent = 0.0;
 					cpercent += countryNavies[c] / navalPowerNavy;
 					var blockadeCheckbox = $("<input>");
-					$(blockadeCheckbox).attr({
-						type: "checkbox",
-						form: "war_form",
-						name: "block_" + c.replace(" ", ""),
-						value: key.replace(" ", "") + "_blocks_" + c.replace(" ", ""),
-						onchange: "updateCountryPoints();",
-					});
-					var ccell = $("<td>");					
+					$(blockadeCheckbox).attr(
+							{
+								type : "checkbox",
+								form : "war_form",
+								name : "block_" + c.replace(" ", ""),
+								value : key.replace(" ", "") + "_blocks_"
+										+ c.replace(" ", ""),
+								onchange : "updateCountryPoints();",
+							});
+					var ccell = $("<td>");
 					$(ccell).append((cpercent * 100).toFixed(2) + ": ");
 					$(ccell).append(blockadeCheckbox);
 					$(row).append(ccell);
@@ -241,27 +311,57 @@
 		var table = $("#stat_table");
 		$(table).find("tr").remove();
 		// Iterate the types of attributes
-		$.each(attributeValuesTemplate, function (type, attributes){
-			var header = $("<tr>");
-			$(header).append($("<th>").append(type));
-			$(header).append($("<th>").append("Atacante"));
-			$(header).append($("<th>").append("Defensor"));
-			$(table).append(header);
-			// Iterate the attributes
-			$.each(attributes, function(name, value) {
-				var row = $("<tr>");
-				$(row).append($("<td>").append(name + " &#10005; " + attributeValuesTemplate[type][name] + " pts."));
-				var at = (attackerPoints[type] == null) || isEmpty(attackerPoints[type]);
-				$(row).append($("<td>").append((attackerPoints[type] == null) || isEmpty(attackerPoints[type]) ? 0 : attackerPoints[type][name].toFixed(2)));
-				$(row).append($("<td>").append((defenderPoints[type] == null) || isEmpty(defenderPoints[type]) ? 0 : defenderPoints[type][name].toFixed(2)));
-				$(table).append(row);
-			});
-		});
+		$
+				.each(
+						attributeValuesTemplate,
+						function(type, attributes) {
+							var header = $("<tr>");
+							$(header).append($("<th>").append(type));
+							$(header).append($("<th>").append("Atacante"));
+							$(header).append($("<th>").append("Defensor"));
+							$(table).append(header);
+							// Iterate the attributes
+							$
+									.each(
+											attributes,
+											function(name, value) {
+												var row = $("<tr>");
+												$(row)
+														.append(
+																$("<td>")
+																		.append(
+																				name
+																						+ " &#10005; "
+																						+ attributeValuesTemplate[type][name]
+																						+ " pts."));
+												var at = (attackerPoints[type] == null)
+														|| isEmpty(attackerPoints[type]);
+												$(row)
+														.append(
+																$("<td>")
+																		.append(
+																				(attackerPoints[type] == null)
+																						|| isEmpty(attackerPoints[type]) ? 0
+																						: attackerPoints[type][name]
+																								.toFixed(2)));
+												$(row)
+														.append(
+																$("<td>")
+																		.append(
+																				(defenderPoints[type] == null)
+																						|| isEmpty(defenderPoints[type]) ? 0
+																						: defenderPoints[type][name]
+																								.toFixed(2)));
+												$(table).append(row);
+											});
+						});
 		// Add the sum row:
 		var sumrow = $("<tr>");
 		$(sumrow).append($("<th>").append("Puntos totales"));
-		$(sumrow).append($("<th>").append(sumTotalPoints(attackerPoints).toFixed(2)));
-		$(sumrow).append($("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
+		$(sumrow).append(
+				$("<th>").append(sumTotalPoints(attackerPoints).toFixed(2)));
+		$(sumrow).append(
+				$("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
 		$(table).append(sumrow);
 	}
 	/* Calculates the power of navies between coalitions and naval powers */
@@ -296,20 +396,20 @@
 		}
 		drawCoalitionNavies(turn, attackerNavy, defenderNavy);
 	}
-	
+
 	/* Calculates the power of navies between naval powers and countries */
 	/* This function is VIP */
 	function updateCountryNavies() {
 		var turn = getSelectedTurn();
 		var countryNavies = {};
 		// Grab the names of all the countries from the table
-		for (var key in countries) {
+		for ( var key in countries) {
 			var name = key;
 			var intervention = countries[name][turn]["navales"];
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
-			+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
-			.val();
+					.val();
 			var finalNavy = navies * commitment;
 			countryNavies[name] = finalNavy;
 		}
@@ -320,31 +420,30 @@
 		// TODO: Download template via ajax to do this (only once per page load)
 		// Reference table with points per attribute.
 		attributeValuesTemplate = {
-				"economicos": {
-					"PIB/p.c ($ Geary-Khamis de 1990)": 8.0,
-					"Población total": 8.0,
-					"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)": 8.0,
-					"Producción acero (Tm)": 8.0,
-					"Producción carbón (Tm)": 8.0,
-				},
-				"militares": 
-				{
-					"Densidad ferroviaria (km/km2)": 8.0,
-					"Soldados -de todos los ejércitos-": 11.0,
-					"Reservistas -de todos los ejércitos-": 11.0,
-				},
-				"navales": {
-					"Tonelaje desplazado por la Armada (Tm)": 5.0,
-					"Tonelaje desplazado por la marina mercante (Tm)": 3.0,
-				},
+			"economicos" : {
+				"PIB/p.c ($ Geary-Khamis de 1990)" : 8.0,
+				"Población total" : 8.0,
+				"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)" : 8.0,
+				"Producción acero (Tm)" : 8.0,
+				"Producción carbón (Tm)" : 8.0,
+			},
+			"militares" : {
+				"Densidad ferroviaria (km/km2)" : 8.0,
+				"Soldados -de todos los ejércitos-" : 11.0,
+				"Reservistas -de todos los ejércitos-" : 11.0,
+			},
+			"navales" : {
+				"Tonelaje desplazado por la Armada (Tm)" : 5.0,
+				"Tonelaje desplazado por la marina mercante (Tm)" : 3.0,
+			},
 		};
 	}
-	
+
 	function updateCountryPoints() {
 		var attackerCountries = $("#coal1_box").find("span.country_names",
-		"li.ui-sortable-handle");
+				"li.ui-sortable-handle");
 		var defenderCountries = $("#coal2_box").find("span.country_names",
-		"li.ui-sortable-handle");
+				"li.ui-sortable-handle");
 		var turn = getSelectedTurn();
 		// Add up the power of coalitions
 		var defenders = [];
@@ -359,26 +458,32 @@
 		for (var key = 0; key < defenderCountries.length; key++) {
 			// TODO: Refactor name.replace() to name
 			var name = $(defenderCountries[key]).text();
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input").val();
-			var blockaded = isBlockaded("block_" + name.replace(" ", ""), "block_defender");
-			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded);
-			defenders.push(intervention);			
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+					.val();
+			var blockaded = isBlockaded("block_" + name.replace(" ", ""),
+					"block_defender");
+			var intervention = calculateCommitment(countries[name][turn],
+					commitment, blockaded);
+			defenders.push(intervention);
 		}
 		for (var key = 0; key < attackerCountries.length; key++) {
 			var name = $(attackerCountries[key]).text();
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input").val();
-			var blockaded = isBlockaded("block_" + name.replace(" ", ""), "block_attacker");
-			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded);
+			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+					.val();
+			var blockaded = isBlockaded("block_" + name.replace(" ", ""),
+					"block_attacker");
+			var intervention = calculateCommitment(countries[name][turn],
+					commitment, blockaded);
 			attackers.push(intervention);
 		}
 		var attackerStats = sumCoalition(attackers);
 		var defenderStats = sumCoalition(defenders);
-		
+
 		// Calculate the points
 		var attackerPoints = {};
 		var defenderPoints = {};
 		// First, calculate the total
-		var totalStats = sumCoalition([attackerStats, defenderStats]);
+		var totalStats = sumCoalition([ attackerStats, defenderStats ]);
 		// Iterate the total and create an object with attacker and defender
 		// points
 		$.each(attributeValuesTemplate, function(type, types) {
@@ -390,20 +495,22 @@
 					var points = attributeValuesTemplate[type][name];
 					if (!isEmpty(attackerStats)) {
 						var at = attackerStats[type][name];
-						attackerPoints[type][name] = (total===0) ? 1 : (attackerStats[type][name]/total);
+						attackerPoints[type][name] = (total === 0) ? 1
+								: (attackerStats[type][name] / total);
 						attackerPoints[type][name] *= points;
-					}	
+					}
 					if (!isEmpty(defenderStats)) {
-						defenderPoints[type][name] = (total===0) ? 1 : (defenderStats[type][name]/total);
+						defenderPoints[type][name] = (total === 0) ? 1
+								: (defenderStats[type][name] / total);
 						defenderPoints[type][name] *= points;
 						var def = defenderStats[type][name];
 					}
 				}
 			});
-		});				
+		});
 		drawCountryPoints(attackerPoints, defenderPoints);
 	}
-	
+
 	$(document).ready(function() {
 		// Sortable list to drag countries to coalitions
 		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
@@ -507,7 +614,8 @@
 					class="coalition_lists">
 					<li
 						class="country_selectable"
-						th:each="country : ${countries}">
+						th:each="country : ${countries}"
+						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}">
 						<span
 							th:class="'country_names ' + ${country.name}"
 							th:text="${country.name}"></span>
@@ -519,9 +627,10 @@
 							value=1
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent'}"
+							th:class="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							form="war_form"
-							oninput="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies();updateCountryPoints()"
-							onchange="updateTextInput(this.value, this.id);updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
+							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateTextInput(this, this.value, this.id);"
+							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateTextInput(this, this.value, this.id);">
 						<input
 							type="number"
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
@@ -532,14 +641,20 @@
 							max=1
 							step=0.01
 							value=1
-							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()"
-							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
+							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);"
+							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);">
 						<!--						TODO: JQUERY validate this to max 1  -->
 						<input
 							type="hidden"
 							th:name="${country.name + '_coalition'}"
 							value=""
 							form="war_form">
+						<button
+							type="button"
+							th:name="${country.name + '_split'}"
+							th:id="${country.name + '_split'}"
+							th:value="${country.name}"
+							onclick="splitCountry(this.value);">Dividir</button>
 					</li>
 				</ul>
 			</div>
@@ -575,15 +690,17 @@
 					id="country_navies"
 					border="2">
 					<tr>
-<!-- 						<th>Potencias navales</td> -->
-<!-- 						<th th:each="country : ${countries}" th:text="${country.name}"></th> -->
+						<!-- 						<th>Potencias navales</td> -->
+						<!-- 						<th th:each="country : ${countries}" th:text="${country.name}"></th> -->
 					</tr>
 				</table>
 			</div>
 		</section>
 		<section>
 			<h3>Puntos disponibles para la tirada actual</h3>
-			<table id="stat_table" border="2">
+			<table
+				id="stat_table"
+				border="2">
 			</table>
 			<input
 				type="submit"
@@ -593,23 +710,6 @@
 		<section>
 			<h3>Puntos acumulados</h3>
 			<table border="2">
-			</table>
-		</section>
-		<section>
-			<h3>Tiradas anteriores</h3>
-			<table border="2">
-				<tr>
-					<td>Tirada 1</td>
-					<td>Atacante</td>
-					<td>Defensor</td>
-				</tr>
-			</table>
-			<table border="2">
-				<tr>
-					<td>Economicos</td>
-					<td>Atacante</td>
-					<td>Defensor</td>
-				</tr>
 			</table>
 		</section>
 	</article>
