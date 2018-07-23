@@ -45,25 +45,6 @@
 		}
 		return true;
 	}
-
-//	/* Functions that sync input and slider together */
-//	function restrictIfDuplicate(inpt, clazz) {
-//		if ($(inpt).attr("type") == "range") {
-//			var inputs = $("input." + clazz);
-//			for (var i = 0; i<inputs.length; i++) {
-//				if (inputs[i] !== inpt) {
-//					$(inpt).attr("max", 1 - $(inputs[i]).val());
-//				}
-//			}
-//		} else {
-//			var inputs = $("input." + clazz + "_input");
-//			for (var i = 0; i<inputs.length; i++) {
-//				if (inputs[i] !== inpt) {
-//					$(inpt).attr("max", 1 - $(inputs[i]).val());
-//				}
-//			}
-//		}		
-//	}
 	
 	function updateTextInput(input, val, id) {
 		$("#" + id + "_input").val(val);
@@ -72,6 +53,18 @@
 	function updateSliderInput(input, val, id) {
 		var id = id.replace("_input", "");
 		$("#" + id).val(val);
+	}
+	
+	function swapButton(li, originalName) {
+		var button = $(li).find("button." + originalName + "_split");
+		var text = $(button).text();
+		if (text==="Dividir") {
+			$(button).text("Borrar");
+			$(button).attr("onclick", "deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+		} else if (text==="Borrar") {
+			$(button).text("Dividir");
+			$(button).attr("onclick", "splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+		}
 	}
 	
 	/**
@@ -85,6 +78,10 @@
 		var item = $("#"+escapedName+"_listitem");
 		var list = $(item).parent("ul");
 		var clone = $(item).clone().appendTo(list);
+		var name1 = name + " 1";
+		var name2 = name + " 2";
+		$(clone).find("span.country_names", "li.ui-sortable-handle").text(name2);
+		$(item).find("span.country_names", "li.ui-sortable-handle").text(name1);
 		// Balance the commitment
 		var newPercentInput = $(clone).find("input."+escapedName+"_percent_input");
 		var originalPercentInput = $(item).find("input."+escapedName+"_percent_input");
@@ -92,26 +89,43 @@
 		var newPercent = 1 - originalPercent;
 		$(originalPercentInput).val(newPercent.toFixed(2));
 		$(newPercentInput).val(newPercent.toFixed(2));		
-		balanceCommitment(name, originalPercent, newPercent);
+		balanceCommitment(name, name1, name2, originalPercent, newPercent);
 		// Replace the buttons
-		// swapButton(item);
-		// swapButton(clone);
-		// Rename the ids of the new country
+		swapButton(item, name);
+		swapButton(clone, name);
+		// Rename the ids of the countries
+		$(item).attr("id", escapedName + "1_listitem");	
+		$(item).find("input#" + escapedName + "_percent").attr("id", escapedName + "1_percent");	
+		$(item).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "1_percent_input");
 		$(clone).attr("id", escapedName + "2_listitem");	
 		$(clone).find("input#" + escapedName + "_percent").attr("id", escapedName + "2_percent");	
 		$(clone).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "2_percent_input");	
-		//$(clone).find("input#" + escapedName + "_listitem").attr("id", escapedName + "2_listitem");	
+		// $(clone).find("input#" + escapedName + "_listitem").attr("id",
+		// escapedName + "2_listitem");
 		// Limit the max commitment UI elements
 		$("#" + escapedName + "2_percent").attr("max", newPercent);
 		$("#" + escapedName + "2_percent_input").attr("max", newPercent);
-		$("#" + escapedName + "_percent").attr("max", originalPercent);
-		$("#" + escapedName + "_percent_input").attr("max", originalPercent);
-		// TODO: RETOMAR COALITIONS NOT ADDING PARTITION PROPERLY
+		$("#" + escapedName + "1_percent").attr("max", originalPercent);
+		$("#" + escapedName + "1_percent_input").attr("max", originalPercent);
 	}
 	
-	function balanceCommitment(name, op, np) {
+	/**
+	 * Deletes the selected partition and merges it back into the full country
+	 * by adding both sets of data, maintaining any losses. Basically undos all
+	 * that splitCountry() did.
+	 * 
+	 * @param: original name of country
+	 */
+	function deletePartition(partitionName) {
+		// Split the countries
+		var escapedPartitionName = partitionName.replace(" ", "");
+		var clazz = $("#"+escapedPartitionName+"_listitem").attr("class");
+		var partitions = $("li.class");
+	}
+	
+	function balanceCommitment(name, name1, name2, op, np) {
 		var newCountry = $.extend(true, {}, countries[name]);
-		var oldCountry = countries[name];
+		var oldCountry = $.extend(true, {}, countries[name]);
 		$.each(oldCountry, function(turn, turns) {
 			$.each(turns, function(type, types) {
 				$.each (types, function(name, attribute) {
@@ -122,8 +136,8 @@
 				});			
 			})
 		});
-		countries[name] = oldCountry;
-		countries[name + " 2"] = newCountry;		
+		countries[name1] = oldCountry;
+		countries[name2] = newCountry;		
 	}
 
 	/* Sums an array of country objects */
@@ -288,8 +302,7 @@
 					var cpercent = 0.0;
 					cpercent += countryNavies[c] / navalPowerNavy;
 					var blockadeCheckbox = $("<input>");
-					$(blockadeCheckbox).attr(
-							{
+					$(blockadeCheckbox).attr({
 								type : "checkbox",
 								form : "war_form",
 								name : "block_" + c.replace(" ", ""),
@@ -375,22 +388,35 @@
 				"li.ui-sortable-handle");
 		var turn = getSelectedTurn();
 		for (var key = 0; key < attackerCountries.length; key++) {
-			var name = $(attackerCountries[key]).text();
+			var longname = $(attackerCountries[key]).text();
+			var name = longname;
+			// Remove the suffix if it exists to use the country full values
+			var nameSplit = longname.split(" ");
+			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
+				name = nameSplit.join(" ");
+			}
 			var intervention = countries[name][turn]["navales"];
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			// Este name da el fallo
+			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
 					.val();
 			attackerNavy += navies * commitment;
 		}
 		for (var key = 0; key < defenderCountries.length; key++) {
-			var name = $(defenderCountries[key]).text();
+			var longname = $(defenderCountries[key]).text();
+			var name = longname;
+			// Remove the suffix if it exists to use the country full values
+			var nameSplit = longname.split(" ");
+			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
+				name = nameSplit.join(" ");
+			}
 			var intervention = countries[name][turn]["navales"];
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
 					.val();
 			defenderNavy += navies * commitment;
 		}
@@ -404,14 +430,26 @@
 		var countryNavies = {};
 		// Grab the names of all the countries from the table
 		for ( var key in countries) {
-			var name = key;
+			// TODO: NO FUNCIONA CON LOS PAISES PARTICIONADOS
+			var longname = key;
+			var name = longname;
+			// Remove the suffix if it exists to use the country full values
+			var nameSplit = longname.split(" ");
+			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
+				name = nameSplit.join(" ");
+			}
 			var intervention = countries[name][turn]["navales"];
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
 					.val();
+			// This is so the "parent" country appears in full force when it's
+			// partitioned
+			if (commitment == null) {
+				commitment = 1;
+			}
 			var finalNavy = navies * commitment;
-			countryNavies[name] = finalNavy;
+			countryNavies[longname] = finalNavy;
 		}
 		drawCountryNavies(turn, countryNavies);
 	}
@@ -421,7 +459,7 @@
 		// Reference table with points per attribute.
 		attributeValuesTemplate = {
 			"economicos" : {
-				"PIB/p.c ($ Geary-Khamis de 1990)" : 8.0,
+				"PIB ($ Geary-Khamis de 1990)" : 8.0,
 				"Población total" : 8.0,
 				"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)" : 8.0,
 				"Producción acero (Tm)" : 8.0,
@@ -457,20 +495,32 @@
 		 */
 		for (var key = 0; key < defenderCountries.length; key++) {
 			// TODO: Refactor name.replace() to name
-			var name = $(defenderCountries[key]).text();
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			var longname = $(defenderCountries[key]).text();
+			var name = longname;
+			// Remove the suffix if it exists to use the country full values
+			var nameSplit = longname.split(" ");
+			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
+				name = nameSplit.join(" ");
+			}
+			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + name.replace(" ", ""),
+			var blockaded = isBlockaded("block_" + longname.replace(" ", ""),
 					"block_defender");
 			var intervention = calculateCommitment(countries[name][turn],
 					commitment, blockaded);
 			defenders.push(intervention);
 		}
 		for (var key = 0; key < attackerCountries.length; key++) {
-			var name = $(attackerCountries[key]).text();
-			var commitment = $("#" + name.replace(" ", "") + "_percent_input")
+			var longname = $(attackerCountries[key]).text();
+			var name = longname;
+			// Remove the suffix if it exists to use the country full values
+			var nameSplit = longname.split(" ");
+			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
+				name = nameSplit.join(" ");
+			}
+			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + name.replace(" ", ""),
+			var blockaded = isBlockaded("block_" + longname.replace(" ", ""),
 					"block_attacker");
 			var intervention = calculateCommitment(countries[name][turn],
 					commitment, blockaded);
@@ -524,7 +574,6 @@
 				$(this).clone()
 			},
 		});
-		// $("li.country_selectable").selectable();
 		$("ul.coalition_lists").disableSelection();
 
 		// Ajax call to get all country data to display in tables dynamically
@@ -612,9 +661,9 @@
 				<ul
 					id="country_list"
 					class="coalition_lists">
-					<li
-						class="country_selectable"
+					<li						
 						th:each="country : ${countries}"
+						th:class="${#strings.replace(country.name, ' ', '') + '_listitem'}"
 						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}">
 						<span
 							th:class="'country_names ' + ${country.name}"
@@ -652,9 +701,10 @@
 						<button
 							type="button"
 							th:name="${country.name + '_split'}"
+							th:class="${country.name + '_split'}"
 							th:id="${country.name + '_split'}"
 							th:value="${country.name}"
-							onclick="splitCountry(this.value);">Dividir</button>
+							onclick="splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()">Dividir</button>
 					</li>
 				</ul>
 			</div>
@@ -670,7 +720,6 @@
 			</div>
 		</section>
 		<section>
-			<h1>RETOMAR AQUI: AJAX</h1>
 			<h3>Armadas</h3>
 			<div>
 				<h4>Potencias navales vs. Coaliciones</h4>
