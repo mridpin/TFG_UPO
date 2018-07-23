@@ -56,7 +56,7 @@
 	}
 	
 	function swapButton(li, originalName) {
-		var button = $(li).find("button." + originalName + "_split");
+		var button = $(li).find("button." + originalName.replace(" ", "") + "_split");
 		var text = $(button).text();
 		if (text==="Dividir") {
 			$(button).text("Borrar");
@@ -116,11 +116,28 @@
 	 * 
 	 * @param: original name of country
 	 */
-	function deletePartition(partitionName) {
-		// Split the countries
-		var escapedPartitionName = partitionName.replace(" ", "");
-		var clazz = $("#"+escapedPartitionName+"_listitem").attr("class");
-		var partitions = $("li.class");
+	function deletePartition(countryName) {
+		// Delete the country partitions, leaving only the original
+		var escapedName = countryName.replace(" ", "");
+		var clazz = escapedName+"_listitem";
+		var partitions = $("li." + clazz);
+		var partition1 = $(partitions[0]).find("span." + escapedName).text();
+		var partition2 = $(partitions[1]).find("span." + escapedName).text();
+		delete countries[partition1];
+		delete countries[partition2];
+		// Remove the list items and rename the ids
+		var item = partitions[0];
+		$(partitions[1]).remove();
+		$(item).find("span.country_names", "li.ui-sortable-handle").text(countryName);
+		$(item).find("input."+escapedName+"_percent_input").attr("max", 1);
+		$(item).find("input."+escapedName+"_percent").attr("max", 1);
+		$(item).find("input."+escapedName+"_percent_input").val(1);
+		$(item).find("input."+escapedName+"_percent").val(1);
+		$(item).attr("id", escapedName + "_listitem");	
+		$(item).find("input[type=range]").attr("id", escapedName + "_percent");	
+		$(item).find("input[type=number]").attr("id", escapedName + "_percent_input");		
+		swapButton(item, countryName);
+		// TODO:: RU DIVIDIDO DA FALLO NAN CON LOS NUMEROS
 	}
 	
 	function balanceCommitment(name, name1, name2, op, np) {
@@ -209,7 +226,7 @@
 
 	function isBlockaded(country, coalition) {
 		var res = false;
-		var countryCheckboxes = $("[name=" + country + "]");
+		var countryCheckboxes = $("[name=" + country.replace(" ", "") + "]");
 		var coalitionCheckboxes = $("[name=" + coalition + "]");
 		for (var i = 0; i < countryCheckboxes.length; i++) {
 			res = res || $(countryCheckboxes[i]).prop("checked");
@@ -593,11 +610,6 @@
 </script>
 </head>
 <body>
-	<h3>TODO: Mejoras UX y validacion</h3>
-	<ol class='example'>
-		<li>Las listas de coaliciones no pueden estar vacias: desactivar
-			campos de nombres y botones si lo estan</li>
-	</ol>
 	<article>
 		<h2>Crear un enfrentamiento</h2>
 		<section>
@@ -701,7 +713,7 @@
 						<button
 							type="button"
 							th:name="${country.name + '_split'}"
-							th:class="${country.name + '_split'}"
+							th:class="${#strings.replace(country.name, ' ', '') + '_split'}"
 							th:id="${country.name + '_split'}"
 							th:value="${country.name}"
 							onclick="splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()">Dividir</button>
