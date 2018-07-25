@@ -7,7 +7,7 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script
-	src="js/customjs.js"
+	src="js/customjslib.js"
 	type="text/javascript"></script>
 <style>
 .ui-state-highlight {
@@ -51,12 +51,12 @@
 	}
 
 	function updateSliderInput(input, val, id) {
-		var id = id.replace("_input", "");
+		var id = id.replaceAll("_input", "");
 		$("#" + id).val(val);
 	}
 	
 	function swapButton(li, originalName) {
-		var button = $(li).find("button." + originalName.replace(" ", "") + "_split");
+		var button = $(li).find("button." + originalName.replaceAll(" ", "") + "_split");
 		var text = $(button).text();
 		if (text==="Dividir") {
 			$(button).text("Borrar");
@@ -74,7 +74,7 @@
 	 */
 	function splitCountry(name) {
 		// Split the countries
-		var escapedName = name.replace(" ", "");
+		var escapedName = name.replaceAll(" ", "");
 		var item = $("#"+escapedName+"_listitem");
 		var list = $(item).parent("ul");
 		var clone = $(item).clone().appendTo(list);
@@ -90,7 +90,7 @@
 		$(originalPercentInput).val(newPercent.toFixed(2));
 		$(newPercentInput).val(newPercent.toFixed(2));		
 		balanceCommitment(name, name1, name2, originalPercent, newPercent);
-		// Replace the buttons
+		// replaceAll the buttons
 		swapButton(item, name);
 		swapButton(clone, name);
 		// Rename the ids of the countries
@@ -118,7 +118,7 @@
 	 */
 	function deletePartition(countryName) {
 		// Delete the country partitions, leaving only the original
-		var escapedName = countryName.replace(" ", "");
+		var escapedName = countryName.replaceAll(" ", "");
 		var clazz = escapedName+"_listitem";
 		var partitions = $("li." + clazz);
 		var partition1 = $(partitions[0]).find("span." + escapedName).text();
@@ -230,7 +230,7 @@
 	 */
 	function isBlockaded(country, coalition) {
 		var res = false;
-		var countryCheckboxes = $("[name=" + country.replace(" ", "") + "]");
+		var countryCheckboxes = $("[name=" + country.replaceAll(" ", "") + "]");
 		var coalitionCheckboxes = $("[name=" + coalition + "]");
 		for (var i = 0; i < countryCheckboxes.length; i++) {
 			res = res || $(countryCheckboxes[i]).prop("checked");
@@ -269,7 +269,7 @@
 					type : "checkbox",
 					form : "war_form",
 					name : "block_attacker",
-					value : key.replace(" ", "") + "_blocks_" + "attacker",
+					value : key.replaceAll(" ", "") + "_blocks_" + "attacker",
 					onchange : "updateCountryPoints();",
 				});
 				var c1cell = $("<td>");
@@ -280,7 +280,7 @@
 					type : "checkbox",
 					form : "war_form",
 					name : "block_defender",
-					value : key.replace(" ", "") + "_blocks_" + "defender",
+					value : key.replaceAll(" ", "") + "_blocks_" + "defender",
 					onchange : "updateCountryPoints();",
 				});
 				var c2cell = $("<td>");
@@ -325,9 +325,9 @@
 					$(blockadeCheckbox).attr({
 								type : "checkbox",
 								form : "war_form",
-								name : "block_" + c.replace(" ", ""),
-								value : key.replace(" ", "") + "_blocks_"
-										+ c.replace(" ", ""),
+								name : "block_" + c.replaceAll(" ", ""),
+								value : key.replaceAll(" ", "") + "_blocks_"
+										+ c.replaceAll(" ", ""),
 								onchange : "updateCountryPoints();",
 							});
 					var ccell = $("<td>");
@@ -420,7 +420,7 @@
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 			// Este name da el fallo
-			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			attackerNavy += navies * commitment;
 		}
@@ -436,7 +436,7 @@
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			defenderNavy += navies * commitment;
 		}
@@ -460,7 +460,7 @@
 			var intervention = countries[name][turn]["navales"];
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			// This is so the "parent" country appears in full force when it's
 			// partitioned
@@ -514,7 +514,7 @@
 		 * to the coalition
 		 */
 		for (var key = 0; key < defenderCountries.length; key++) {
-			// TODO: Refactor name.replace() to name
+			// TODO: Refactor name.replaceAll() to name
 			var longname = $(defenderCountries[key]).text();
 			var name = longname;
 			// Remove the suffix if it exists to use the country full values
@@ -522,9 +522,9 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + longname.replace(" ", ""),
+			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""),
 					"block_defender");
 			var intervention = calculateCommitment(countries[name][turn],
 					commitment, blockaded);
@@ -538,9 +538,9 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $("#" + longname.replace(" ", "") + "_percent_input")
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + longname.replace(" ", ""),
+			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""),
 					"block_attacker");
 			var intervention = calculateCommitment(countries[name][turn],
 					commitment, blockaded);
