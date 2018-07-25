@@ -224,6 +224,10 @@
 		return res;
 	}
 
+	/**
+	 * Returns whether a country or its coalition is being blockaded
+	 * @param: boolean, whether the country or coalition is blockaded
+	 */
 	function isBlockaded(country, coalition) {
 		var res = false;
 		var countryCheckboxes = $("[name=" + country.replace(" ", "") + "]");
@@ -246,7 +250,6 @@
 
 	/* Updates the table with the new info */
 	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
-		// TODO: REMOTAR AQUI: MAKE BLOCKADE CHECKBOX WORK
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>");
@@ -394,8 +397,8 @@
 				$("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
 		$(table).append(sumrow);
 	}
+	
 	/* Calculates the power of navies between coalitions and naval powers */
-	/* This function is VIP */
 	function updateCoalitionNavies() {
 		var attackerNavy = 0.0;
 		var defenderNavy = 0.0;
@@ -441,7 +444,6 @@
 	}
 
 	/* Calculates the power of navies between naval powers and countries */
-	/* This function is VIP */
 	function updateCountryNavies() {
 		var turn = getSelectedTurn();
 		var countryNavies = {};
@@ -494,6 +496,7 @@
 		};
 	}
 
+	
 	function updateCountryPoints() {
 		var attackerCountries = $("#coal1_box").find("span.country_names",
 				"li.ui-sortable-handle");

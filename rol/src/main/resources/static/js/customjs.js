@@ -23,5 +23,11 @@ function matchPasswords() {
 }
 
 /**
- * Add property function isEmpty() to objects
+ * Extends the String prototype to add a replaceAll function
  */
+String.prototype.replaceAll = function(search, replace) {
+    if (replace === undefined) {
+        return this.toString();
+    }
+    return this.split(search).join(replace);
+}
