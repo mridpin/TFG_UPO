@@ -37,6 +37,10 @@
 	const INLAND_BATTLE_PENALTY = 0.75;
 	const BLOCKABLE_ATTRIBUTES = "economicos";
 	const INLAND_ATTRIBUTES = "navales";
+	const INFANTRY = [ "Soldados -de todos los ejércitos-",
+			"Reservistas -de todos los ejércitos-" ];
+	const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
+	const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
 
 	function isEmpty(obj) {
 		for ( var key in obj) {
@@ -45,7 +49,7 @@
 		}
 		return true;
 	}
-	
+
 	function updateTextInput(input, val, id) {
 		$("#" + id + "_input").val(val);
 	}
@@ -54,19 +58,26 @@
 		var id = id.replaceAll("_input", "");
 		$("#" + id).val(val);
 	}
-	
+
 	function swapButton(li, originalName) {
-		var button = $(li).find("button." + originalName.replaceAll(" ", "") + "_split");
+		var button = $(li).find(
+				"button." + originalName.replaceAll(" ", "") + "_split");
 		var text = $(button).text();
-		if (text==="Dividir") {
+		if (text === "Dividir") {
 			$(button).text("Borrar");
-			$(button).attr("onclick", "deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
-		} else if (text==="Borrar") {
+			$(button)
+					.attr(
+							"onclick",
+							"deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+		} else if (text === "Borrar") {
 			$(button).text("Dividir");
-			$(button).attr("onclick", "splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+			$(button)
+					.attr(
+							"onclick",
+							"splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
 		}
 	}
-	
+
 	/**
 	 * Splits a country into two factions
 	 * 
@@ -75,40 +86,44 @@
 	function splitCountry(name) {
 		// Split the countries
 		var escapedName = name.replaceAll(" ", "");
-		var item = $("#"+escapedName+"_listitem");
+		var item = $("#" + escapedName + "_listitem");
 		var list = $(item).parent("ul");
 		var clone = $(item).clone().appendTo(list);
 		var name1 = name + " 1";
 		var name2 = name + " 2";
-		$(clone).find("span.country_names", "li.ui-sortable-handle").text(name2);
+		$(clone).find("span.country_names", "li.ui-sortable-handle")
+				.text(name2);
 		$(item).find("span.country_names", "li.ui-sortable-handle").text(name1);
 		// Balance the commitment
-		var newPercentInput = $(clone).find("input."+escapedName+"_percent_input");
-		var originalPercentInput = $(item).find("input."+escapedName+"_percent_input");
+		var newPercentInput = $(clone).find(
+				"input." + escapedName + "_percent_input");
+		var originalPercentInput = $(item).find(
+				"input." + escapedName + "_percent_input");
 		var originalPercent = $(originalPercentInput).val();
 		var newPercent = 1 - originalPercent;
 		$(originalPercentInput).val(newPercent.toFixed(2));
-		$(newPercentInput).val(newPercent.toFixed(2));		
+		$(newPercentInput).val(newPercent.toFixed(2));
 		balanceCommitment(name, name1, name2, originalPercent, newPercent);
-		// replaceAll the buttons
 		swapButton(item, name);
 		swapButton(clone, name);
 		// Rename the ids of the countries
-		$(item).attr("id", escapedName + "1_listitem");	
-		$(item).find("input#" + escapedName + "_percent").attr("id", escapedName + "1_percent");	
-		$(item).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "1_percent_input");
-		$(clone).attr("id", escapedName + "2_listitem");	
-		$(clone).find("input#" + escapedName + "_percent").attr("id", escapedName + "2_percent");	
-		$(clone).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "2_percent_input");	
-		// $(clone).find("input#" + escapedName + "_listitem").attr("id",
-		// escapedName + "2_listitem");
+		$(item).attr("id", escapedName + "1_listitem");
+		$(item).find("input#" + escapedName + "_percent").attr("id",
+				escapedName + "1_percent");
+		$(item).find("input#" + escapedName + "_percent_input").attr("id",
+				escapedName + "1_percent_input");
+		$(clone).attr("id", escapedName + "2_listitem");
+		$(clone).find("input#" + escapedName + "_percent").attr("id",
+				escapedName + "2_percent");
+		$(clone).find("input#" + escapedName + "_percent_input").attr("id",
+				escapedName + "2_percent_input");
 		// Limit the max commitment UI elements
 		$("#" + escapedName + "2_percent").attr("max", newPercent);
 		$("#" + escapedName + "2_percent_input").attr("max", newPercent);
 		$("#" + escapedName + "1_percent").attr("max", originalPercent);
 		$("#" + escapedName + "1_percent_input").attr("max", originalPercent);
 	}
-	
+
 	/**
 	 * Deletes the selected partition and merges it back into the full country
 	 * by adding both sets of data, maintaining any losses. Basically undos all
@@ -119,7 +134,7 @@
 	function deletePartition(countryName) {
 		// Delete the country partitions, leaving only the original
 		var escapedName = countryName.replaceAll(" ", "");
-		var clazz = escapedName+"_listitem";
+		var clazz = escapedName + "_listitem";
 		var partitions = $("li." + clazz);
 		var partition1 = $(partitions[0]).find("span." + escapedName).text();
 		var partition2 = $(partitions[1]).find("span." + escapedName).text();
@@ -128,33 +143,34 @@
 		// Remove the list items and rename the ids
 		var item = partitions[0];
 		$(partitions[1]).remove();
-		$(item).find("span.country_names", "li.ui-sortable-handle").text(countryName);
-		$(item).find("input."+escapedName+"_percent_input").attr("max", 1);
-		$(item).find("input."+escapedName+"_percent").attr("max", 1);
-		$(item).find("input."+escapedName+"_percent_input").val(1);
-		$(item).find("input."+escapedName+"_percent").val(1);
-		$(item).attr("id", escapedName + "_listitem");	
-		$(item).find("input[type=range]").attr("id", escapedName + "_percent");	
-		$(item).find("input[type=number]").attr("id", escapedName + "_percent_input");		
+		$(item).find("span.country_names", "li.ui-sortable-handle").text(
+				countryName);
+		$(item).find("input." + escapedName + "_percent_input").attr("max", 1);
+		$(item).find("input." + escapedName + "_percent").attr("max", 1);
+		$(item).find("input." + escapedName + "_percent_input").val(1);
+		$(item).find("input." + escapedName + "_percent").val(1);
+		$(item).attr("id", escapedName + "_listitem");
+		$(item).find("input[type=range]").attr("id", escapedName + "_percent");
+		$(item).find("input[type=number]").attr("id",
+				escapedName + "_percent_input");
 		swapButton(item, countryName);
-		// TODO:: RU DIVIDIDO DA FALLO NAN CON LOS NUMEROS
 	}
-	
+
 	function balanceCommitment(name, name1, name2, op, np) {
 		var newCountry = $.extend(true, {}, countries[name]);
 		var oldCountry = $.extend(true, {}, countries[name]);
 		$.each(oldCountry, function(turn, turns) {
 			$.each(turns, function(type, types) {
-				$.each (types, function(name, attribute) {
+				$.each(types, function(name, attribute) {
 					if (!isNaN(attribute)) {
 						newCountry[turn][type][name] *= np;
 						oldCountry[turn][type][name] *= op;
 					}
-				});			
+				});
 			})
 		});
 		countries[name1] = oldCountry;
-		countries[name2] = newCountry;		
+		countries[name2] = newCountry;
 	}
 
 	/* Sums an array of country objects */
@@ -216,6 +232,8 @@
 		$.each(res, function(type, types) {
 			$.each(types, function(name, value) {
 				res[type][name] *= c;
+				// TODO: YOU MUST PENALIZE THE !!!POINTS!!! OF THE WHOLE COALITION, EXCEPT FOR THE BLOCKADE
+				// Penalize for blockade
 				if (blockaded && type === BLOCKABLE_ATTRIBUTES) {
 					res[type][name] *= BLOCKADE_PENALTY;
 				}
@@ -322,7 +340,8 @@
 					var cpercent = 0.0;
 					cpercent += countryNavies[c] / navalPowerNavy;
 					var blockadeCheckbox = $("<input>");
-					$(blockadeCheckbox).attr({
+					$(blockadeCheckbox).attr(
+							{
 								type : "checkbox",
 								form : "war_form",
 								name : "block_" + c.replaceAll(" ", ""),
@@ -397,7 +416,7 @@
 				$("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
 		$(table).append(sumrow);
 	}
-	
+
 	/* Calculates the power of navies between coalitions and naval powers */
 	function updateCoalitionNavies() {
 		var attackerNavy = 0.0;
@@ -420,7 +439,8 @@
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 			// Este name da el fallo
-			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
+			var commitment = $(
+					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			attackerNavy += navies * commitment;
 		}
@@ -436,7 +456,8 @@
 			// TODO: Download via ajax a mapping of this
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
+			var commitment = $(
+					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			defenderNavy += navies * commitment;
 		}
@@ -460,7 +481,8 @@
 			var intervention = countries[name][turn]["navales"];
 			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
 					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
+			var commitment = $(
+					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
 			// This is so the "parent" country appears in full force when it's
 			// partitioned
@@ -496,7 +518,6 @@
 		};
 	}
 
-	
 	function updateCountryPoints() {
 		var attackerCountries = $("#coal1_box").find("span.country_names",
 				"li.ui-sortable-handle");
@@ -522,12 +543,13 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
+			var commitment = $(
+					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""),
-					"block_defender");
+			var blockaded = isBlockaded(
+					"block_" + longname.replaceAll(" ", ""), "block_defender");
 			var intervention = calculateCommitment(countries[name][turn],
-					commitment, blockaded);
+					commitment, blockaded, "defense");
 			defenders.push(intervention);
 		}
 		for (var key = 0; key < attackerCountries.length; key++) {
@@ -538,12 +560,13 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input")
+			var commitment = $(
+					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
-			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""),
-					"block_attacker");
+			var blockaded = isBlockaded(
+					"block_" + longname.replaceAll(" ", ""), "block_attacker");
 			var intervention = calculateCommitment(countries[name][turn],
-					commitment, blockaded);
+					commitment, blockaded, "attack");
 			attackers.push(intervention);
 		}
 		var attackerStats = sumCoalition(attackers);
@@ -564,16 +587,34 @@
 					var total = totalStats[type][name];
 					var points = attributeValuesTemplate[type][name];
 					if (!isEmpty(attackerStats)) {
+						// TODO: APPLY MODIFIERS HERE
 						var at = attackerStats[type][name];
-						attackerPoints[type][name] = (total === 0) ? 1
-								: (attackerStats[type][name] / total);
+						attackerPoints[type][name] = (total === 0) ? 1 : (attackerStats[type][name] / total);
 						attackerPoints[type][name] *= points;
+						// Apply modifiers:
+						// 1. Penalize infantry for attack
+						if (INFANTRY.includes(name)) {
+							attackerPoints[type][name] *= INFANTRY_ATTACK_PENALTY;
+						}
+						// Penalize for inland battles
+						if (type===INLAND_ATTRIBUTES && $("#inland_battle").prop("checked")) {
+							attackerPoints[type][name] *= INLAND_BATTLE_PENALTY;
+						}
 					}
 					if (!isEmpty(defenderStats)) {
 						defenderPoints[type][name] = (total === 0) ? 1
 								: (defenderStats[type][name] / total);
 						defenderPoints[type][name] *= points;
 						var def = defenderStats[type][name];
+						// Apply modifiers
+						// 1. Bonus to infantry for defense
+						if (INFANTRY.includes(name)) {
+							defenderPoints[type][name] *= INFANTRY_DEFENSE_BONUS;
+						}
+						// 2. Penalize navies for inland battles
+						if (type===INLAND_ATTRIBUTES && $("#inland_battle").prop("checked")) {
+							defenderPoints[type][name] *= INLAND_BATTLE_PENALTY;
+						}
 					}
 				}
 			});
@@ -676,7 +717,7 @@
 				<ul
 					id="country_list"
 					class="coalition_lists">
-					<li						
+					<li
 						th:each="country : ${countries}"
 						th:class="${#strings.replace(country.name, ' ', '') + '_listitem'}"
 						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}">
@@ -736,6 +777,15 @@
 		</section>
 		<section>
 			<h3>Armadas</h3>
+			<div>
+				<label for="inland_battle">Batalla Interior</label>
+				<input
+					type="checkbox"
+					id="inland_battle"
+					name="inland_battle"
+					value="inland_battle"
+					onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
+			</div>
 			<div>
 				<h4>Potencias navales vs. Coaliciones</h4>
 				<table
