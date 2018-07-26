@@ -232,7 +232,8 @@
 		$.each(res, function(type, types) {
 			$.each(types, function(name, value) {
 				res[type][name] *= c;
-				// TODO: YOU MUST PENALIZE THE !!!POINTS!!! OF THE WHOLE COALITION, EXCEPT FOR THE BLOCKADE
+				// TODO: YOU MUST PENALIZE THE !!!POINTS!!! OF THE WHOLE
+				// COALITION, EXCEPT FOR THE BLOCKADE
 				// Penalize for blockade
 				if (blockaded && type === BLOCKABLE_ATTRIBUTES) {
 					res[type][name] *= BLOCKADE_PENALTY;
@@ -244,6 +245,7 @@
 
 	/**
 	 * Returns whether a country or its coalition is being blockaded
+	 * 
 	 * @param: boolean, whether the country or coalition is blockaded
 	 */
 	function isBlockaded(country, coalition) {
@@ -285,7 +287,7 @@
 				var blockadeAttackerCheckbox = $("<input>");
 				$(blockadeAttackerCheckbox).attr({
 					type : "checkbox",
-					form : "war_form",
+					//form : "war_form",
 					name : "block_attacker",
 					value : key.replaceAll(" ", "") + "_blocks_" + "attacker",
 					onchange : "updateCountryPoints();",
@@ -296,7 +298,7 @@
 				var blockadeDefenderCheckbox = $("<input>");
 				$(blockadeDefenderCheckbox).attr({
 					type : "checkbox",
-					form : "war_form",
+					//form : "war_form",
 					name : "block_defender",
 					value : key.replaceAll(" ", "") + "_blocks_" + "defender",
 					onchange : "updateCountryPoints();",
@@ -343,7 +345,7 @@
 					$(blockadeCheckbox).attr(
 							{
 								type : "checkbox",
-								form : "war_form",
+								//form : "war_form",
 								name : "block_" + c.replaceAll(" ", ""),
 								value : key.replaceAll(" ", "") + "_blocks_"
 										+ c.replaceAll(" ", ""),
@@ -410,10 +412,12 @@
 		// Add the sum row:
 		var sumrow = $("<tr>");
 		$(sumrow).append($("<th>").append("Puntos totales"));
-		$(sumrow).append(
-				$("<th>").append(sumTotalPoints(attackerPoints).toFixed(2)));
-		$(sumrow).append(
-				$("<th>").append(sumTotalPoints(defenderPoints).toFixed(2)));
+		$(sumrow).append($("<th>").append($("<span>", {
+			id : "total_attack_score"
+		}).append(sumTotalPoints(attackerPoints).toFixed(2))));
+		$(sumrow).append($("<th>").append($("<span>", {
+			id : "total_defender_score"
+		}).append(sumTotalPoints(defenderPoints).toFixed(2))));
 		$(table).append(sumrow);
 	}
 
@@ -579,78 +583,126 @@
 		var totalStats = sumCoalition([ attackerStats, defenderStats ]);
 		// Iterate the total and create an object with attacker and defender
 		// points
-		$.each(attributeValuesTemplate, function(type, types) {
-			attackerPoints[type] = {};
-			defenderPoints[type] = {};
-			$.each(types, function(name, attribute) {
-				if (!isEmpty(totalStats[type])) {
-					var total = totalStats[type][name];
-					var points = attributeValuesTemplate[type][name];
-					if (!isEmpty(attackerStats)) {
-						// TODO: APPLY MODIFIERS HERE
-						var at = attackerStats[type][name];
-						attackerPoints[type][name] = (total === 0) ? 1 : (attackerStats[type][name] / total);
-						attackerPoints[type][name] *= points;
-						// Apply modifiers:
-						// 1. Penalize infantry for attack
-						if (INFANTRY.includes(name)) {
-							attackerPoints[type][name] *= INFANTRY_ATTACK_PENALTY;
-						}
-						// Penalize for inland battles
-						if (type===INLAND_ATTRIBUTES && $("#inland_battle").prop("checked")) {
-							attackerPoints[type][name] *= INLAND_BATTLE_PENALTY;
-						}
-					}
-					if (!isEmpty(defenderStats)) {
-						defenderPoints[type][name] = (total === 0) ? 1
-								: (defenderStats[type][name] / total);
-						defenderPoints[type][name] *= points;
-						var def = defenderStats[type][name];
-						// Apply modifiers
-						// 1. Bonus to infantry for defense
-						if (INFANTRY.includes(name)) {
-							defenderPoints[type][name] *= INFANTRY_DEFENSE_BONUS;
-						}
-						// 2. Penalize navies for inland battles
-						if (type===INLAND_ATTRIBUTES && $("#inland_battle").prop("checked")) {
-							defenderPoints[type][name] *= INLAND_BATTLE_PENALTY;
-						}
-					}
-				}
-			});
-		});
+		$
+				.each(
+						attributeValuesTemplate,
+						function(type, types) {
+							attackerPoints[type] = {};
+							defenderPoints[type] = {};
+							$
+									.each(
+											types,
+											function(name, attribute) {
+												if (!isEmpty(totalStats[type])) {
+													var total = totalStats[type][name];
+													var points = attributeValuesTemplate[type][name];
+													if (!isEmpty(attackerStats)) {
+														// TODO: APPLY MODIFIERS
+														// HERE
+														var at = attackerStats[type][name];
+														attackerPoints[type][name] = (total === 0) ? 1
+																: (attackerStats[type][name] / total);
+														attackerPoints[type][name] *= points;
+														// Apply modifiers:
+														// 1. Penalize infantry
+														// for attack
+														if (INFANTRY
+																.includes(name)) {
+															attackerPoints[type][name] *= INFANTRY_ATTACK_PENALTY;
+														}
+														// Penalize for inland
+														// battles
+														if (type === INLAND_ATTRIBUTES
+																&& $(
+																		"#inland_battle")
+																		.prop(
+																				"checked")) {
+															attackerPoints[type][name] *= INLAND_BATTLE_PENALTY;
+														}
+													}
+													if (!isEmpty(defenderStats)) {
+														defenderPoints[type][name] = (total === 0) ? 1
+																: (defenderStats[type][name] / total);
+														defenderPoints[type][name] *= points;
+														var def = defenderStats[type][name];
+														// Apply modifiers
+														// 1. Bonus to infantry
+														// for defense
+														if (INFANTRY
+																.includes(name)) {
+															defenderPoints[type][name] *= INFANTRY_DEFENSE_BONUS;
+														}
+														// 2. Penalize navies
+														// for inland battles
+														if (type === INLAND_ATTRIBUTES
+																&& $(
+																		"#inland_battle")
+																		.prop(
+																				"checked")) {
+															defenderPoints[type][name] *= INLAND_BATTLE_PENALTY;
+														}
+													}
+												}
+											});
+						});
 		drawCountryPoints(attackerPoints, defenderPoints);
 	}
 
-	$(document).ready(function() {
-		// Sortable list to drag countries to coalitions
-		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
-			connectWith : ".coalition_lists",
-			dropOnEmpty : true,
-			placeholder : "ui-state-highlight",
-			update : function() {
-				updateCoalitionNavies();
-				updateCountryNavies();
-				updateCountryPoints();
-				$(this).clone()
-			},
-		});
-		$("ul.coalition_lists").disableSelection();
+	$(document).ready(
+			function() {
+				// Sortable list to drag countries to coalitions
+				$("ul#country_list, ul#attacker_list, ul#defender_list")
+						.sortable({
+							connectWith : ".coalition_lists",
+							dropOnEmpty : true,
+							placeholder : "ui-state-highlight",
+							update : function() {
+								updateCoalitionNavies();
+								updateCountryNavies();
+								updateCountryPoints();
+								$(this).clone()
+							},
+						});
 
-		// Ajax call to get all country data to display in tables dynamically
-		$.ajax({
-			type : "POST",
-			url : "/mapCountries",
-			success : function(response) {
-				countries = response;
-				// setupCoalitionNavies();
-				updateCoalitionNavies();
-				updateCountryNavies();
-				updateCountryPoints();
-			}
-		});
-		downloadPointsTemplate();
-	});
+				$("ul.coalition_lists").disableSelection();
+
+				$("#war_form").submit(
+						function() {
+							// Submit the scores
+							$("#attacker_score").val(
+									$("#total_attack_score").text());
+							$("#defender_score").val(
+									$("#total_defender_score").text());
+							// Submit the coalitions as a string list such as
+							// country,percent; to be parsed by the server
+							var attacker = "";
+							$.each($("#coal1_box").find("li"), function(key, val) {
+							    attacker += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+							});
+							$("#attacker_countries").val(attacker);
+							var defender = "";
+							$.each($("#coal2_box").find("li"), function(key, val) {
+								defender += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+							});
+							$("#defender_countries").val(defender);
+							return true;
+						});
+
+				// Ajax call to get all country data to display in tables
+				// dynamically
+				$.ajax({
+					type : "POST",
+					url : "/mapCountries",
+					success : function(response) {
+						countries = response;
+						// setupCoalitionNavies();
+						updateCoalitionNavies();
+						updateCountryNavies();
+						updateCountryPoints();
+					}
+				});
+				downloadPointsTemplate();
+			});
 </script>
 </head>
 <body>
@@ -658,11 +710,36 @@
 		<h2>Crear un enfrentamiento</h2>
 		<section>
 			<h3>Nombre</h3>
-			<form id="war_form">
+			<form
+				id="war_form"
+				name="war_form"
+				action="#"
+				th:action="@{/createRoll}"
+				method="post">
 				<label>Nombre:</label>
 				<input
 					type="text"
 					name="name">
+				<input
+					type="hidden"
+					name="attacker_score"
+					id="attacker_score"
+					value="0">
+				<input
+					type="hidden"
+					name="defender_score"
+					id="defender_score"	
+					value="0">
+				<input
+					type="hidden"
+					name="attacker_countries"
+					id="attacker_countries"
+					value="">
+				<input
+					type="hidden"
+					name="defender_countries"
+					id="defender_countries"
+					value="">
 			</form>
 		</section>
 		<section>
@@ -696,7 +773,7 @@
 				<label>Nombre coalici&oacute;n atacante</label>
 				<input
 					type="text"
-					name="coal1_name"
+					name="attacker_name"
 					form="war_form">
 				<h4>Coalici&oacute;n Defensora</h4>
 				<div
@@ -709,7 +786,7 @@
 				<label>Nombre coalici&oacute;n defensora</label>
 				<input
 					type="text"
-					name="coal2_name"
+					name="defender_name"
 					form="war_form">
 			</div>
 			<h4>Pa&iacute;ses</h4>
@@ -720,7 +797,8 @@
 					<li
 						th:each="country : ${countries}"
 						th:class="${#strings.replace(country.name, ' ', '') + '_listitem'}"
-						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}">
+						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}"
+						th:name="${country.name}">
 						<span
 							th:class="'country_names ' + ${country.name}"
 							th:text="${country.name}"></span>
@@ -733,7 +811,6 @@
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent'}"
 							th:class="${#strings.replace(country.name, ' ', '') + '_percent'}"
-							form="war_form"
 							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateTextInput(this, this.value, this.id);"
 							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateTextInput(this, this.value, this.id);">
 						<input
@@ -741,7 +818,6 @@
 							th:name="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
 							th:id="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
 							th:class="${#strings.replace(country.name, ' ', '') + '_percent_input'}"
-							form="war_form"
 							min=0
 							max=1
 							step=0.01
@@ -749,11 +825,6 @@
 							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);"
 							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);">
 						<!--						TODO: JQUERY validate this to max 1  -->
-						<input
-							type="hidden"
-							th:name="${country.name + '_coalition'}"
-							value=""
-							form="war_form">
 						<button
 							type="button"
 							th:name="${country.name + '_split'}"
@@ -784,6 +855,7 @@
 					id="inland_battle"
 					name="inland_battle"
 					value="inland_battle"
+					form="war_form"
 					onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 			</div>
 			<div>
@@ -804,8 +876,6 @@
 					id="country_navies"
 					border="2">
 					<tr>
-						<!-- 						<th>Potencias navales</td> -->
-						<!-- 						<th th:each="country : ${countries}" th:text="${country.name}"></th> -->
 					</tr>
 				</table>
 			</div>

@@ -5,6 +5,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.hibernate.validator.constraints.Range;
+
 @Entity
 @Table(name = "involvement")
 public class Involvement implements Serializable {
@@ -26,7 +28,7 @@ public class Involvement implements Serializable {
 	@JoinColumn(name = "coalition")
 	private Coalition coalition;
 	@NotNull
-	@Size(min = 0, max = 1)
+	@Range(min = 0, max = 1)
 	@Column(name="involvement_percent")
 	private Double involvementPercent;
 
