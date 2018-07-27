@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.CoalitionRepository;
 import es.upo.tfg.rol.model.dao.CountryRepository;
 import es.upo.tfg.rol.model.dao.InvolvementRepository;
@@ -27,20 +29,6 @@ import es.upo.tfg.rol.model.pojos.War;
 @Service("warService")
 @Transactional
 public class WarServiceImpl implements WarService {
-
-	public final static String COALITION_SEPARATOR = ";";
-	public final static String INVOLVEMENT_SEPARATOR = ",";
-	private static final Map<Integer, Double> DIE;
-	static {
-		DIE = new HashMap<Integer, Double>();
-		DIE.put(1, 0.0);
-		DIE.put(2, 3.0);
-		DIE.put(3, 7.0);
-		DIE.put(4, 12.0);
-		DIE.put(5, 17.0);
-		DIE.put(6, 22.0);
-	}
-	public final static Integer DIE_SIDE = 6;
 	
 	@Autowired
 	private WarRepository warRep;
@@ -98,14 +86,14 @@ public class WarServiceImpl implements WarService {
 		coalRep.save(attacker);
 		coalRep.save(defender);
 		// Assemble the involvements with the country strings and commitment percents
-		String[] attackers = attackerCountries.split(COALITION_SEPARATOR);
-		String[] defenders = defenderCountries.split(COALITION_SEPARATOR);
+		String[] attackers = attackerCountries.split(Rules.COALITION_SEPARATOR);
+		String[] defenders = defenderCountries.split(Rules.COALITION_SEPARATOR);
 		List<Involvement> attackerInvolvements = new ArrayList<>();
 		List<Involvement> defenderInvolvements = new ArrayList<>();
 		try {
 			for (String s : attackers) {
 				// Assemble the interventions
-				String[] c = s.split(INVOLVEMENT_SEPARATOR);
+				String[] c = s.split(Rules.INVOLVEMENT_SEPARATOR);
 				Involvement inv = new Involvement();
 				inv.setCoalition(attacker);
 				// TODO: ESTO DA FALLO
@@ -116,7 +104,7 @@ public class WarServiceImpl implements WarService {
 			}
 			for (String s : defenders) {
 				// Assemble the interventions
-				String[] c = s.split(INVOLVEMENT_SEPARATOR);
+				String[] c = s.split(Rules.INVOLVEMENT_SEPARATOR);
 				Involvement inv = new Involvement();
 				inv.setCoalition(defender);
 				inv.setCountry(this.findCountryByName(c[0], countries));
@@ -130,10 +118,10 @@ public class WarServiceImpl implements WarService {
 		}
 		// Roll the dice and resolve the scores
 		Random rand = new Random();
-		Integer attackerRoll = rand.nextInt(DIE_SIDE) + 1;
-		Integer defenderRoll = rand.nextInt(DIE_SIDE) + 1;
-		Double attackerRollScore = DIE.get(attackerRoll);
-		Double defenderRollScore = DIE.get(attackerRoll);
+		Integer attackerRoll = rand.nextInt(Rules.DIE_SIDE) + 1;
+		Integer defenderRoll = rand.nextInt(Rules.DIE_SIDE) + 1;
+		Double attackerRollScore = Rules.DIE.get(attackerRoll);
+		Double defenderRollScore = Rules.DIE.get(defenderRoll);
 		attackerScore += attackerRollScore;
 		defenderScore += defenderRollScore;
 		// Assign the winner and loser
@@ -164,5 +152,40 @@ public class WarServiceImpl implements WarService {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public War findById(String warId) {
+		Long id;
+		try {
+			id = Long.parseLong(warId);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			return null;
+		}
+		Optional<War> war = warRep.findById(id);
+		return (war.isPresent() ? war.get() : null);
+	}
+
+	@Override
+	public War findOpenWar(Game game) {
+		List<War> wars = this.findByGame(game);
+		for (War w : wars) {
+			if (!Rules.CLOSED_WAR.equals(w.getStatus())) {
+				return w;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<War> findByGame(Game game) {
+		List<Turn> turns = turnRep.findByGame(game);
+		List<War> wars = new ArrayList<>();
+		for (Turn t : turns) {
+			List<War> turnWars = warRep.findByTurn(t);
+			wars.addAll(turnWars);
+		}
+		return wars;
 	}
 }

@@ -676,13 +676,21 @@
 							// Submit the coalitions as a string list such as
 							// country,percent; to be parsed by the server
 							var attacker = "";
-							$.each($("#coal1_box").find("li"), function(key, val) {
-							    attacker += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+							$.each($("#coal1_box").find("li"), function(key,
+									val) {
+								attacker += $(val).attr("name")
+										+ ","
+										+ $(val).find("input[type=number]")
+												.val() + ";";
 							});
 							$("#attacker_countries").val(attacker);
 							var defender = "";
-							$.each($("#coal2_box").find("li"), function(key, val) {
-								defender += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+							$.each($("#coal2_box").find("li"), function(key,
+									val) {
+								defender += $(val).attr("name")
+										+ ","
+										+ $(val).find("input[type=number]")
+												.val() + ";";
 							});
 							$("#defender_countries").val(defender);
 							return true;
@@ -707,7 +715,7 @@
 </head>
 <body>
 	<article>
-		<h2>Crear un enfrentamiento</h2>
+		<h2>Comenzar una tirada</h2>
 		<section>
 			<h3>Nombre</h3>
 			<form
@@ -717,9 +725,19 @@
 				th:action="@{/createRoll}"
 				method="post">
 				<label>Nombre:</label>
-				<input
-					type="text"
-					name="name">
+				<div th:switch="${session.war.id==null}">
+					<input
+						th:case="${true}"
+						type="text"
+						name="name"
+						required="required">
+					<input
+						th:case="${false}"
+						type="text"
+						name="name"
+						th:value="${session.war.name}"
+						readonly="readonly">
+				</div>
 				<input
 					type="hidden"
 					name="attacker_score"
@@ -728,7 +746,7 @@
 				<input
 					type="hidden"
 					name="defender_score"
-					id="defender_score"	
+					id="defender_score"
 					value="0">
 				<input
 					type="hidden"
@@ -753,8 +771,9 @@
 						th:class="subscenario_radio"
 						th:id="${turn.subscenario}"
 						th:value="${turn.subscenario}"
-						th:checked="${turnStat.index==0}"
+						th:checked="${war?.turn?.subscenario!=null and war?.turn?.subscenario==turn.subscenario} ? true : ${turnStat.index==0 ? true : false}"
 						form="war_form"
+						th:disabled="${war?.turn?.subscenario!=null and war?.turn?.subscenario!=turn.subscenario}"
 						onclick="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 				</li>
 			</ul>
@@ -891,9 +910,27 @@
 				value="Tirar dado"
 				form="war_form">
 		</section>
-		<section>
+		<section th:if="${session.war.id != null}">
 			<h3>Puntos acumulados</h3>
 			<table border="2">
+				<tr>
+					<th>Puntos por tirada</th>
+					<th>Atacante</th>
+					<th>Defensor</th>
+				</tr>
+				<tr th:each="roll, rollStats : ${rolls}">
+					<td th:switch="${rollStats.index}">
+					<span th:case="0">Primera Tirada &#10005; 0.15 puntos</span>
+					<span th:case="1">Segunda Tirada &#10005; 0.25 puntos</span>
+					</td>
+					<td th:text="${roll.attackerScore}"></td>
+					<td th:text="${roll.defenderScore}"></td>
+				</tr>
+				<tr id="total_score">
+				<th>Puntuaci&oacute;n total</th>
+				<th id="attacker_total_score"></th>
+				<th id="defender_total_score"></th>
+				</tr>
 			</table>
 		</section>
 	</article>

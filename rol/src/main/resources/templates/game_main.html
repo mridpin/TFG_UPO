@@ -43,11 +43,15 @@
 			<h3>Enfrentamientos [ejemplo visual, l&oacute;gica no
 				implementada a&uacute;n]</h3>
 			<ul>
-				<li><h4>1860</h4></li>
+				<li>
+					<h4>1860</h4>
+				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong><u>Coalici&oacute;n Anglo-Francesa</u></strong>
-							vs <strong>Coalici&oacute;n Rusa</strong></li>
+						<li>
+							<strong><u>Coalici&oacute;n Anglo-Francesa</u></strong> vs <strong>Coalici&oacute;n
+								Rusa</strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -89,11 +93,15 @@
 						</li>
 					</ul>
 				</li>
-				<li><h4>1870</h4></li>
+				<li>
+					<h4>1870</h4>
+				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong>Coalici&oacute;n Francesa</strong> vs <strong><u>Federaci&oacute;n
-									de Alemania del Norte</u></strong></li>
+						<li>
+							<strong>Coalici&oacute;n Francesa</strong> vs <strong><u>Federaci&oacute;n
+									de Alemania del Norte</u></strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -142,11 +150,15 @@
 						</li>
 					</ul>
 				</li>
-				<li><h4>1880</h4></li>
+				<li>
+					<h4>1880</h4>
+				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong>Coalici&oacute;n A</strong> vs <strong><u>Federaci&oacute;n
-									B</u></strong></li>
+						<li>
+							<strong>Coalici&oacute;n A</strong> vs <strong><u>Federaci&oacute;n
+									B</u></strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -161,8 +173,10 @@
 				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong>Coalici&oacute;n A</strong> vs <strong>Coalici&oacute;n
-								C</strong></li>
+						<li>
+							<strong>Coalici&oacute;n A</strong> vs <strong>Coalici&oacute;n
+								C</strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -172,8 +186,10 @@
 				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong>Coalici&oacute;n n ...</strong> vs <strong>Coalici&oacute;n
-								m ...</strong></li>
+						<li>
+							<strong>Coalici&oacute;n n ...</strong> vs <strong>Coalici&oacute;n
+								m ...</strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -182,10 +198,14 @@
 						</li>
 					</ul>
 				</li>
-				<li><h4>1890</h4></li>
+				<li>
+					<h4>1890</h4>
+				</li>
 				<li style="list-style-type: none;">
 					<ul>
-						<li><strong>[...m&aacute;s guerras aqu&iacute;...]</strong></li>
+						<li>
+							<strong>[...m&aacute;s guerras aqu&iacute;...]</strong>
+						</li>
 						<li style="list-style-type: none;">
 							<ul>
 								<li>Batalla 1</li>
@@ -197,18 +217,43 @@
 
 			</ul>
 		</section>
-		<section th:if="${game.endDate == null}">
-			<h3>Crear enfrentamientos</h3>
-			<form
-				class="form"
-				action="#"
-				th:action="@{/war}"
-				method="post">
-				<input
-					class="btn btn-lg btn-primary btn-block"
-					type="submit"
-					value="Comenzar Enfrentamiento">
-			</form>
+		<section
+			th:if="${game.endDate == null}"
+			th:switch="${war!=null}">
+			<div th:case="${true}">
+				<h3>Retomar enfrentamientos</h3>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/war}"
+					method="get">
+					<input
+						type="hidden"
+						name="war_id"
+						th:value="${war.id}">
+					<input
+						class="btn btn-lg btn-primary btn-block"
+						type="submit"
+						value="Retomar Enfrentamiento en curso">
+				</form>
+			</div>
+			<div th:case=${false}>
+				<h3>Crear enfrentamientos</h3>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/war}"
+					method="get">
+					<input
+						type="hidden"
+						name="war_id"
+						value="">
+					<input
+						class="btn btn-lg btn-primary btn-block"
+						type="submit"
+						value="Comenzar Enfrentamiento">
+				</form>
+			</div>
 		</section>
 		<section th:if="${game.endDate == null}">
 			<h3>Cerrar partida</h3>

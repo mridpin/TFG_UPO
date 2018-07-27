@@ -11,17 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.CountryService;
+import es.upo.tfg.rol.controller.service.RollService;
 import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
 import es.upo.tfg.rol.model.pojos.Turn;
+import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;
 
 @Controller
@@ -33,28 +37,47 @@ public class WarController {
 	WarService wServ;
 	@Autowired
 	TurnService tServ;
+	@Autowired
+	RollService rServ;
 
-	@PostMapping("/war")
-	public String createWar(HttpSession session, Model model) {
+	@GetMapping("/war")
+	public String createWar(HttpSession session, Model model,
+			@RequestParam(name = "war_id") String warId) {
 		Game game = (Game) session.getAttribute("game");
-		if (game == null) {
+		User user = (User) session.getAttribute("user");
+		// Deny access to prevent users from accessing other user's wars by HTML
+		// tampering with the warID
+		if (game == null || user == null || !user.equals(game.getMaster())) {
 			return Access.reject();
 		}
 		List<Country> countries = cServ.findCountries(game);
 		List<Turn> turns = tServ.findTurns(game);
-		War war = wServ.createWar(game);
+		// If there is no id, it means a new war must be created
+		// TODO: UPDATE DESIGN DIAGRAM
+		War war;
+		List<Roll> rolls = new ArrayList<>();
+		if (warId==null || "".equals(warId)) {
+			war = wServ.createWar(game);
+		} else {
+			war = wServ.findById(warId);
+			rolls = rServ.findByWar(war);
+		}
+		if (war==null) {
+			return Access.reject();
+		}		
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
+		model.addAttribute("rolls", rolls);
 		model.addAttribute("countries", countries);
 		model.addAttribute("turns", turns);
 		return "war";
 	}
 
-	@PostMapping("/endWar")
+	@GetMapping("/endWar")
 	public String endWar(HttpSession session) {
 		War war = (War) session.getAttribute("war");
 		wServ.endWar(war);
-		// TODO: Redirect to game_main
+		// TODO: Redirect to game_main, calculate and show the winning coalition
 		return "redirect:/landing";
 	}
 
@@ -64,19 +87,27 @@ public class WarController {
 			@RequestParam(name = "attacker_score", required = true) Double attackerScore,
 			@RequestParam(name = "defender_score", required = true) Double defenderScore,
 			@RequestParam(name = "attacker_countries", required = true) String attackerCountries,
-			@RequestParam(name = "attacker_name", required = true) String attackerName,
+			@RequestParam(name = "attacker_name") String attackerName,
 			@RequestParam(name = "defender_countries", required = true) String defenderCountries,
-			@RequestParam(name = "defender_name", required = true) String defenderName,
+			@RequestParam(name = "defender_name") String defenderName,
 			@RequestParam(name = "subscenario", required = true) String subscenario) {
-		Game game = (Game)session.getAttribute("game");
+		// TODO: PETA CUANDO LA GUERRA YA EXISTE
+		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
-		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore, attackerCountries, defenderCountries, defenderName, attackerName, subscenario);
-		if (roll==null) {
-			// TODO: Haandle logic error
+		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
+				attackerCountries, defenderCountries, defenderName, attackerName,
+				subscenario);
+		if (roll == null) {
+			// TODO: Handle logic error
 			return "redirect:/landing";
 		} else {
-			model.addAttribute("roll", roll);
-			return "redirect:/landing";
+			int nRolls = rServ.findByWar(war).size();
+			if (nRolls < Rules.MAX_ROLLS_PER_WAR) {
+				model.addAttribute("roll", roll);
+				return "redirect:/war";
+			} else {
+				return "redirect:/endWar";
+			}
 		}
 	}
 

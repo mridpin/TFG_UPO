@@ -27,11 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
 import es.upo.tfg.rol.controller.service.UserService;
+import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.exceptions.NotAuthorized;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
+import es.upo.tfg.rol.model.pojos.War;
 
 @Controller
 public class GameController {
@@ -42,10 +44,11 @@ public class GameController {
 	GameService gServ;
 	@Autowired
 	UserService uServ;
-	
+	@Autowired
+	WarService wServ;
 
 	@GetMapping("/create_game")
-		public String createGame(Model model) {
+	public String createGame(Model model) {
 		model.addAttribute("turn", new Turn());
 		return "create_game";
 	}
@@ -69,6 +72,13 @@ public class GameController {
 			session.setAttribute("game", game);
 			List<Country> countries = cServ.findCountries(game);
 			model.addAttribute("countries", countries);
+			// TODO: UPDATE DESIGN DIAGRAM
+			// If there is no open war, "create war" button will show, else it will be a
+			// "open ongoing war" button
+			War war = wServ.findOpenWar(game);
+			if (war != null) {
+				model.addAttribute("war", war);
+			}
 			boolean access = Objects.equals(user, master);
 			if (!access) {
 				return "game_player";
@@ -243,7 +253,8 @@ public class GameController {
 		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
 		for (Turn t : turns) {
 			t.setGame(game);
-			gServ.saveTurn(t); // TODO: this is provisional, should be on gServ createGame method
+			gServ.saveTurn(t); // TODO: this is provisional, should be on gServ createGame
+								// method
 		}
 		return "redirect:/landing";
 	}

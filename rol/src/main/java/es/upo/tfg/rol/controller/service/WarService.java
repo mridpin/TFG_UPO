@@ -1,5 +1,7 @@
 package es.upo.tfg.rol.controller.service;
 
+import java.util.List;
+
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
 import es.upo.tfg.rol.model.pojos.War;
@@ -14,4 +16,10 @@ public interface WarService {
 			String attackerCountries, String defenderCountries, String defenderName,
 			String attackerName, String subscenario);
 
+	List<War> findByGame(Game game);
+
+	War findById(String warId);
+
+	War findOpenWar(Game game);
+	
 }
