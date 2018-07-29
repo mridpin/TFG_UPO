@@ -5,9 +5,11 @@ import java.util.Map;
 
 public class Rules {
 	
-	public final static Integer MAX_ROLLS_PER_WAR = 3;
+	// Parsing constants
 	public final static String COALITION_SEPARATOR = ";";
 	public final static String INVOLVEMENT_SEPARATOR = ",";
+	public final static String CLOSED_WAR = "closed";
+	// Die constants
 	public static final Map<Integer, Double> DIE;
 	static {
 		DIE = new HashMap<Integer, Double>();
@@ -19,7 +21,15 @@ public class Rules {
 		DIE.put(6, 22.0);
 	}
 	public final static Integer DIE_SIDE = 6;
-	public final static String CLOSED_WAR = "closed";
+	// Rolls constants
+	public static final Map<Integer, Double> ROLL_SCORE;
+	static {
+		ROLL_SCORE = new HashMap<Integer, Double>();
+		ROLL_SCORE.put(1, 0.15);
+		ROLL_SCORE.put(2, 0.25);
+		ROLL_SCORE.put(3, 0.60);
+	}
+	public final static Integer MAX_ROLLS_PER_WAR = 3;
 
 	public Rules() {
 		// TODO Auto-generated constructor stub

@@ -46,6 +46,7 @@ public class WarController {
 			@RequestParam(name = "war_id") String warId) {
 		Game game = (Game) session.getAttribute("game");
 		User user = (User) session.getAttribute("user");
+		Roll lastRoll = null;
 		// Deny access to prevent users from accessing other user's wars by HTML
 		// tampering with the warID
 		if (game == null || user == null || !user.equals(game.getMaster())) {
@@ -62,6 +63,7 @@ public class WarController {
 		} else {
 			war = wServ.findById(warId);
 			rolls = rServ.findByWar(war);
+			lastRoll = rolls.get(rolls.size() - 1);
 		}
 		if (war==null) {
 			return Access.reject();
@@ -69,6 +71,7 @@ public class WarController {
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
 		model.addAttribute("rolls", rolls);
+		model.addAttribute("lastRoll", lastRoll);
 		model.addAttribute("countries", countries);
 		model.addAttribute("turns", turns);
 		return "war";
@@ -107,10 +110,8 @@ public class WarController {
 			int nRolls = rServ.findByWar(war).size();
 			redirectAttributes.addAttribute("war_id", war.getId());
 			if (nRolls < Rules.MAX_ROLLS_PER_WAR) {
-				redirectAttributes.addFlashAttribute("roll", roll);
 				return "redirect:/war";
 			} else {
-				redirectAttributes.addFlashAttribute("roll", roll);
 				return "redirect:/endWar";
 			}
 		}

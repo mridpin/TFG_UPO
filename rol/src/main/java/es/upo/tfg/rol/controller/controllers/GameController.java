@@ -62,7 +62,8 @@ public class GameController {
 
 	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
-			@RequestParam(name = "game_id", required = true) String gameId) throws InterruptedException {
+			@RequestParam(name = "game_id", required = true) String gameId)
+			throws InterruptedException {
 		User user = (User) session.getAttribute("user");
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
@@ -89,15 +90,17 @@ public class GameController {
 			for (Turn t : turns) {
 				List<War> turnWars = wServ.findByTurn(t);
 				wars.add(turnWars);
-			}			
+			}
 			model.addAttribute("wars", wars);
 			// 5. Add the rolls
+			// TODO: RETOMAR AQUI PORQUE LAS DOS ULTIMAS GUERRAS SON IGUALES. APROVECHAR
+			// LA NUEVA RELACION COALITION-INVOLVEMENT PARA MOSTRAR TODOS LOS PAISES
 			List<List<List<Roll>>> rollsPerGame = new ArrayList<>();
 			for (List<War> turnWars : wars) {
 				List<List<Roll>> rollsPerTurn = new ArrayList<>();
-				for (War w : turnWars) {					
+				for (War w : turnWars) {
 					List<Roll> rollsPerWar = rServ.findByWar(w);
-					rollsPerTurn.add(rollsPerWar);					
+					rollsPerTurn.add(rollsPerWar);
 				}
 				rollsPerGame.add(rollsPerTurn);
 			}

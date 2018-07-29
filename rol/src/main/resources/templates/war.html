@@ -647,9 +647,29 @@
 						});
 		drawCountryPoints(attackerPoints, defenderPoints);
 	}
+	
+	/**
+	 * Loads the previous coalitions in the coalition boxes, by searching for names in the last result table
+	 */
+	function loadPreviousCoalitions() {
+		var lastAttackersTDs = $("td.last_attacker_country_name");
+		var lastDefendersTDs = $("td.last_defender_country_name");
+		var attackersList = $("ul#attacker_list");
+		var defenderList = $("ul#defender_list");
+		for (var i = 0; i < lastAttackersTDs.length; i++) {
+			var countryLi = $("#" + $(lastAttackersTDs[i]).text().replace(" ", "") + "_listitem");
+			$(attackersList).append(countryLi);
+		}
+		for (var i = 0; i < lastDefendersTDs.length; i++) {
+			var countryLi = $("#" + $(lastDefendersTDs[i]).text().replace(" ", "")  + "_listitem");
+			$(defenderList).append(countryLi);
+		}
+	}
 
 	$(document).ready(
 			function() {
+				// Load the previous coalitions if they exist
+				loadPreviousCoalitions();
 				// Sortable list to drag countries to coalitions
 				$("ul#country_list, ul#attacker_list, ul#defender_list")
 						.sortable({
@@ -721,7 +741,9 @@
 				th:if="${rollStats.index == rollStats.size-1}"
 				id="last_roll_result">
 				<h3>Resultado de la &uacute;ltima tirada</h3>
-				<table border="1">
+				<table
+					id="last_result"
+					border="1">
 					<tr>
 						<th colspan="4">Puntuaci&oacute;n</th>
 					</tr>
@@ -733,16 +755,45 @@
 							colspan="2"
 							th:text="${roll.defender.name}"></th>
 					</tr>
-					<tr th:each="inv, invStats : ${roll}">
-						<td th:text="${roll.attacker}"></td>
+					<tr>
+						<td colspan="2">
+							<table
+								id="last_attacker_result_table"
+								border="1"
+								style="width: 100%;">
+								<tr th:each="inv, invStats : ${roll.attacker.involvements}">
+									<td
+										class="last_attacker_country_name"
+										th:text="${inv.country.name}"></td>
+									<td
+										class="last_attacker_country_percent"
+										th:text="${inv.involvementPercent}"></td>
+								</tr>
+							</table>
+					</td>
+					<td colspan="2">
+						<table
+							id="last_defender_result_table"
+							border="1"
+							style="width: 100%;">
+							<tr th:each="inv, invStats : ${roll.defender.involvements}">
+								<td
+									class="last_defender_country_name"
+									th:text="${inv.country.name}"></td>
+								<td
+									class="last_defender_country_percent"
+									th:text="${inv.involvementPercent}"></td>
+							</tr>
+						</table>
+					</td>
 					</tr>
 					<tr>
-						<td
+						<th
 							colspan="2"
-							th:text="${roll.attackerScore}"></td>
-						<td
+							th:text="${roll.attackerScore}"></th>
+						<th
 							colspan="2"
-							th:text="${roll.defenderScore}"></td>
+							th:text="${roll.defenderScore}"></th>
 					</tr>
 				</table>
 			</section>
@@ -825,6 +876,8 @@
 				<input
 					type="text"
 					name="attacker_name"
+					th:value="${lastRoll?.attacker?.name}"
+					th:readonly="${lastRoll!=null}"
 					form="war_form">
 				<h4>Coalici&oacute;n Defensora</h4>
 				<div
@@ -837,7 +890,9 @@
 				<label>Nombre coalici&oacute;n defensora</label>
 				<input
 					type="text"
-					name="defender_name"
+					name="defender_name"					
+					th:value="${lastRoll?.defender?.name}"
+					th:readonly="${lastRoll!=null}"
 					form="war_form">
 			</div>
 			<h4>Pa&iacute;ses</h4>

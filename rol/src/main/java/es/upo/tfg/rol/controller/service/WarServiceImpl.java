@@ -29,7 +29,7 @@ import es.upo.tfg.rol.model.pojos.War;
 @Service("warService")
 @Transactional
 public class WarServiceImpl implements WarService {
-	
+
 	@Autowired
 	private WarRepository warRep;
 	@Autowired
@@ -62,7 +62,7 @@ public class WarServiceImpl implements WarService {
 	public Roll roll(Game game, War war, String name, Double attackerScore,
 			Double defenderScore, String attackerCountries, String defenderCountries,
 			String defenderName, String attackerName, String subscenario) {
-		// Get the list of turns from the game, then find the correct one from
+		// Get the list of turns from the game, then find the correct one from the
 		// subscenario
 		List<Turn> turns = turnRep.findByGame(game);
 		Turn turn = this.findTurnFromGame(turns, subscenario);
@@ -73,9 +73,21 @@ public class WarServiceImpl implements WarService {
 		war.setTurn(turn);
 		// If this is the first roll of the war, save it
 		if (war.getId() == null) {
-			// TODO: Get the # war of this turn
-			war.setName("".equals(name) ? "Guerra" : name);
+			if ("".equals(name)) {
+				// TODO: UPDATE DESIGN DIAGRAM TO REFLECT THESE CHANGES
+				int warNumber = warRep.findByTurn(turn).size();
+				String genericWarName = "Guerra " + warNumber + " de "
+						+ turn.getSubscenario();
+				war.setName(genericWarName);
+			} else {
+				war.setName(name);
+			}
 			warRep.save(war);
+		} else {
+			// TODO: UPDATE DESIGN DIAGRAM TO REFLECT THESE CHANGES
+			List<Roll> rolls = rollRep.findByWar(war);
+			attackerName = rolls.get(rolls.size()-1).getAttacker().getName();
+			defenderName = rolls.get(rolls.size()-1).getAttacker().getName();
 		}
 		// Create the coalitions
 		List<Country> countries = countryRep.findByGame(game);
@@ -96,7 +108,6 @@ public class WarServiceImpl implements WarService {
 				String[] c = s.split(Rules.INVOLVEMENT_SEPARATOR);
 				Involvement inv = new Involvement();
 				inv.setCoalition(attacker);
-				// TODO: ESTO DA FALLO
 				inv.setCountry(this.findCountryByName(c[0], countries));
 				inv.setInvolvementPercent(Double.parseDouble(c[1]));
 				attackerInvolvements.add(inv);
@@ -117,13 +128,14 @@ public class WarServiceImpl implements WarService {
 			return null;
 		}
 		// Roll the dice and resolve the scores
+		Integer nRoll = rollRep.findByWar(war).size() + 1;
 		Random rand = new Random();
 		Integer attackerRoll = rand.nextInt(Rules.DIE_SIDE) + 1;
 		Integer defenderRoll = rand.nextInt(Rules.DIE_SIDE) + 1;
 		Double attackerRollScore = Rules.DIE.get(attackerRoll);
 		Double defenderRollScore = Rules.DIE.get(defenderRoll);
-		attackerScore += attackerRollScore;
-		defenderScore += defenderRollScore;
+		attackerScore = (attackerScore + attackerRollScore) * Rules.ROLL_SCORE.get(nRoll);
+		defenderScore = (defenderScore + defenderRollScore) * Rules.ROLL_SCORE.get(nRoll);
 		// Assign the winner and loser
 		Roll roll = new Roll();
 		roll.setAttacker(attacker);
