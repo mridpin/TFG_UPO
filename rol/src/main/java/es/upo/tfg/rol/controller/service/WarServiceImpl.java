@@ -188,4 +188,9 @@ public class WarServiceImpl implements WarService {
 		}
 		return wars;
 	}
+
+	@Override
+	public List<War> findByTurn(Turn turn) {
+		return warRep.findByTurn(turn);
+	}
 }

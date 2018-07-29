@@ -4,6 +4,7 @@ import java.util.List;
 
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
+import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.War;
 
 public interface WarService {
@@ -21,5 +22,7 @@ public interface WarService {
 	War findById(String warId);
 
 	War findOpenWar(Game game);
+
+	List<War> findByTurn(Turn t);
 	
 }

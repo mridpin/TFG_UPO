@@ -62,10 +62,10 @@
 						<form
 							action="#"
 							th:action="@{/openGame}"
-							method="post">
+							method="get">
 							<input
 								type="hidden"
-								name="gameIndex"
+								name="game_id"
 								th:value="${game.id}">
 							<input
 								type="submit"
@@ -97,10 +97,10 @@
 						<form
 							action="#"
 							th:action="@{/openGame}"
-							method="post">
+							method="get">
 							<input
 								type="hidden"
-								name="gameIndex"
+								name="game_id"
 								th:value="${game.id}">
 							<input
 								type="submit"

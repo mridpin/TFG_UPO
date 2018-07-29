@@ -1,5 +1,6 @@
 /**
  * Makes input fields in profile page editable
+ * 
  * @returns
  */
 function makeEditable() {
@@ -9,6 +10,7 @@ function makeEditable() {
 
 /**
  * Checks if both passwords match to prevent typos
+ * 
  * @returns
  */
 function matchPasswords() {
@@ -23,6 +25,29 @@ function matchPasswords() {
 }
 
 /**
+ * On the game page, calculates the total score of each war
+ * 
+ * @returns
+ */
+function calculateRollTotals() {
+	var tables = $(".rolls_per_turn");
+	for (var t = 0; t<tables.length; t++) {
+		var attackerScores = $(tables[t]).find("tr.attacker_score_cell");
+		var attackerTotal = 0.0;
+		for (var r = 0; r<attackerScores.length; r++) {
+			attackerTotal += $(attackerScores[r]).text();
+		}
+		var defenderScores = $(tables[t]).find("tr.defender_score_cell");
+		var defenderTotal = 0.0;
+		for (var r = 0; r<defenderScores.length; r++) {
+			defenderTotal += $(defenderScores[r]).text();
+		}
+		$(tables[t]).find("th.attacker_score").text(attackerTotal);
+		$(tables[t]).find("th.defender_score").text(defenderTotal);
+	}
+}
+
+/**
  * Extends the String prototype to add a replaceAll function
  */
 String.prototype.replaceAll = function(search, replace) {
@@ -31,3 +56,4 @@ String.prototype.replaceAll = function(search, replace) {
     }
     return this.split(search).join(replace);
 }
+

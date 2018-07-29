@@ -715,6 +715,38 @@
 </head>
 <body>
 	<article>
+		<th:block th:if="${rolls!=null and !rolls.empty}">
+			<section
+				th:each="roll, rollStats : ${rolls}"
+				th:if="${rollStats.index == rollStats.size-1}"
+				id="last_roll_result">
+				<h3>Resultado de la &uacute;ltima tirada</h3>
+				<table border="1">
+					<tr>
+						<th colspan="4">Puntuaci&oacute;n</th>
+					</tr>
+					<tr>
+						<th
+							colspan="2"
+							th:text="${roll.attacker.name}"></th>
+						<th
+							colspan="2"
+							th:text="${roll.defender.name}"></th>
+					</tr>
+					<tr th:each="inv, invStats : ${roll}">
+						<td th:text="${roll.attacker}"></td>
+					</tr>
+					<tr>
+						<td
+							colspan="2"
+							th:text="${roll.attackerScore}"></td>
+						<td
+							colspan="2"
+							th:text="${roll.defenderScore}"></td>
+					</tr>
+				</table>
+			</section>
+		</th:block>
 		<h2>Comenzar una tirada</h2>
 		<section>
 			<h3>Nombre</h3>
@@ -858,7 +890,7 @@
 				<form
 					action="#"
 					th:action="@{/endWar}"
-					method="post">
+					method="get">
 					<input
 						type="submit"
 						value="Terminar Enfrentamiento">
@@ -919,17 +951,16 @@
 					<th>Defensor</th>
 				</tr>
 				<tr th:each="roll, rollStats : ${rolls}">
-					<td th:switch="${rollStats.index}">
-					<span th:case="0">Primera Tirada &#10005; 0.15 puntos</span>
-					<span th:case="1">Segunda Tirada &#10005; 0.25 puntos</span>
-					</td>
+					<td th:switch="${rollStats.index}"><span th:case="0">Primera
+							Tirada &#10005; 0.15 puntos</span> <span th:case="1">Segunda
+							Tirada &#10005; 0.25 puntos</span></td>
 					<td th:text="${roll.attackerScore}"></td>
 					<td th:text="${roll.defenderScore}"></td>
 				</tr>
 				<tr id="total_score">
-				<th>Puntuaci&oacute;n total</th>
-				<th id="attacker_total_score"></th>
-				<th id="defender_total_score"></th>
+					<th>Puntuaci&oacute;n total</th>
+					<th id="attacker_total_score"></th>
+					<th id="defender_total_score"></th>
 				</tr>
 			</table>
 		</section>

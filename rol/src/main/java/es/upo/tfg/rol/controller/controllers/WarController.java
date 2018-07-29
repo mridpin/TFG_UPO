@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.CountryService;
@@ -74,15 +75,17 @@ public class WarController {
 	}
 
 	@GetMapping("/endWar")
-	public String endWar(HttpSession session) {
+	public String endWar(HttpSession session, RedirectAttributes redirectAttributes) {
+		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
 		wServ.endWar(war);
-		// TODO: Redirect to game_main, calculate and show the winning coalition
-		return "redirect:/landing";
+		// TODO: Calculate and show the winning coalition
+		redirectAttributes.addAttribute("game_id", game.getId());
+		return "redirect:/openGame";
 	}
 
 	@PostMapping("/createRoll")
-	public String createRoll(HttpSession session, Model model,
+	public String createRoll(HttpSession session, Model model, RedirectAttributes redirectAttributes,
 			@RequestParam(name = "name", required = true) String name,
 			@RequestParam(name = "attacker_score", required = true) Double attackerScore,
 			@RequestParam(name = "defender_score", required = true) Double defenderScore,
@@ -102,10 +105,12 @@ public class WarController {
 			return "redirect:/landing";
 		} else {
 			int nRolls = rServ.findByWar(war).size();
+			redirectAttributes.addAttribute("war_id", war.getId());
 			if (nRolls < Rules.MAX_ROLLS_PER_WAR) {
-				model.addAttribute("roll", roll);
+				redirectAttributes.addFlashAttribute("roll", roll);
 				return "redirect:/war";
 			} else {
+				redirectAttributes.addFlashAttribute("roll", roll);
 				return "redirect:/endWar";
 			}
 		}

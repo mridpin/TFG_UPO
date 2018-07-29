@@ -26,11 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
+import es.upo.tfg.rol.controller.service.RollService;
+import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.exceptions.NotAuthorized;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
+import es.upo.tfg.rol.model.pojos.Roll;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;
@@ -45,7 +48,11 @@ public class GameController {
 	@Autowired
 	UserService uServ;
 	@Autowired
+	TurnService tServ;
+	@Autowired
 	WarService wServ;
+	@Autowired
+	RollService rServ;
 
 	@GetMapping("/create_game")
 	public String createGame(Model model) {
@@ -53,25 +60,48 @@ public class GameController {
 		return "create_game";
 	}
 
-	@PostMapping("/openGame")
+	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
-			@RequestParam(name = "gameIndex", required = true) String stat) {
+			@RequestParam(name = "game_id", required = true) String gameId) throws InterruptedException {
 		User user = (User) session.getAttribute("user");
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
 			// values in the url, or F12 and changing the html. If they do, they'll be
 			// redirected to an error page
-			Long id = Long.parseLong(stat); // throws NumberFormatException
+			Long id = Long.parseLong(gameId); // throws NumberFormatException
 			Game game = gServ.findById(id);
 			if (game == null) {
 				throw new NotAuthorized("Recurso no encontrado");
 			}
 			User master = game.getMaster();
-			// Add relevant info to the model
+			// Add relevant info to the model:
+			// 1. Add the game
 			model.addAttribute("game", game);
 			session.setAttribute("game", game);
+			// 2. Add the countries
 			List<Country> countries = cServ.findCountries(game);
 			model.addAttribute("countries", countries);
+			// 3. Add the turns
+			List<Turn> turns = tServ.findTurns(game);
+			model.addAttribute("turns", turns);
+			// 4. Add the wars
+			List<List<War>> wars = new ArrayList<>();
+			for (Turn t : turns) {
+				List<War> turnWars = wServ.findByTurn(t);
+				wars.add(turnWars);
+			}			
+			model.addAttribute("wars", wars);
+			// 5. Add the rolls
+			List<List<List<Roll>>> rollsPerGame = new ArrayList<>();
+			for (List<War> turnWars : wars) {
+				List<List<Roll>> rollsPerTurn = new ArrayList<>();
+				for (War w : turnWars) {					
+					List<Roll> rollsPerWar = rServ.findByWar(w);
+					rollsPerTurn.add(rollsPerWar);					
+				}
+				rollsPerGame.add(rollsPerTurn);
+			}
+			model.addAttribute("rolls", rollsPerGame);
 			// TODO: UPDATE DESIGN DIAGRAM
 			// If there is no open war, "create war" button will show, else it will be a
 			// "open ongoing war" button
