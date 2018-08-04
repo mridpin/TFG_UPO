@@ -9,6 +9,7 @@ public class Rules {
 	public final static String COALITION_SEPARATOR = ";";
 	public final static String INVOLVEMENT_SEPARATOR = ",";
 	public final static String CLOSED_WAR = "closed";
+	public final static String ORIGINAL_FILE = "_original";
 	// Die constants
 	public static final Map<Integer, Double> DIE;
 	static {
@@ -34,6 +35,8 @@ public class Rules {
 	public final static Integer MAX_ROLLS_PER_WAR = 3;
 	public final static Double HIGHEST_ROLL_MODIFIER = 1.05;
 	public final static Double LOWEST_ROLL_MODIFIER = 0.95;
+	public final static Double COST_OF_WAR_LOSER = 0.05;
+	public final static Double COST_OF_WAR_WINNER = 0.02;
 
 	public Rules() {
 		// TODO Auto-generated constructor stub

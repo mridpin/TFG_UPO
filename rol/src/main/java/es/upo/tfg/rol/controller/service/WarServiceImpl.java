@@ -159,6 +159,10 @@ public class WarServiceImpl implements WarService {
 		// Return the new roll
 		return roll;
 	}
+	
+	private void applyCostOFWar(Roll roll) {
+		
+	}
 
 	private Country findCountryByName(String name, List<Country> countries) {
 		for (Country c : countries) {
