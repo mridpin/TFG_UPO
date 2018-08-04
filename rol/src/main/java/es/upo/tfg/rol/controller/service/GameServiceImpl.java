@@ -35,7 +35,6 @@ public class GameServiceImpl implements GameService {
 
 	@Override
 	public List<Game> findOpenGames(User user) {
-		// TODO: optimize by combining both queries into one?
 		List<Game> masteredOpenGames = gameRep.findOpenByMaster(user);
 		List<Game> playedOpenGames = gameRep.findOpenByPlayer(user);
 		List<Game> gamesParticipated = new ArrayList<>();
@@ -62,7 +61,6 @@ public class GameServiceImpl implements GameService {
 
 	@Override
 	public List<Game> findClosedGames(User user) {
-		// TODO: optimize by combining both queries into one?
 		List<Game> masteredClosedGames = gameRep.findClosedByMaster(user);
 		List<Game> playedClosedGames = gameRep.findClosedByPlayer(user);
 		List<Game> gamesParticipated = new ArrayList<>();

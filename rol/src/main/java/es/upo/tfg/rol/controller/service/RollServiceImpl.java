@@ -18,7 +18,6 @@ public class RollServiceImpl implements RollService {
 	private RollRepository rollRep;
 	
 	public RollServiceImpl() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

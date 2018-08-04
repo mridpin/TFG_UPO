@@ -232,8 +232,6 @@
 		$.each(res, function(type, types) {
 			$.each(types, function(name, value) {
 				res[type][name] *= c;
-				// TODO: YOU MUST PENALIZE THE !!!POINTS!!! OF THE WHOLE
-				// COALITION, EXCEPT FOR THE BLOCKADE
 				// Penalize for blockade
 				if (blockaded && type === BLOCKABLE_ATTRIBUTES) {
 					res[type][name] *= BLOCKADE_PENALTY;
@@ -474,7 +472,6 @@
 		var countryNavies = {};
 		// Grab the names of all the countries from the table
 		for ( var key in countries) {
-			// TODO: NO FUNCIONA CON LOS PAISES PARTICIONADOS
 			var longname = key;
 			var name = longname;
 			// Remove the suffix if it exists to use the country full values
@@ -597,8 +594,6 @@
 													var total = totalStats[type][name];
 													var points = attributeValuesTemplate[type][name];
 													if (!isEmpty(attackerStats)) {
-														// TODO: APPLY MODIFIERS
-														// HERE
 														var at = attackerStats[type][name];
 														attackerPoints[type][name] = (total === 0) ? 1
 																: (attackerStats[type][name] / total);

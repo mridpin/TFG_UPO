@@ -135,7 +135,19 @@ public class WarServiceImpl implements WarService {
 		Double attackerRollScore = Rules.DIE.get(attackerRoll);
 		Double defenderRollScore = Rules.DIE.get(defenderRoll);
 		attackerScore = (attackerScore + attackerRollScore) * Rules.ROLL_SCORE.get(nRoll);
+		if (attackerRoll.doubleValue() == Rules.HIGHEST_ROLL) {
+			attackerRollScore *= Rules.HIGHEST_ROLL_MODIFIER;
+		}
+		if (attackerRoll.doubleValue() == Rules.LOWEST_ROLL) {
+			attackerRollScore *= Rules.LOWEST_ROLL_MODIFIER;
+		}
 		defenderScore = (defenderScore + defenderRollScore) * Rules.ROLL_SCORE.get(nRoll);
+		if (defenderRoll.doubleValue() == Rules.HIGHEST_ROLL) {
+			defenderScore *= Rules.HIGHEST_ROLL_MODIFIER;
+		}
+		if (defenderRoll.doubleValue() == Rules.LOWEST_ROLL) {
+			defenderScore *= Rules.LOWEST_ROLL_MODIFIER;
+		}
 		// Assign the winner and loser
 		Roll roll = new Roll();
 		roll.setAttacker(attacker);

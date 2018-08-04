@@ -21,6 +21,8 @@ public class Rules {
 		DIE.put(6, 22.0);
 	}
 	public final static Integer DIE_SIDE = 6;
+	public final static Integer HIGHEST_ROLL = 6;
+	public final static Integer LOWEST_ROLL = 1;
 	// Rolls constants
 	public static final Map<Integer, Double> ROLL_SCORE;
 	static {
@@ -30,6 +32,8 @@ public class Rules {
 		ROLL_SCORE.put(3, 0.60);
 	}
 	public final static Integer MAX_ROLLS_PER_WAR = 3;
+	public final static Double HIGHEST_ROLL_MODIFIER = 1.05;
+	public final static Double LOWEST_ROLL_MODIFIER = 0.95;
 
 	public Rules() {
 		// TODO Auto-generated constructor stub

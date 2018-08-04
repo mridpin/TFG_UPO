@@ -18,7 +18,6 @@ public class TurnServiceImpl implements TurnService {
 	TurnRepository turnRep;
 	
 	public TurnServiceImpl() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

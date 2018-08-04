@@ -9,23 +9,46 @@
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		var tables = $(".rolls_per_turn");
-		for (var t = 0; t<tables.length; t++) {
-			var attackerScores = $(tables[t]).find("td.attacker_score_cell");
-			var attackerTotal = 0.0;
-			for (var r = 0; r<attackerScores.length; r++) {
-				attackerTotal += parseFloat($(attackerScores[r]).text());
-			}
-			var defenderScores = $(tables[t]).find("td.defender_score_cell");
-			var defenderTotal = 0.0;
-			for (var r = 0; r<defenderScores.length; r++) {
-				defenderTotal += parseFloat($(defenderScores[r]).text());
-			}
-			$(tables[t]).find("th.attacker_score").text(attackerTotal.toFixed(2));
-			$(tables[t]).find("th.defender_score").text(defenderTotal.toFixed(2));
-		}
-	});
+	function openRoll(id) {
+		var modal = $("div#" + id + "_modal");
+		$(modal).show();
+	}
+
+	//TODO: TEMPORAARY, MAAKE AA PROPER MODAL
+	function closeRoll(id) {
+		var modal = $("div#" + id + "_modal");
+		$(modal).hide();
+
+	}
+	$(document)
+			.ready(
+					function() {
+						// Show total scores
+						var tables = $(".rolls_per_turn");
+						for (var t = 0; t < tables.length; t++) {
+							var attackerScores = $(tables[t]).find(
+									"td.attacker_score_cell");
+							var attackerTotal = 0.0;
+							for (var r = 0; r < attackerScores.length; r++) {
+								attackerTotal += parseFloat($(attackerScores[r])
+										.text());
+							}
+							var defenderScores = $(tables[t]).find(
+									"td.defender_score_cell");
+							var defenderTotal = 0.0;
+							for (var r = 0; r < defenderScores.length; r++) {
+								defenderTotal += parseFloat($(defenderScores[r])
+										.text());
+							}
+							$(tables[t]).find("th.attacker_score").text(
+									attackerTotal.toFixed(2));
+							$(tables[t]).find("th.defender_score").text(
+									defenderTotal.toFixed(2));
+
+							// Hide detail tables
+							$(".roll_detail").hide();
+						}
+					});
 </script>
 </head>
 <body>
@@ -64,43 +87,107 @@
 				<li th:each="turn, turnStats : ${turns}">
 					<span th:text="${turn.subscenario}"></span>
 					<ul class="wars_per_turn">
-						<li
-							style="list-style-type: none;"
-							th:each="turnwar, turnwarStats : ${wars[turnStats.index]}">
-							<ul class="wars_per_turn">
-								<li th:each="war, warStats : ${turnwar}">
-									<h4 th:text="${war.name}"></h4>
-									<table
-										border="1"
-										class="rolls_per_turn">
-										<tr>
-											<th
-												th:text="${rolls[turnStats.index][warStats.index][0].attacker.name}"></th>
-											<th
-												th:text="${rolls[turnStats.index][warStats.index][0].defender.name}"></th>
-										</tr>
-										<th:block
-											th:each="roll, rollStats : ${rolls[turnStats.index][warStats.index]}">
-											<tr class="score_rows">
-												<td
-													class="attacker_score_cell"
-													th:text="${roll.attackerScore}"></td>
-												<td
-													class="defender_score_cell"
-													th:text="${roll.defenderScore}"></td>
-											</tr>
-										</th:block>
-										<tr class="total_score">
-											<th class="attacker_score">Total atacante</th>
-											<th class="defender_score">Total defensor</th>
-										</tr>
-									</table>
-								</li>
-							</ul>
+						<li th:each="war, warStats : ${wars[turnStats.index]}">
+							<h4 th:text="${war.name}"></h4>
+							<table
+								border="1"
+								class="rolls_per_turn">
+								<tr>
+									<th th:text="${war.rolls[0].attacker.name}"></th>
+									<th th:text="${war.rolls[0].defender.name}"></th>
+								</tr>
+								<th:block th:each="roll, rollStats : ${war.rolls}">
+									<tr class="score_rows">
+										<td
+											class="attacker_score_cell"
+											th:text="${roll.attackerScore}"></td>
+										<td
+											class="defender_score_cell"
+											th:text="${roll.defenderScore}"></td>
+										<td><button
+												th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
+												onclick="openRoll(this.value)">Detalles</button></td>
+									</tr>
+								</th:block>
+								<tr class="total_score">
+									<th class="attacker_score">Total atacante</th>
+									<th class="defender_score">Total defensor</th>
+								</tr>
+							</table>
 						</li>
 					</ul>
 				</li>
 			</ul>
+			<th:block th:each="turn, turnStats : ${turns}">
+				<th:block th:each="turnwar, turnwarStats : ${wars[turnStats.index]}">
+					<th:block th:each="roll, rollStats : ${turnwar.rolls}">
+						<div
+							class="roll_detail"
+							th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index + '_modal'}">
+							<table
+								th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
+								border="1">
+								<tr>
+									<th colspan="4">Puntuaci&oacute;n</th>
+								</tr>
+								<tr>
+									<th
+										colspan="2"
+										th:text="${roll.attacker.name}"></th>
+									<th
+										colspan="2"
+										th:text="${roll.defender.name}"></th>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<table
+											id="last_attacker_result_table"
+											border="1"
+											style="width: 100%;">
+											<tr th:each="inv, invStats : ${roll.attacker.involvements}">
+												<td
+													class="last_attacker_country_name"
+													th:text="${inv.country.name}"></td>
+												<td
+													class="last_attacker_country_percent"
+													th:text="${inv.involvementPercent}"></td>
+											</tr>
+										</table>
+									</td>
+									<td colspan="2">
+										<table
+											id="last_defender_result_table"
+											border="1"
+											style="width: 100%;">
+											<tr th:each="inv, invStats : ${roll.defender.involvements}">
+												<td
+													class="last_defender_country_name"
+													th:text="${inv.country.name}"></td>
+												<td
+													class="last_defender_country_percent"
+													th:text="${inv.involvementPercent}"></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<th
+										colspan="2"
+										th:text="${roll.attackerScore}"></th>
+									<th
+										colspan="2"
+										th:text="${roll.defenderScore}"></th>
+								</tr>
+								<tr>
+									<td colspan="4"><button
+											th:value="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
+											onclick="closeRoll(this.value)">Cerrar</button></td>
+								</tr>
+							</table>
+						</div>
+					</th:block>
+				</th:block>
+			</th:block>
 		</section>
 		<section
 			th:if="${game.endDate == null}"

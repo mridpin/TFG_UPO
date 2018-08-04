@@ -92,19 +92,8 @@ public class GameController {
 				wars.add(turnWars);
 			}
 			model.addAttribute("wars", wars);
-			// 5. Add the rolls
-			// TODO: RETOMAR AQUI PORQUE LAS DOS ULTIMAS GUERRAS SON IGUALES. APROVECHAR
-			// LA NUEVA RELACION COALITION-INVOLVEMENT PARA MOSTRAR TODOS LOS PAISES
-			List<List<List<Roll>>> rollsPerGame = new ArrayList<>();
-			for (List<War> turnWars : wars) {
-				List<List<Roll>> rollsPerTurn = new ArrayList<>();
-				for (War w : turnWars) {
-					List<Roll> rollsPerWar = rServ.findByWar(w);
-					rollsPerTurn.add(rollsPerWar);
-				}
-				rollsPerGame.add(rollsPerTurn);
-			}
-			model.addAttribute("rolls", rollsPerGame);
+			// TODO: APROVECHAR LA NUEVA RELACION COALITION-INVOLVEMENT PARA MOSTRAR TODOS
+			// LOS PAISES
 			// TODO: UPDATE DESIGN DIAGRAM
 			// If there is no open war, "create war" button will show, else it will be a
 			// "open ongoing war" button
