@@ -243,6 +243,7 @@ public class GameController {
 		// TODO: post-redirect-get
 		// Create and persist the game
 		// TODO: Create game in gameservice
+		// TODO: Validate the turns with the player file
 		Game game = new Game();
 		game.setMaster((User) session.getAttribute("user"));
 		game.setName(name);
@@ -260,17 +261,20 @@ public class GameController {
 			String millis = "" + System.currentTimeMillis();
 			String filename = millis + "-"
 					+ StringUtils.cleanPath(f.getOriginalFilename());
-			String referenceFilename = millis + Rules.ORIGINAL_FILE + "-"
-					+ StringUtils.cleanPath(f.getOriginalFilename());
+			String referenceFilename = filename + Rules.ORIGINAL_FILE;
 			Path dataPath = Paths.get("countryData");
 			try (InputStream inputStream = f.getInputStream()) {
 				Files.copy(inputStream, dataPath.resolve(filename),
 						StandardCopyOption.REPLACE_EXISTING);
-				Files.copy(inputStream, dataPath.resolve(referenceFilename),
-						StandardCopyOption.REPLACE_EXISTING);
 				c.setData(filename);
 				c.setGame(game);
 				cServ.saveCountry(c);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try (InputStream inputStream = f.getInputStream()) {
+				Files.copy(inputStream, dataPath.resolve(referenceFilename),
+						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
