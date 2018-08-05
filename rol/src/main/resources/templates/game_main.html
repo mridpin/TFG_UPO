@@ -100,10 +100,10 @@
 									<tr class="score_rows">
 										<td
 											class="attacker_score_cell"
-											th:text="${roll.attackerScore}"></td>
+											th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></td>
 										<td
 											class="defender_score_cell"
-											th:text="${roll.defenderScore}"></td>
+											th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></td>
 										<td><button
 												th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
 												onclick="openRoll(this.value)">Detalles</button></td>
@@ -173,10 +173,10 @@
 								<tr>
 									<th
 										colspan="2"
-										th:text="${roll.attackerScore}"></th>
+										th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></th>
 									<th
 										colspan="2"
-										th:text="${roll.defenderScore}"></th>
+										th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></th>
 								</tr>
 								<tr>
 									<td colspan="4"><button
@@ -188,6 +188,21 @@
 					</th:block>
 				</th:block>
 			</th:block>
+		</section>
+		<section>
+			<h3>Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span></h3>
+			<p>Turno siguiente: <span th:text="${nextTurn==null ? 'Ya es el &uacute;ltimo turno' : nextTurn.subscenario}"></span></p>
+			<form
+				class="form"
+				action="#"
+				th:action="@{/nextTurn}"
+				method="post">
+				<input
+					class=""
+					type="submit"
+					value="Avanzar Turno"
+					th:disabled="${nextTurn==null}">
+			</form>
 		</section>
 		<section
 			th:if="${game.endDate == null}"

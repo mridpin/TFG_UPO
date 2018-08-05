@@ -97,7 +97,6 @@ public class WarController {
 			@RequestParam(name = "defender_countries", required = true) String defenderCountries,
 			@RequestParam(name = "defender_name") String defenderName,
 			@RequestParam(name = "subscenario", required = true) String subscenario) {
-		// TODO: PETA CUANDO LA GUERRA YA EXISTE
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,

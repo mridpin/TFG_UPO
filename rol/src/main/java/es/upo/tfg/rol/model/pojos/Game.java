@@ -42,13 +42,16 @@ public class Game implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "master")
 	private User master;
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "active_turn")
+	private Turn activeTurn;
 
 	public Game() {
 	}
 
 	public Game(Long id, @NotNull @Size(min = 2, max = 64) String name,
-			@NotNull @Size(min = 2, max = 64) String scenario,
-			@NotNull Date startDate, Date endDate, @NotNull User master) {
+			@NotNull @Size(min = 2, max = 64) String scenario, @NotNull Date startDate,
+			Date endDate, @NotNull User master, @NotNull Turn activeTurn) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -56,6 +59,7 @@ public class Game implements Serializable {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.master = master;
+		this.activeTurn = activeTurn;
 	}
 
 	public Long getId() {
@@ -104,20 +108,27 @@ public class Game implements Serializable {
 
 	public void setMaster(User master) {
 		this.master = master;
+	}	
+
+	public Turn getActiveTurn() {
+		return activeTurn;
 	}
+
+	public void setActiveTurn(Turn activeTurn) {
+		this.activeTurn = activeTurn;
+	}	
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((activeTurn == null) ? 0 : activeTurn.hashCode());
 		result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((master == null) ? 0 : master.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((scenario == null) ? 0 : scenario.hashCode());
-		result = prime * result
-				+ ((startDate == null) ? 0 : startDate.hashCode());
+		result = prime * result + ((scenario == null) ? 0 : scenario.hashCode());
+		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
 		return result;
 	}
 
@@ -130,6 +141,11 @@ public class Game implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Game other = (Game) obj;
+		if (activeTurn == null) {
+			if (other.activeTurn != null)
+				return false;
+		} else if (!activeTurn.equals(other.activeTurn))
+			return false;
 		if (endDate == null) {
 			if (other.endDate != null)
 				return false;

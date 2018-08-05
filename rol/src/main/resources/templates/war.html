@@ -849,10 +849,9 @@
 						th:class="subscenario_radio"
 						th:id="${turn.subscenario}"
 						th:value="${turn.subscenario}"
-						th:checked="${war?.turn?.subscenario!=null and war?.turn?.subscenario==turn.subscenario} ? true : ${turnStat.index==0 ? true : false}"
+						th:checked="${session.game.activeTurn==turn}"
 						form="war_form"
-						th:disabled="${war?.turn?.subscenario!=null and war?.turn?.subscenario!=turn.subscenario}"
-						onclick="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
+						th:disabled="${session.game.activeTurn!=turn}">
 				</li>
 			</ul>
 		</section>

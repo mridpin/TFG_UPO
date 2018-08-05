@@ -62,15 +62,22 @@ public class CountryServiceImpl implements CountryService {
 					// attributeList.add(subscenarioAttributeList);
 					attributes.put(subscenario, subscenarioAttributes);
 					break;
-				case "type":
+				case "tipo":
 					type = dataline[1];
 					typeAttributes = new HashMap<>();
 					subscenarioAttributes.put(type, typeAttributes);
 					break;
 				default:
 					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-					typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
-					break;
+					if ("true".equals(dataline[1]) || "sí".equals(dataline[1])
+							|| "si".equals(dataline[1]) || "yes".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 1.0);
+					} else if ("false".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 0.0);
+					} else {
+						typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
+						break;
+					}
 				}
 			}
 		} catch (IOException e) {

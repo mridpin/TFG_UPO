@@ -87,7 +87,7 @@ public class Country implements Serializable {
 
 	public void setData(String data) {
 		this.data = data;
-	}
+	}	
 
 	public User getPlayer() {
 		return player;

@@ -24,6 +24,7 @@ public class Turn implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "game")
 	private Game game;
+	// TODO: SECURE THE ORDER BY ADDING A ORDER ATTRIBUTE
 
 	public Turn() {
 	}
@@ -63,7 +64,6 @@ public class Turn implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((game == null) ? 0 : game.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((subscenario == null) ? 0 : subscenario.hashCode());
 		return result;
@@ -78,11 +78,6 @@ public class Turn implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Turn other = (Turn) obj;
-		if (game == null) {
-			if (other.game != null)
-				return false;
-		} else if (!game.equals(other.game))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;

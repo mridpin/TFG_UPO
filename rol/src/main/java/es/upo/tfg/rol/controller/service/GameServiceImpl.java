@@ -17,6 +17,7 @@ import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.comparators.GameByDateComparator;
+import es.upo.tfg.rol.model.pojos.comparators.TurnByIdComparator;
 
 @Service("gameService")
 @Transactional
@@ -75,6 +76,22 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public void saveTurn(Turn t) {
 		turnRep.save(t);	
+	}
+
+
+	@Override
+	public void nextTurn(Game game) {
+		List<Turn> turns = turnRep.findByGame(game);
+		Turn currentTurn = game.getActiveTurn();
+		Comparator<Turn> comp = new TurnByIdComparator();
+		//Collections.sort(turns, comp);
+		int index = turns.indexOf(currentTurn);
+		// Secure against trampling the html
+		if (index != (turns.size() - 1)) {
+			Turn nextTurn = turns.get(index + 1);
+			game.setActiveTurn(nextTurn);
+		}		
+		gameRep.save(game);
 	}
 
 }

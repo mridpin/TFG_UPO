@@ -20,4 +20,6 @@ public interface GameService {
 
 	void saveTurn(Turn t);
 
+	void nextTurn(Game game);
+
 }

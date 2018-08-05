@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
 import es.upo.tfg.rol.controller.service.RollService;
@@ -85,6 +87,9 @@ public class GameController {
 			// 3. Add the turns
 			List<Turn> turns = tServ.findTurns(game);
 			model.addAttribute("turns", turns);
+			int index = turns.indexOf(game.getActiveTurn());
+			Turn nextTurn = (index != turns.size() - 1) ? turns.get(index + 1) : null;
+			model.addAttribute("nextTurn", nextTurn);
 			// 4. Add the wars
 			List<List<War>> wars = new ArrayList<>();
 			for (Turn t : turns) {
@@ -249,13 +254,19 @@ public class GameController {
 		List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
 		int i = 0;
 		for (Country c : countries) {
-			// Prepare and store datafile
+			// Prepare and store datafile. Each datafile is stored twice, one copy will
+			// stay unmodified as reference
 			MultipartFile f = files.get(i);
-			String filename = System.currentTimeMillis() + "-"
+			String millis = "" + System.currentTimeMillis();
+			String filename = millis + "-"
+					+ StringUtils.cleanPath(f.getOriginalFilename());
+			String referenceFilename = millis + Rules.ORIGINAL_FILE + "-"
 					+ StringUtils.cleanPath(f.getOriginalFilename());
 			Path dataPath = Paths.get("countryData");
 			try (InputStream inputStream = f.getInputStream()) {
 				Files.copy(inputStream, dataPath.resolve(filename),
+						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(inputStream, dataPath.resolve(referenceFilename),
 						StandardCopyOption.REPLACE_EXISTING);
 				c.setData(filename);
 				c.setGame(game);
@@ -278,6 +289,8 @@ public class GameController {
 			gServ.saveTurn(t); // TODO: this is provisional, should be on gServ createGame
 								// method
 		}
+		game.setActiveTurn(turns.get(0));
+		gServ.saveGame(game);
 		return "redirect:/landing";
 	}
 
@@ -293,5 +306,15 @@ public class GameController {
 			return "redirect:/landing";
 		}
 		return "game_main";
+	}
+
+	@PostMapping("/nextTurn")
+	public String endTurn(HttpSession session, Model model,
+			RedirectAttributes redirectAttributes) {
+		// TODO: POST REDIRECT GET THIS
+		Game game = (Game) session.getAttribute("game");
+		gServ.nextTurn(game);
+		redirectAttributes.addAttribute("game_id", game.getId());
+		return "redirect:/openGame";
 	}
 }
