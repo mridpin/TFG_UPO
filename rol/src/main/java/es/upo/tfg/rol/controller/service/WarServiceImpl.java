@@ -1,5 +1,11 @@
 package es.upo.tfg.rol.controller.service;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +48,9 @@ public class WarServiceImpl implements WarService {
 	private InvolvementRepository invRep;
 	@Autowired
 	private CoalitionRepository coalRep;
+	
+	@Autowired
+	private CountryService countryServ;
 
 	@Override
 	public War createWar(Game game) {
@@ -86,8 +95,8 @@ public class WarServiceImpl implements WarService {
 		} else {
 			// TODO: UPDATE DESIGN DIAGRAM TO REFLECT THESE CHANGES
 			List<Roll> rolls = rollRep.findByWar(war);
-			attackerName = rolls.get(rolls.size()-1).getAttacker().getName();
-			defenderName = rolls.get(rolls.size()-1).getAttacker().getName();
+			attackerName = rolls.get(rolls.size() - 1).getAttacker().getName();
+			defenderName = rolls.get(rolls.size() - 1).getAttacker().getName();
 		}
 		// Create the coalitions
 		List<Country> countries = countryRep.findByGame(game);
@@ -159,11 +168,44 @@ public class WarServiceImpl implements WarService {
 		// Return the new roll
 		return roll;
 	}
-	
-	private void applyCostOFWar(Roll roll) {
-		
+
+	private void applyCostOfWar(Roll roll) {
+		// Separate countries into winners and losers
+		List<Involvement> winners;
+		List<Involvement> losers;
+		if (roll.getAttackerScore() > roll.getDefenderScore()) {
+			winners = roll.getAttacker().getInvolvements();
+			losers = roll.getDefender().getInvolvements();
+		} else {
+			losers = roll.getAttacker().getInvolvements();
+			winners = roll.getDefender().getInvolvements();
+		}
+		for (Involvement i : winners) {
+			this.damageCountry(Rules.COST_OF_WAR_WINNER, i);
+		}
 	}
 
+	private void damageCountry(Double costOfWar, Involvement i) {
+		Country c = i.getCountry();
+		// Map the country
+		Map<String, Map<String, Map<String, Double>>> attributes = countryServ.mapCountry(c);
+		// Apply the damage
+		for (String subscenario : attributes.keySet()) {
+			Map<String, Map<String, Double>> subscenarioAttributes = attributes.get(subscenario);			
+			for (String type : subscenarioAttributes.keySet()) {
+				Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
+				for (String key : typeAttributes.keySet()) {
+					// TODO: ACUMULAR EL COST OF WAR
+					Double d = typeAttributes.get(key) * (1 - costOfWar);
+					typeAttributes.put(key, d);
+				}
+			}
+		}
+		// Write the map back into the file
+		// TODO: IMPLEMENT THIS
+		countryServ.demapCountry(attributes);
+	}
+	
 	private Country findCountryByName(String name, List<Country> countries) {
 		for (Country c : countries) {
 			if (c.getName().equals(name)) {

@@ -154,4 +154,10 @@ public class CountryServiceImpl implements CountryService {
 		return attributes;
 	}
 
+	@Override
+	public void demapCountry(Map<String, Map<String, Map<String, Double>>> attributes) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -10,6 +10,7 @@ public class Rules {
 	public final static String INVOLVEMENT_SEPARATOR = ",";
 	public final static String CLOSED_WAR = "closed";
 	public final static String ORIGINAL_FILE = "_original";
+	public final static String COUNTRY_FILE_PATH = "countryData";
 	// Die constants
 	public static final Map<Integer, Double> DIE;
 	static {

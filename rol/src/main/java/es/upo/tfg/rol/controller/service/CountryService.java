@@ -19,4 +19,6 @@ public interface CountryService {
 
 	Map<String, Map<String, Map<String, Double>>> mapCountry(Country c);
 
+	void demapCountry(Map<String, Map<String, Map<String, Double>>> attributes);
+
 }
