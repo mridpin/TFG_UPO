@@ -165,6 +165,8 @@ public class WarServiceImpl implements WarService {
 		roll.setDefenderScore(defenderScore);
 		roll.setWar(war);
 		rollRep.save(roll);
+		// Cost of war penalty
+		this.applyCostOfWar(roll);
 		// Return the new roll
 		return roll;
 	}
@@ -174,14 +176,21 @@ public class WarServiceImpl implements WarService {
 		List<Involvement> winners;
 		List<Involvement> losers;
 		if (roll.getAttackerScore() > roll.getDefenderScore()) {
-			winners = roll.getAttacker().getInvolvements();
-			losers = roll.getDefender().getInvolvements();
+			Coalition attacker = roll.getAttacker();
+			winners = invRep.findByCoalition(attacker);
+			Coalition defender = roll.getDefender();
+			losers = invRep.findByCoalition(defender);
 		} else {
-			losers = roll.getAttacker().getInvolvements();
-			winners = roll.getDefender().getInvolvements();
+			Coalition attacker = roll.getAttacker();
+			losers = invRep.findByCoalition(attacker);
+			Coalition defender = roll.getDefender();
+			winners = invRep.findByCoalition(defender);
 		}
 		for (Involvement i : winners) {
 			this.damageCountry(Rules.COST_OF_WAR_WINNER, i);
+		}
+		for (Involvement i : losers) {
+			this.damageCountry(Rules.COST_OF_WAR_LOSER, i);
 		}
 	}
 
@@ -196,14 +205,12 @@ public class WarServiceImpl implements WarService {
 				Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
 				for (String key : typeAttributes.keySet()) {
 					// TODO: ACUMULAR EL COST OF WAR
-					Double d = typeAttributes.get(key) * (1 - costOfWar);
+					Double d = typeAttributes.get(key) * i.getInvolvementPercent() * (1 - costOfWar);
 					typeAttributes.put(key, d);
 				}
 			}
 		}
-		// Write the map back into the file
-		// TODO: IMPLEMENT THIS
-		countryServ.demapCountry(attributes);
+		countryServ.demapCountry(attributes, c);
 	}
 	
 	private Country findCountryByName(String name, List<Country> countries) {

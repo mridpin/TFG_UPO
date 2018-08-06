@@ -3,9 +3,13 @@ package es.upo.tfg.rol.controller.service;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.CountryRepository;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
@@ -109,7 +114,7 @@ public class CountryServiceImpl implements CountryService {
 		try {
 			String filename = "countryData" + File.separator + country.getData();
 			InputStream is = new FileInputStream(filename);
-			BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_16));
 			while ((line = br.readLine()) != null) {
 				String[] dataline = line.split(";");
 				String whatDo = dataline[0].trim().toLowerCase();
@@ -155,9 +160,31 @@ public class CountryServiceImpl implements CountryService {
 	}
 
 	@Override
-	public void demapCountry(Map<String, Map<String, Map<String, Double>>> attributes) {
-		// TODO Auto-generated method stub
-		
+	public void demapCountry(Map<String, Map<String, Map<String, Double>>> attributes,
+			Country country) {
+		String filename = "countryData" + File.separator + country.getData();
+		try (OutputStreamWriter os = new OutputStreamWriter(
+				new FileOutputStream(filename, false), StandardCharsets.UTF_16)) {
+			String nameline = Rules.COUNTRY_NAME + Rules.SEMICOLON + country.getName() + Rules.SEMICOLON + System.lineSeparator();
+			os.write(nameline);
+			for (String subscenario : attributes.keySet()) {
+				Map<String, Map<String, Double>> subscenarioAttributes = attributes
+						.get(subscenario);
+				String subscenarioline = Rules.COUNTRY_SUBSCENARIO + Rules.SEMICOLON + subscenario + Rules.SEMICOLON + System.lineSeparator();
+				os.write(subscenarioline);
+				for (String type : subscenarioAttributes.keySet()) {
+					Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
+					String typeline = Rules.COUNTRY_TYPE + Rules.SEMICOLON + type + Rules.SEMICOLON + System.lineSeparator();
+					os.write(typeline);
+					for (String key : typeAttributes.keySet()) {
+						String value = key + Rules.SEMICOLON + typeAttributes.get(key) + Rules.SEMICOLON + System.lineSeparator();
+						os.write(value);
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
