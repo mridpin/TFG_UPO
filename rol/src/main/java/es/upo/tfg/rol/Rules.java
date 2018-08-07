@@ -14,6 +14,7 @@ public class Rules {
 	public final static String COUNTRY_NAME = "Nombre";
 	public final static String COUNTRY_SUBSCENARIO = "Subescenario";
 	public final static String COUNTRY_TYPE = "Tipo";
+	public final static String DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
 	public final static String SEMICOLON = ";";
 	// Die constants
 	public static final Map<Integer, Double> DIE;

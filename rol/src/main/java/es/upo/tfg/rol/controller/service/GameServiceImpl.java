@@ -151,7 +151,7 @@ public class GameServiceImpl implements GameService {
 		try {
 			Files.deleteIfExists(Paths.get(currFilename));
 			// TODO: RETOMAR AQUI: ESTO NO FUNCIONA
-			//Files.copy(Paths.get(ogFilename), Paths.get(currFilename), options);
+			Files.copy(Paths.get(ogFilename), Paths.get(currFilename), options);
 		} catch (IOException e) {
 			// TODO: HANDLE THIS EXCEPTION? PRIORITY = 3
 			e.printStackTrace();
