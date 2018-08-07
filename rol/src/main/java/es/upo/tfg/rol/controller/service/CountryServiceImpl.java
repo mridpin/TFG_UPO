@@ -114,7 +114,7 @@ public class CountryServiceImpl implements CountryService {
 		try {
 			String filename = "countryData" + File.separator + country.getData();
 			InputStream is = new FileInputStream(filename);
-			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_16));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 			while ((line = br.readLine()) != null) {
 				String[] dataline = line.split(";");
 				String whatDo = dataline[0].trim().toLowerCase();
@@ -164,7 +164,7 @@ public class CountryServiceImpl implements CountryService {
 			Country country) {
 		String filename = "countryData" + File.separator + country.getData();
 		try (OutputStreamWriter os = new OutputStreamWriter(
-				new FileOutputStream(filename, false), StandardCharsets.UTF_16)) {
+				new FileOutputStream(filename, false), StandardCharsets.UTF_8)) {
 			String nameline = Rules.COUNTRY_NAME + Rules.SEMICOLON + country.getName() + Rules.SEMICOLON + System.lineSeparator();
 			os.write(nameline);
 			for (String subscenario : attributes.keySet()) {

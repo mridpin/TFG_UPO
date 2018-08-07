@@ -32,15 +32,29 @@
 }
 </style>
 <script type="text/javascript">
-	// TODO: AJAX download this ruleset into a constant of arrays
+	// TODO: AJAX download this ruleset into a array constant
 	const BLOCKADE_PENALTY = 0.75;
 	const INLAND_BATTLE_PENALTY = 0.75;
 	const BLOCKABLE_ATTRIBUTES = "economicos";
+	const MILITARY_ATTRIBUTES = "militares";
 	const INLAND_ATTRIBUTES = "navales";
 	const INFANTRY = [ "Soldados -de todos los ejércitos-",
 			"Reservistas -de todos los ejércitos-" ];
+	const RESERVES = "Reservistas -de todos los ejércitos-";
+	const DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
+	const DEVELOPED_INFRAESTRUCTURE_ROLL = 3;
 	const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
 	const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
+	
+	// TODO: RETOMAR AQUI: APLICAR PENALIZACION INFRAESTRUCTURA
+	function getRollNumber() {
+		var res = 1;
+		if ($("table.previous_rolls") != null) {
+			var prevRolls = $("tr.prev_roll_row");
+			res = prevRolls.length + 1;
+		}
+		return res;
+	}
 
 	function isEmpty(obj) {
 		for ( var key in obj) {
@@ -238,6 +252,17 @@
 				}
 			});
 		});
+		// Disable reserves for 1st roll
+		var rollNumber = getRollNumber();
+		if (rollNumber == 1) {
+			res[MILITARY_ATTRIBUTES][RESERVES] = 0.0;
+		}
+		// Penalize reserves for underdeveloped countries
+		if (Math.round(res[MILITARY_ATTRIBUTES][DEVELOPED_INFRAESTRUCTURE])===0) {			
+			if (rollNumber < DEVELOPED_INFRAESTRUCTURE_ROLL) {
+				res[MILITARY_ATTRIBUTES][RESERVES] = 0.0;
+			}
+		}
 		return res;
 	}
 
@@ -595,7 +620,7 @@
 													var points = attributeValuesTemplate[type][name];
 													if (!isEmpty(attackerStats)) {
 														var at = attackerStats[type][name];
-														attackerPoints[type][name] = (total === 0) ? 1
+														attackerPoints[type][name] = (total === 0) ? attackerStats[type][name]
 																: (attackerStats[type][name] / total);
 														attackerPoints[type][name] *= points;
 														// Apply modifiers:
@@ -616,7 +641,7 @@
 														}
 													}
 													if (!isEmpty(defenderStats)) {
-														defenderPoints[type][name] = (total === 0) ? 1
+														defenderPoints[type][name] = (total === 0) ? attackerStats[type][name]
 																: (defenderStats[type][name] / total);
 														defenderPoints[type][name] *= points;
 														var def = defenderStats[type][name];
@@ -993,13 +1018,13 @@
 		</section>
 		<section th:if="${session.war.id != null}">
 			<h3>Puntos acumulados</h3>
-			<table border="2">
+			<table border="2" class="previous_rolls">
 				<tr>
 					<th>Puntos por tirada</th>
 					<th>Atacante</th>
 					<th>Defensor</th>
 				</tr>
-				<tr th:each="roll, rollStats : ${rolls}">
+				<tr th:each="roll, rollStats : ${rolls}" class="prev_roll_row">
 					<td th:switch="${rollStats.index}"><span th:case="0">Primera
 							Tirada &#10005; 0.15 puntos</span> <span th:case="1">Segunda
 							Tirada &#10005; 0.25 puntos</span></td>
