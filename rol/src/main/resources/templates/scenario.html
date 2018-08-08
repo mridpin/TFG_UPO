@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>Crea un escenario</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="js/customjs.js"
+	type="text/javascript"></script>
+</head>
+<body>
+	<nav>
+		<form
+			action="#"
+			th:action="@{/landing}"
+			method="get">
+			<input
+				type="submit"
+				value="Volver a la p&aacute;gina principal">
+		</form>
+	</nav>
+	<article>
+		<h2>Crear escenario</h2>
+		<section>
+			<form
+				class="form"
+				action="#"
+				th:action="@{/createScenario}"
+				method="post"
+				enctype="multipart/form-data">
+				<label
+					for="name"
+					class="">Nombre</label>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					placeholder="Nombre del escenario"
+					required
+					autofocus
+					maxlength="256">
+				<label
+					for="description"
+					class="">Descripci&oacute;n</label>
+				<input
+					type="text"
+					id="description"
+					name="description"
+					placeholder="Describe brevemente tu escenario..."
+					maxlength="512">
+				<input
+					type="file"
+					id="data"
+					name="data"
+					accept=".csv"
+					required>
+				<input
+					type="submit"
+					value="Crear Escenario">
+			</form>
+		</section>
+	</article>
+</body>
+</html>
