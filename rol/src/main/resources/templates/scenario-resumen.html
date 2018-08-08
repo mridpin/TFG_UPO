@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>Crea un escenario</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="js/customjs.js"
+	type="text/javascript"></script>
+</head>
+<body>
+	<article>
+		<h2>¡Tu escenario ha sido creado con &eacute;xito!</h2>
+		<section>
+			<h3>Resumen de tu escenario: <span th:text="${scenario.name}"></span></h3>
+			<ul>
+				<li th:each="subscenarioMap : ${map}"><span th:text="${subscenarioMap.key}"></span>
+					<ul>
+						<li th:each="typeMap : ${subscenarioMap.value}"><span th:text="${typeMap.key}"></span>
+							<ul>
+							<li th:each="attribute : ${typeMap.value}"><span th:text="${attribute.key + ': ' + attribute.value}"></span>						
+							</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</section>
+		<section>
+			<h3>Volver</h3>
+			<form
+				action="#"
+				th:action="@{/landing}"
+				method="get">
+				<input
+					type="submit"
+					value="Volver a la p&aacute;gina principal">
+			</form>
+		</section>
+	</article>
+</body>
+</html>

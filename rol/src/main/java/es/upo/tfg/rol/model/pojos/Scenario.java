@@ -1,4 +1,5 @@
 package es.upo.tfg.rol.model.pojos;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class Scenario implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -21,7 +22,7 @@ public class Scenario implements Serializable {
 	@Size(min = 2, max = 256)
 	@Column(name = "name")
 	private String name;
-	@Size(min = 2, max = 512)
+	@Size(max = 512)
 	@Column(name = "description")
 	private String description;
 	@NotNull
@@ -89,7 +90,7 @@ public class Scenario implements Serializable {
 
 	public void setAttributes(Map<String, Map<String, Map<String, Double>>> attributes) {
 		this.attributes = attributes;
-	}	
+	}
 
 	public User getAuthor() {
 		return author;

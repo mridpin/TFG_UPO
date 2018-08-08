@@ -1,13 +1,18 @@
 package es.upo.tfg.rol.controller.service;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +44,7 @@ public class ScenarioServiceImpl implements ScenarioService {
 		scenario.setDescription(description);
 		scenario.setAuthor(user);
 		String millis = "" + System.currentTimeMillis();
-		String filename = millis + "-" + name;
+		String filename = millis + "-" + name + ".csv";
 		// Prepare and store datafile
 		Path dataPath = Paths.get(Rules.SCENARIO_FILE_PATH);
 		try (InputStream inputStream = data.getInputStream()) {
@@ -51,6 +56,57 @@ public class ScenarioServiceImpl implements ScenarioService {
 			e.printStackTrace();
 		}
 		return scenario;
+	}
+
+	@Override
+	public Map<String, Map<String, Map<String, Double>>> mapScenario(Scenario scenario) {
+		String line = null;
+		String subscenario;
+		String type;
+		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
+		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
+		Map<String, Double> typeAttributes = new HashMap<>();
+		String filename = Rules.SCENARIO_FILE_PATH + File.separator + scenario.getData();
+		try (InputStream is = new FileInputStream(filename)){			
+			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String whatDo = dataline[0].trim().toLowerCase();
+				switch (whatDo) {
+				case "nombre":
+					break;
+				case "subescenario":
+					subscenario = dataline[1];
+					subscenarioAttributes = new HashMap<>();
+					attributes.put(subscenario, subscenarioAttributes);
+					break;
+				case "tipo":
+					type = dataline[1];
+					typeAttributes = new HashMap<>();
+					subscenarioAttributes.put(type, typeAttributes);
+					break;
+				default:
+					if ("true".equals(dataline[1]) || "sí".equals(dataline[1])
+							|| "si".equals(dataline[1]) || "yes".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 1.0);
+					} else if ("false".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 0.0);
+					} else {
+						typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
+						break;
+					}
+				}
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (NumberFormatException e) {
+			System.err.print(scenario.getName() + "\n");
+			e.printStackTrace();
+			return null;
+		}
+		return attributes;
 	}
 
 }
