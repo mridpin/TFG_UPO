@@ -97,8 +97,6 @@ public class GameController {
 				wars.add(turnWars);
 			}
 			model.addAttribute("wars", wars);
-			// TODO: APROVECHAR LA NUEVA RELACION COALITION-INVOLVEMENT PARA MOSTRAR TODOS
-			// LOS PAISES
 			// TODO: UPDATE DESIGN DIAGRAM
 			// If there is no open war, "create war" button will show, else it will be a
 			// "open ongoing war" button
