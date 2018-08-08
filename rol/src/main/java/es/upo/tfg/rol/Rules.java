@@ -11,6 +11,7 @@ public class Rules {
 	public final static String CLOSED_WAR = "closed";
 	public final static String ORIGINAL_FILE = "_original";
 	public final static String COUNTRY_FILE_PATH = "countryData";
+	public final static String SCENARIO_FILE_PATH = "scenarios";
 	public final static String COUNTRY_NAME = "Nombre";
 	public final static String COUNTRY_SUBSCENARIO = "Subescenario";
 	public final static String COUNTRY_TYPE = "Tipo";

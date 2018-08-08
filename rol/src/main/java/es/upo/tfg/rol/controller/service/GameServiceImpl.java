@@ -150,7 +150,6 @@ public class GameServiceImpl implements GameService {
 				StandardCopyOption.COPY_ATTRIBUTES };
 		try {
 			Files.deleteIfExists(Paths.get(currFilename));
-			// TODO: RETOMAR AQUI: ESTO NO FUNCIONA
 			Files.copy(Paths.get(ogFilename), Paths.get(currFilename), options);
 		} catch (IOException e) {
 			// TODO: HANDLE THIS EXCEPTION? PRIORITY = 3
