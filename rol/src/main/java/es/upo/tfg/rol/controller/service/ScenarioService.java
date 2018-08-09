@@ -1,5 +1,6 @@
 package es.upo.tfg.rol.controller.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -27,5 +28,18 @@ public interface ScenarioService {
 	 * @return map of the attributes of the scenario
 	 */
 	Map<String, Map<String, Map<String, Double>>> mapScenario(Scenario scenario);
+
+	/**
+	 * Finds all available scenarios
+	 * @return a list of scenarios
+	 */
+	List<Scenario> findAllScenarios();
+
+	/**
+	 * Finds a scenario by id
+	 * @param id
+	 * @return scenario
+	 */
+	Scenario findById(Long id);
 	
 }

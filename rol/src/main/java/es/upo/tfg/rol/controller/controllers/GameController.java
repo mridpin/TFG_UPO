@@ -29,6 +29,7 @@ import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
 import es.upo.tfg.rol.controller.service.RollService;
+import es.upo.tfg.rol.controller.service.ScenarioService;
 import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.controller.service.WarService;
@@ -36,6 +37,7 @@ import es.upo.tfg.rol.exceptions.NotAuthorized;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
+import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;
@@ -55,10 +57,14 @@ public class GameController {
 	WarService wServ;
 	@Autowired
 	RollService rServ;
+	@Autowired
+	ScenarioService scServ;
 
 	@GetMapping("/create_game")
 	public String createGame(Model model) {
+		List<Scenario> scenarios = scServ.findAllScenarios();
 		model.addAttribute("turn", new Turn());
+		model.addAttribute("scenarios", scenarios);
 		return "create_game";
 	}
 

@@ -11,14 +11,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.mysql.fabric.xmlrpc.base.Array;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.ScenarioRepository;
@@ -107,6 +112,19 @@ public class ScenarioServiceImpl implements ScenarioService {
 			return null;
 		}
 		return attributes;
+	}
+
+	@Override
+	public List<Scenario> findAllScenarios() {
+		List<Scenario> scenarios = new ArrayList<>();
+		scRep.findAll().forEach(scenarios::add);
+		return scenarios;
+	}
+
+	@Override
+	public Scenario findById(Long id) {
+		Optional<Scenario> scenarioOp = scRep.findById(id);
+		return (scenarioOp.isPresent()) ? scenarioOp.get() : null;
 	}
 
 }
