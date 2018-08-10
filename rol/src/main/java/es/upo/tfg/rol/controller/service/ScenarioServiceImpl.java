@@ -127,4 +127,12 @@ public class ScenarioServiceImpl implements ScenarioService {
 		return (scenarioOp.isPresent()) ? scenarioOp.get() : null;
 	}
 
+	@Override
+	public Map<String, Object> mapRules() {
+		// Get all the static rules
+		Map<String, Object> rules = Rules.getRules();
+		// TODO:RETOMAR AQUI: CONSTRUIR MAPA DEL FICHERO usando las keywords
+		return null;
+	}
+
 }

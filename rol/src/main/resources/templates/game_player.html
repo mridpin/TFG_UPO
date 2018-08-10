@@ -8,6 +8,47 @@
 <script
 	src="js/customjs.js"
 	type="text/javascript"></script>
+<script type="text/javascript">
+	function openRoll(id) {
+		var modal = $("div#" + id + "_modal");
+		$(modal).show();
+	}
+
+	//TODO: TEMPORAARY, MAAKE AA PROPER MODAL
+	function closeRoll(id) {
+		var modal = $("div#" + id + "_modal");
+		$(modal).hide();
+	}
+	$(document)
+			.ready(
+					function() {
+						// Show total scores
+						var tables = $(".rolls_per_turn");
+						for (var t = 0; t < tables.length; t++) {
+							var attackerScores = $(tables[t]).find(
+									"td.attacker_score_cell");
+							var attackerTotal = 0.0;
+							for (var r = 0; r < attackerScores.length; r++) {
+								attackerTotal += parseFloat($(attackerScores[r])
+										.text());
+							}
+							var defenderScores = $(tables[t]).find(
+									"td.defender_score_cell");
+							var defenderTotal = 0.0;
+							for (var r = 0; r < defenderScores.length; r++) {
+								defenderTotal += parseFloat($(defenderScores[r])
+										.text());
+							}
+							$(tables[t]).find("th.attacker_score").text(
+									attackerTotal.toFixed(2));
+							$(tables[t]).find("th.defender_score").text(
+									defenderTotal.toFixed(2));
+
+							// Hide detail tables
+							$(".roll_detail").hide();
+						}
+					});
+</script>
 </head>
 <body>
 	<header></header>
@@ -21,8 +62,11 @@
 				value="Volver a la p&aacute;gina principal">
 		</form>
 	</nav>
-	<article>
-		<h2><span th:text="${game.name}"></span> - <span th:text="${game.master.nickname}"></span></h2>
+<article>
+		<h2>
+			<span th:text="${game.name}"></span> - <span
+				th:text="${game.master.nickname}"></span>
+		</h2>
 		<section>
 			<h3>Participantes</h3>
 			<table border="2">
@@ -37,162 +81,116 @@
 			</table>
 		</section>
 		<section>
-			<h3>Enfrentamientos [ejemplo visual, l&oacute;gica no
-				implementada a&uacute;n]</h3>
-			<ul>
-				<li><h4>1860</h4></li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong><u>Coalici&oacute;n Anglo-Francesa</u></strong>
-							vs <strong>Coalici&oacute;n Rusa</strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-								<li style="list-style-type: none;">
-									<table border="1">
-										<tr>
-											<td>Reino Unido</td>
-											<td rowspan="3">vs</td>
-											<td rowspan="2">Rusia</td>
-										</tr>
-										<tr>
-											<td>Francia</td>
-										</tr>
-										<tr>
-											<td>30 pts</td>
-											<td>25 pts</td>
-										</tr>
-									</table>
-								</li>
-								<li>Batalla 2</li>
-								<li style="list-style-type: none;">
-									<table border="1">
-										<tr>
-											<td>Reino Unido</td>
-											<td rowspan="3">vs</td>
-											<td>Rusia</td>
-										</tr>
-										<tr>
-											<td>Francia</td>
-											<td>Austria-Hungr&iacute;a</td>
-										</tr>
-										<tr>
-											<td>32 pts</td>
-											<td>28 pts</td>
-										</tr>
-									</table>
-								</li>
-							</ul>
+			<h3>Enfrentamientos</h3>
+			<ul id="turn_list">
+				<li th:each="turn, turnStats : ${turns}">
+					<span th:text="${turn.subscenario}"></span>
+					<ul class="wars_per_turn">
+						<li th:each="war, warStats : ${wars[turnStats.index]}">
+							<h4 th:text="${war.name}"></h4>
+							<table
+								border="1"
+								class="rolls_per_turn">
+								<tr>
+									<th th:text="${war.rolls[0].attacker.name}"></th>
+									<th th:text="${war.rolls[0].defender.name}"></th>
+								</tr>
+								<th:block th:each="roll, rollStats : ${war.rolls}">
+									<tr class="score_rows">
+										<td
+											class="attacker_score_cell"
+											th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></td>
+										<td
+											class="defender_score_cell"
+											th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></td>
+										<td><button
+												th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
+												onclick="openRoll(this.value)">Detalles</button></td>
+									</tr>
+								</th:block>
+								<tr class="total_score">
+									<th class="attacker_score">Total atacante</th>
+									<th class="defender_score">Total defensor</th>
+								</tr>
+							</table>
 						</li>
 					</ul>
 				</li>
-				<li><h4>1870</h4></li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong>Coalici&oacute;n Francesa</strong> vs <strong><u>Federaci&oacute;n
-									de Alemania del Norte</u></strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-								<li style="list-style-type: none;">
-									<table border="1">
-										<tr>
-											<td>Francia</td>
-											<td rowspan="2">vs</td>
-											<td>Alemania</td>
-										</tr>
-										<tr>
-											<td>17 pts</td>
-											<td>16 pts</td>
-										</tr>
-									</table>
-								</li>
-								<li>Batalla 2</li>
-								<li style="list-style-type: none;">
-									<table border="1">
-										<tr>
-											<td>Francia</td>
-											<td rowspan="2">vs</td>
-											<td>Alemania</td>
-										</tr>
-										<tr>
-											<td>15 pts</td>
-											<td>14 pts</td>
-										</tr>
-									</table>
-								</li>
-								<li>Batalla 3</li>
-								<li style="list-style-type: none;">
-									<table border="1">
-										<tr>
-											<td>Francia</td>
-											<td rowspan="2">vs</td>
-											<td>Alemania</td>
-										</tr>
-										<tr>
-											<td>17 pts</td>
-											<td>20 pts</td>
-										</tr>
-									</table>
-								</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li><h4>1880</h4></li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong>Coalici&oacute;n A</strong> vs <strong><u>Federaci&oacute;n
-									B</u></strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-
-								<li>Batalla 2</li>
-
-								<li>Batalla 3</li>
-
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong>Coalici&oacute;n A</strong> vs <strong>Coalici&oacute;n
-								C</strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong>Coalici&oacute;n n ...</strong> vs <strong>Coalici&oacute;n
-								m ...</strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-								<li>Batalla n ...</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li><h4>1890</h4></li>
-				<li style="list-style-type: none;">
-					<ul>
-						<li><strong>[...m&aacute;s guerras aqu&iacute;...]</strong></li>
-						<li style="list-style-type: none;">
-							<ul>
-								<li>Batalla 1</li>
-								<li>Batalla n ...</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-
 			</ul>
+			<th:block th:each="turn, turnStats : ${turns}">
+				<th:block th:each="turnwar, turnwarStats : ${wars[turnStats.index]}">
+					<th:block th:each="roll, rollStats : ${turnwar.rolls}">
+						<div
+							class="roll_detail"
+							th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index + '_modal'}">
+							<table
+								th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
+								border="1">
+								<tr>
+									<th colspan="4">Puntuaci&oacute;n</th>
+								</tr>
+								<tr>
+									<th
+										colspan="2"
+										th:text="${roll.attacker.name}"></th>
+									<th
+										colspan="2"
+										th:text="${roll.defender.name}"></th>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<table
+											id="last_attacker_result_table"
+											border="1"
+											style="width: 100%;">
+											<tr th:each="inv, invStats : ${roll.attacker.involvements}">
+												<td
+													class="last_attacker_country_name"
+													th:text="${inv.country.name}"></td>
+												<td
+													class="last_attacker_country_percent"
+													th:text="${inv.involvementPercent}"></td>
+											</tr>
+										</table>
+									</td>
+									<td colspan="2">
+										<table
+											id="last_defender_result_table"
+											border="1"
+											style="width: 100%;">
+											<tr th:each="inv, invStats : ${roll.defender.involvements}">
+												<td
+													class="last_defender_country_name"
+													th:text="${inv.country.name}"></td>
+												<td
+													class="last_defender_country_percent"
+													th:text="${inv.involvementPercent}"></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<th
+										colspan="2"
+										th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></th>
+									<th
+										colspan="2"
+										th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></th>
+								</tr>
+								<tr>
+									<td colspan="4"><button
+											th:value="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
+											onclick="closeRoll(this.value)">Cerrar</button></td>
+								</tr>
+							</table>
+						</div>
+					</th:block>
+				</th:block>
+			</th:block>
+		</section>
+		<section>
+			<h3>Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span></h3>
+			<p>Turno siguiente: <span th:text="${nextTurn==null ? 'Ya es el &uacute;ltimo turno' : nextTurn.subscenario}"></span></p>
 		</section>
 	</article>
 </body>

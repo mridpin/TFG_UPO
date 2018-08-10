@@ -46,7 +46,6 @@
 	const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
 	const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
 	
-	// TODO: RETOMAR AQUI: APLICAR PENALIZACION INFRAESTRUCTURA
 	function getRollNumber() {
 		var res = 1;
 		if ($("table.previous_rolls") != null) {
@@ -735,7 +734,14 @@
 							$("#defender_countries").val(defender);
 							return true;
 						});
-
+				// Ajax call to get all rules
+				$.ajax({
+					type : "POST",
+					url : "/mapRules",
+					success : function(response) {
+						rules = response;
+					}
+				});
 				// Ajax call to get all country data to display in tables
 				// dynamically
 				$.ajax({
@@ -743,7 +749,6 @@
 					url : "/mapCountries",
 					success : function(response) {
 						countries = response;
-						// setupCoalitionNavies();
 						updateCoalitionNavies();
 						updateCountryNavies();
 						updateCountryPoints();

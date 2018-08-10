@@ -42,5 +42,11 @@ public interface ScenarioService {
 	 * @return scenario
 	 */
 	Scenario findById(Long id);
+
+	/**
+	 * Reads the file of the scenario and returns a map with the rules
+	 * @return map of rules 
+	 */
+	Map<String, Object> mapRules();
 	
 }

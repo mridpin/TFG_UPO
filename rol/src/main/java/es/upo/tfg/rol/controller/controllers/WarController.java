@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.RollService;
+import es.upo.tfg.rol.controller.service.ScenarioService;
 import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.model.pojos.Country;
@@ -40,6 +41,8 @@ public class WarController {
 	TurnService tServ;
 	@Autowired
 	RollService rServ;
+	@Autowired
+	ScenarioService scServ;
 
 	@GetMapping("/war")
 	public String createWar(HttpSession session, Model model,
@@ -58,16 +61,16 @@ public class WarController {
 		// TODO: UPDATE DESIGN DIAGRAM
 		War war;
 		List<Roll> rolls = new ArrayList<>();
-		if (warId==null || "".equals(warId)) {
+		if (warId == null || "".equals(warId)) {
 			war = wServ.createWar(game);
 		} else {
 			war = wServ.findById(warId);
 			rolls = rServ.findByWar(war);
 			lastRoll = rolls.get(rolls.size() - 1);
 		}
-		if (war==null) {
+		if (war == null) {
 			return Access.reject();
-		}		
+		}
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
 		model.addAttribute("rolls", rolls);
@@ -88,7 +91,8 @@ public class WarController {
 	}
 
 	@PostMapping("/createRoll")
-	public String createRoll(HttpSession session, Model model, RedirectAttributes redirectAttributes,
+	public String createRoll(HttpSession session, Model model,
+			RedirectAttributes redirectAttributes,
 			@RequestParam(name = "name", required = true) String name,
 			@RequestParam(name = "attacker_score", required = true) Double attackerScore,
 			@RequestParam(name = "defender_score", required = true) Double defenderScore,
@@ -136,6 +140,18 @@ public class WarController {
 			maps.put(c.getName(), cmap);
 		}
 		return maps;
+	}
+
+	/**
+	 * Ajax call that returns a map of the rules of the game
+	 * 
+	 * @return a map all the rules in the rules class
+	 */
+	@PostMapping(value = "/mapRules", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> mapRules() {
+		Map<String, Object> rules = scServ.mapRules();
+		return rules;
 	}
 
 }
