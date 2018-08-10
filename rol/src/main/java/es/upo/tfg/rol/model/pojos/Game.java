@@ -30,9 +30,9 @@ public class Game implements Serializable {
 	@Column(name = "name")
 	private String name;
 	@NotNull
-	@Size(min = 2, max = 64)
-	@Column(name = "scenario")
-	private String scenario;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "scenario")
+	private Scenario scenario;
 	@NotNull
 	@Column(name = "start_date")
 	private Date startDate;
@@ -50,7 +50,7 @@ public class Game implements Serializable {
 	}
 
 	public Game(Long id, @NotNull @Size(min = 2, max = 64) String name,
-			@NotNull @Size(min = 2, max = 64) String scenario, @NotNull Date startDate,
+			@NotNull Scenario scenario, @NotNull Date startDate,
 			Date endDate, @NotNull User master, @NotNull Turn activeTurn) {
 		super();
 		this.id = id;
@@ -78,11 +78,11 @@ public class Game implements Serializable {
 		this.name = name;
 	}
 
-	public String getScenario() {
+	public Scenario getScenario() {
 		return scenario;
 	}
 
-	public void setScenario(String scenario) {
+	public void setScenario(Scenario scenario) {
 		this.scenario = scenario;
 	}
 
@@ -122,12 +122,10 @@ public class Game implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((activeTurn == null) ? 0 : activeTurn.hashCode());
 		result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((master == null) ? 0 : master.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((scenario == null) ? 0 : scenario.hashCode());
 		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
 		return result;
 	}
@@ -141,11 +139,6 @@ public class Game implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Game other = (Game) obj;
-		if (activeTurn == null) {
-			if (other.activeTurn != null)
-				return false;
-		} else if (!activeTurn.equals(other.activeTurn))
-			return false;
 		if (endDate == null) {
 			if (other.endDate != null)
 				return false;
@@ -165,11 +158,6 @@ public class Game implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
-			return false;
-		if (scenario == null) {
-			if (other.scenario != null)
-				return false;
-		} else if (!scenario.equals(other.scenario))
 			return false;
 		if (startDate == null) {
 			if (other.startDate != null)

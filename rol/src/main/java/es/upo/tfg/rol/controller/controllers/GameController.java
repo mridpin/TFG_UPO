@@ -70,8 +70,7 @@ public class GameController {
 
 	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
-			@RequestParam(name = "game_id", required = true) String gameId)
-			throws InterruptedException {
+			@RequestParam(name = "game_id", required = true) String gameId) {
 		User user = (User) session.getAttribute("user");
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
@@ -133,6 +132,31 @@ public class GameController {
 		model.addAttribute("openGames", playedGames);
 		model.addAttribute("closedGames", closedGames);
 		return "landing";
+	}
+
+	@PostMapping("/removeScenario")
+	public String removeScenario(HttpSession session) {
+		session.removeAttribute("scenario");
+		session.removeAttribute("turns");
+		session.removeAttribute("countries");
+		session.removeAttribute("newGameName");
+		return "redirect:/create_game";
+	}
+
+	@PostMapping("/addScenario")
+	public String addScenario(
+			@RequestParam(name = "scenario_id", required = true) Long id,
+			@RequestParam(name = "name", required = true) String name,
+			HttpSession session) {
+		// Add the scenario to the session
+		session.setAttribute("newGameName", name);
+		Scenario scenario = scServ.findById(id);
+		session.setAttribute("scenario", scenario);
+		// Create a list of turns with the scenario and add them to the session
+		Game game = (Game) session.getAttribute("game");
+		List<Turn> turns = tServ.generateTurns(scenario, game);
+		session.setAttribute("turns", turns);
+		return "redirect:/create_game";
 	}
 
 	@PostMapping("/removePlayer")
@@ -198,41 +222,6 @@ public class GameController {
 		return "redirect:/create_game";
 	}
 
-	@PostMapping("/removeTurn")
-	public String removeTurn(
-			@RequestParam(name = "turnIndex", required = true) String stat,
-			HttpSession session) {
-		// TODO: Throw error if index is tampered with
-		int index = Integer.parseInt(stat);
-		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
-		turns.remove(index);
-		session.setAttribute("turns", turns);
-		return "redirect:/create_game";
-	}
-
-	/**
-	 * Stores turns in the session. By storing in the session we don't need to
-	 * persist until the game is created, therefore avoiding orphan database entries
-	 * in case of browser closing or some other premature exit. You can keep adding
-	 * turns until the VM runs out of memory and crashes
-	 * 
-	 * @param turn
-	 *            data of the turn we are creating
-	 * @param session
-	 *            http session
-	 * @return to the same page to keep adding turns or players
-	 */
-	@PostMapping("/addTurn")
-	public String createTurn(HttpSession session, @ModelAttribute Turn turn) {
-		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
-		if (turns == null) {
-			turns = new ArrayList<>();
-		}
-		turns.add(turn);
-		session.setAttribute("turns", turns);
-		return "redirect:/create_game";
-	}
-
 	/**
 	 * Persist the game and all it's required information, including: 1. Persist the
 	 * countries, 2. Persist the associations between player-country-game
@@ -240,65 +229,21 @@ public class GameController {
 	 * @return current game page
 	 */
 	@PostMapping("/submitGame")
-	public String createGameSubmit(
-			@RequestParam(name = "name", required = true) String name,
-			@RequestParam(name = "scenario", required = true) String scenario,
-			HttpSession session) {
-		// TODO: post-redirect-get
-		// Create and persist the game
-		// TODO: Create game in gameservice
-		// TODO: Validate the turns with the player file
-		Game game = new Game();
-		game.setMaster((User) session.getAttribute("user"));
-		game.setName(name);
-		game.setScenario(scenario);
-		game.setStartDate(new Date());
-		gServ.saveGame(game);
-		// Persist the countries
+	public String createGameSubmit(HttpSession session, RedirectAttributes redirect) {
+		Scenario scenario = (Scenario) session.getAttribute("scenario");
+		User user = (User) session.getAttribute("user");
+		String name = (String) session.getAttribute("newGameName");
 		List<Country> countries = (List<Country>) session.getAttribute("countries");
 		List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
-		int i = 0;
-		for (Country c : countries) {
-			// Prepare and store datafile. Each datafile is stored twice, one copy will
-			// stay unmodified as reference
-			MultipartFile f = files.get(i);
-			String millis = "" + System.currentTimeMillis();
-			String filename = millis + "-"
-					+ StringUtils.cleanPath(f.getOriginalFilename());
-			String referenceFilename = filename + Rules.ORIGINAL_FILE;
-			Path dataPath = Paths.get("countryData");
-			try (InputStream inputStream = f.getInputStream()) {
-				Files.copy(inputStream, dataPath.resolve(filename),
-						StandardCopyOption.REPLACE_EXISTING);
-				c.setData(filename);
-				c.setGame(game);
-				cServ.saveCountry(c);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try (InputStream inputStream = f.getInputStream()) {
-				Files.copy(inputStream, dataPath.resolve(referenceFilename),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			// Just in case two iterations occur in the same millisecond
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			i++;
-		}
-		// Persist the turns
 		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
-		for (Turn t : turns) {
-			t.setGame(game);
-			gServ.saveTurn(t); // TODO: this is provisional, should be on gServ createGame
-								// method
+		Game game = gServ.createGame(name, user, turns, countries, files, scenario);
+		if (game == null) {
+			// TODO: HANDLE ERROR
+		} else {
+			// TODO: post-redirect-get
+			session.setAttribute("game", game);
+			redirect.addAttribute("game_id", game.getId());
 		}
-		game.setActiveTurn(turns.get(0));
-		gServ.saveGame(game);
 		return "redirect:/landing";
 	}
 

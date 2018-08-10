@@ -8,6 +8,37 @@
 <script
 	src="js/customjslib.js"
 	type="text/javascript"></script>
+<script type="text/javascript">
+	function searchScenario() {
+		var searchbox = $("#search_box");
+		var filter = $(searchbox).val().toLowerCase();
+		var table = $("#scenario_table");
+		var trs = $(".scenario_list_elements");
+		var tdname, tdscenario;
+
+		for (var i = 0; i < trs.length; i++) {
+			tdname = $(trs[i]).find("td.scenario_name");
+			tdscenario = $(trs[i]).find("td.scenario_tags");
+			if (tdname && tdscenario) {
+				var tdnametext = $(tdname).text().toLowerCase();
+				var tdscenariotext = $(tdscenario).text().toLowerCase();
+				var keep = (tdnametext.indexOf(filter) > -1)
+						|| (tdscenariotext.indexOf(filter) > -1);
+				if (keep) {
+					$(trs[i]).show();
+				} else {
+					$(trs[i]).hide();
+				}
+			}
+		}
+	}
+
+	function selectScenario(id, name) {
+		$("#scenario").val(name);
+		$("#scenario_id").val(id);
+	}
+</script>
+
 </head>
 <body>
 	<nav>
@@ -21,13 +52,25 @@
 		</form>
 	</nav>
 	<article>
-		<h2>Crear partida</h2>
-		<section>
-			<h3>Crea una nueva partida</h3>
+		<h2 th:if="${session.scenario == null}">Crear partida</h2>
+		<h2 th:if="${session.scenario != null}">
+			Creando partida: <span th:text="${session.newGameName}"></span>
+		</h2>
+		<form
+			th:if="${session.scenario != null}"
+			action="#"
+			th:action="@{/removeScenario}"
+			method="post">
+			<input
+				type="submit"
+				value="Reiniciar creaci&oacute;n">
+		</form>
+		<section th:if="${session.scenario == null}">
+			<h3>Primero, elige un escenario</h3>
 			<form
 				class="form"
 				action="#"
-				th:action="@{/submitGame}"
+				th:action="@{/addScenario}"
 				method="post">
 				<label
 					for="name"
@@ -38,6 +81,8 @@
 					name="name"
 					class="form-control"
 					placeholder="Nombre"
+					th:value="${session.newGameName != null ? session.newGameName : ''}"
+					th:readonly="${session.newGameName != null}"
 					required
 					autofocus>
 				<!-- 			<span -->
@@ -51,25 +96,94 @@
 					id="scenario"
 					name="scenario"
 					class="form-control"
-					placeholder="Escenario"
+					placeholder="Selecciona uno abajo"
+					th:value="${session.scenario?.name}"
 					readonly="readonly"
 					required>
 				<input
 					type="hidden"
 					name="scenario_id"
 					id="scenario_id"
-					value="">
+					th:value="${session.scenario?.id}">
 				<!-- 			<span -->
 				<!-- 				th:if="${#fields.hasErrors('scenario')}" -->
 				<!-- 				th:errors="*{scenario}">Errores en el escenario</span> -->
 				<input
 					class="btn btn-lg btn-primary btn-block"
 					type="submit"
-					value="Crear Partida">
+					value="Confirmar Escenario">
 			</form>
 		</section>
-		<section>
-			<h3>Jugadores</h3>
+		<section th:if="${session.scenario != null}">
+			<h3>¡Tu escenario se ha creado con &eacute;xito!</h3>
+			<p>Escenario seleccionado:</p>
+			<ul>
+				<li th:text="${'Nombre: ' + session.scenario.name}"></li>
+				<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
+				<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
+			</ul>
+		</section>
+		<section th:if="${session.scenario == null}">
+			<h3>Escenarios</h3>
+			<input
+				type="text"
+				id="search_box"
+				placeholder="Buscar por nombre o etiquetas..."
+				onkeyup="searchScenario()">
+			<div style="height: 25%; overflow-y: scroll;">
+				<table id="scenario_table">
+					<tr>
+						<th>Nombre</th>
+						<th>Pablabras clave</th>
+						<th>Autor</th>
+						<th>Ver</th>
+						<th>Seleccionar</th>
+					</tr>
+					<tr
+						th:each="scenario : ${scenarios}"
+						class="scenario_list_elements">
+						<td
+							th:text="${scenario.name}"
+							class="scenario_name"></td>
+						<td
+							th:text="${scenario.description}"
+							class="scenario_tags"></td>
+						<td th:text="${scenario.author.name}"></td>
+						<td><a
+							th:href="@{|/downloads/scenarios?id=${scenario.id}|}"
+							download>Descargar</a></td>
+						<td><button
+								th:onclick="@{|selectScenario(${scenario.id}, '${scenario.name}');|}">Seleccionar</button></td>
+					</tr>
+				</table>
+				<p>¿No te gusta ninguno?</p>
+				<form
+					style="display: inline;"
+					action="#"
+					th:action="@{/createScenario}">
+					<input
+						type="submit"
+						value="Crea tu propio escenario aqu&iacute;!">
+				</form>
+			</div>
+		</section>
+		<section th:if="${session.scenario != null}">
+			<h3>Se han detectado estos turnos:</h3>
+			<div>
+				<table border="2">
+					<tr>
+						<th>Turno</th>
+						<th>Nombre del subescenario</th>
+					</tr>
+					<tr th:each="turn, turnStat : ${session.turns}">
+						<td th:text="${turnStat?.index + 1}"></td>
+						<td th:text="${turn?.subscenario}"></td>
+					</tr>
+				</table>
+			</div>
+		</section>
+		<section th:if="${session.scenario != null}">
+			<h3>Ahora, invita a tus jugadores</h3>
 			<div>
 				<h4>Jugadores a&ntilde;adidos</h4>
 				<table border="2">
@@ -134,90 +248,17 @@
 				</form>
 			</div>
 		</section>
-		<section>
-			<h3>Turnos</h3>
-			<div>
-				<h4>Turnos creados</h4>
-				<table border="2">
-					<tr>
-						<th>Turno</th>
-						<th>Nombre del subescenario</th>
-						<th></th>
-					</tr>
-					<tr th:each="turn, turnStat : ${session.turns}">
-						<td th:text="${turnStat?.index + 1}"></td>
-						<td th:text="${turn?.subscenario}"></td>
-						<td>
-							<form
-								action="#"
-								th:action="@{/removeTurn}"
-								method="post">
-								<input
-									type="hidden"
-									name="turnIndex"
-									th:value="${turnStat.index}">
-								<input
-									type="submit"
-									value="Quitar turno">
-							</form>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div>
-				<h4>Crea un nuevo turno</h4>
-				<form
-					class="form"
-					action="#"
-					th:action="@{/addTurn}"
-					th:object="${turn}"
-					method="post">
-					<label
-						for="turnSubscenario"
-						class="">Nombre del subescenario que representa el turno</label>
-					<input
-						type="text"
-						id="turn_subscenario"
-						th:field="*{subscenario}"
-						class="form-control"
-						placeholder="Subescenario..."
-						required>
-					<input
-						class="btn btn-lg btn-primary btn-block"
-						type="submit"
-						value="A&ntilde;adir Turno">
-				</form>
-			</div>
-		</section>
-		<section>
-		<h1>TODO: IMPLEMENTAR BUSQUEDA Y JAVASCRIPT</h1>
-			<h3>Escenario</h3>
-			<div style="height: 25%; overflow-y: scroll;">
-				<table>
-					<tr>
-						<th>Nombre</th>
-						<th>Pablabras clave</th>
-						<th>Autor</th>
-						<th>Ver</th>
-					</tr>
-					<tr th:each="scenario : ${scenarios}">
-						<td th:text="${scenario.name}"></td>
-						<td th:text="${scenario.description}"></td>
-						<td th:text="${scenario.author.name}"></td>
-						<td><a th:href="@{|/downloads/scenarios?id=${scenario.id}|}" download>Descargar</a></td>
-						<td>Elegir</td>
-					</tr>
-				</table>
-				<p>¿No te gusta ninguno?</p>
-				<form
-					style="display: inline;"
-					action="#"
-					th:action="@{/createScenario}">
-					<input
-						type="submit"
-						value="Crea tu propio escenario aqu&iacute;!">
-				</form>
-			</div>
+		<section
+			th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
+			<form
+				action="#"
+				id="create_game_form"
+				th:action="@{/submitGame}"
+				method="post">
+				<input
+					type="submit"
+					value="Finalizar Creaci&oacute;n">
+			</form>
 		</section>
 	</article>
 </body>

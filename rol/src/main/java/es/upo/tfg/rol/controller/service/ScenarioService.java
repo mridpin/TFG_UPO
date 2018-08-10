@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.upo.tfg.rol.model.pojos.Scenario;
+import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 
 public interface ScenarioService {

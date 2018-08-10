@@ -2,8 +2,10 @@ package es.upo.tfg.rol.controller.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -18,8 +20,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.jayway.jsonpath.internal.Path;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.GameRepository;
@@ -30,6 +32,7 @@ import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Involvement;
 import es.upo.tfg.rol.model.pojos.Roll;
+import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;
@@ -57,6 +60,60 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public void saveGame(Game game) {
 		gameRep.save(game);
+	}
+
+	@Override
+	public Game createGame(String name, User master, List<Turn> turns,
+			List<Country> countries, List<MultipartFile> files, Scenario scenario) {
+		// Create and persist the game
+		Game game = new Game();
+		game.setMaster(master);
+		game.setName(name);
+		game.setScenario(scenario);
+		game.setStartDate(new Date());
+		gameRep.save(game);
+		// Persist the countries
+		int i = 0;
+		for (Country c : countries) {
+			// Prepare and store datafile. Each datafile is stored twice, one copy will
+			// stay unmodified as reference
+			MultipartFile f = files.get(i);
+			String millis = "" + System.currentTimeMillis();
+			String filename = millis + "-"
+					+ StringUtils.cleanPath(f.getOriginalFilename());
+			String referenceFilename = filename + Rules.ORIGINAL_FILE;
+			Path dataPath = Paths.get(Rules.COUNTRY_FILE_PATH);
+			try (InputStream inputStream = f.getInputStream()) {
+				Files.copy(inputStream, dataPath.resolve(filename),
+						StandardCopyOption.REPLACE_EXISTING);
+				c.setData(filename);
+				c.setGame(game);
+				countryService.saveCountry(c);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try (InputStream inputStream = f.getInputStream()) {
+				Files.copy(inputStream, dataPath.resolve(referenceFilename),
+						StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// Just in case two iterations occur in the same millisecond
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			i++;
+		}
+		// Persist the turns
+		for (Turn t : turns) {
+			t.setGame(game);
+			turnRep.save(t);
+		}
+		game.setActiveTurn(turns.get(0));
+		gameRep.save(game);
+		return game;
 	}
 
 	@Override

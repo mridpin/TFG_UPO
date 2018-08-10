@@ -62,7 +62,7 @@
 				<tr>
 				<tr th:each="game, gameStat : ${openGames}">
 					<td th:text="${game.name}"></td>
-					<td th:text="${game.scenario}"></td>
+					<td th:text="${game.scenario.name}"></td>
 					<td th:text="${game.startDate}"></td>
 					<td th:text="${game.master.nickname}"></td>
 					<td th:text="${game.master == session.user} ? 'GM' : 'J'"></td>
@@ -96,7 +96,7 @@
 				<tr>
 				<tr th:each="game, gameStat : ${closedGames}">
 					<td th:text="${game.name}"></td>
-					<td th:text="${game.scenario}"></td>
+					<td th:text="${game.scenario.name}"></td>
 					<td th:text="${game.startDate}"></td>
 					<td th:text="${game.endDate}"></td>
 					<td th:text="${game.master.nickname}"></td>
