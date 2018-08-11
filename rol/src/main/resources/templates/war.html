@@ -32,30 +32,29 @@
 }
 </style>
 <script type="text/javascript">
-	// TODO: AJAX download this ruleset into a array constant
-	const BLOCKADE_PENALTY = 0.75;
-	//const BLOCKADE_PENALTY = "BLOCKADE_PENALTY";
-	const INLAND_BATTLE_PENALTY = 0.75;
-	//const INLAND_BATTLE_PENALTY = "INLAND_BATTLE_PENALTY";
-	const BLOCKABLE_ATTRIBUTES = "economicos";
-	//const ECONOMY = "ECONOMY";
-	const MILITARY_ATTRIBUTES = "militares";
-	//const MILITARY = "MILITARY"
-	const INLAND_ATTRIBUTES = "navales";
-	//const NAVY = "NAVY";
-	const INFANTRY = [ "Soldados -de todos los ejércitos-",
-			"Reservistas -de todos los ejércitos-" ];
-	//const INFANTRY = "INFANTRY";
-	const RESERVES = "Reservistas -de todos los ejércitos-";
-	//const RESERVES = "RESERVES";
-	const DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
-	//const DEVELOPED_INFRAESTRUCTURE = "DEVELOPED_INFRAESTRUCTURE";
-	const DEVELOPED_INFRAESTRUCTURE_ROLL = 3;
-	//const DEVELOPED_INFRAESTRUCTURE_ROLL = "DEVELOPED_INFRAESTRUCTURE_ROLL";
-	const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
-	//const INFANTRY_ATTACK_PENALTY = "INFANTRY_ATTACK_PENALTY";
-	const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
-	//const INFANTRY_DEFENSE_BONUS = "INFANTRY_DEFENSE_BONUS;
+	// const BLOCKADE_PENALTY = 0.75;
+	const BLOCKADE_PENALTY = "BLOCKADE_PENALTY";
+	// const INLAND_BATTLE_PENALTY = 0.75;
+	const INLAND_BATTLE_PENALTY = "INLAND_BATTLE_PENALTY";
+	// const ECONOMY = "economicos";
+	const ECONOMY = "ECONOMY";
+	// const MILITARY = "militares";
+	const MILITARY = "MILITARY"
+	// const NAVY = "navales";
+	const NAVY = "NAVY";
+	// const INFANTRY = [ "Soldados -de todos los ejércitos-", "Reservistas -de
+	// todos los ejércitos-"];
+	const INFANTRY = "INFANTRY";
+	// const RESERVES = "Reservistas -de todos los ejércitos-";
+	const RESERVES = "RESERVES";
+	// const DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
+	const DEVELOPED_INFRAESTRUCTURE = "DEVELOPED_INFRAESTRUCTURE";
+	// const DEVELOPED_INFRAESTRUCTURE_ROLL = 3;
+	const DEVELOPED_INFRAESTRUCTURE_ROLL = "DEVELOPED_INFRAESTRUCTURE_ROLL";
+	// const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
+	const INFANTRY_ATTACK_PENALTY = "INFANTRY_ATTACK_PENALTY";
+	// const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
+	const INFANTRY_DEFENSE_BONUS = "INFANTRY_DEFENSE_BONUS";
 	
 	function getRollNumber() {
 		var res = 1;
@@ -257,20 +256,20 @@
 			$.each(types, function(name, value) {
 				res[type][name] *= c;
 				// Penalize for blockade
-				if (blockaded && type === BLOCKABLE_ATTRIBUTES) {
-					res[type][name] *= BLOCKADE_PENALTY;
+				if (blockaded && type === rules[ECONOMY]) {
+					res[type][name] *= rules[BLOCKADE_PENALTY];
 				}
 			});
 		});
 		// Disable reserves for 1st roll
 		var rollNumber = getRollNumber();
 		if (rollNumber == 1) {
-			res[MILITARY_ATTRIBUTES][RESERVES] = 0.0;
+			res[rules[MILITARY]][rules[RESERVES]] = 0.0;
 		}
 		// Penalize reserves for underdeveloped countries
-		if (Math.round(res[MILITARY_ATTRIBUTES][DEVELOPED_INFRAESTRUCTURE])===0) {			
-			if (rollNumber < DEVELOPED_INFRAESTRUCTURE_ROLL) {
-				res[MILITARY_ATTRIBUTES][RESERVES] = 0.0;
+		if (Math.round(res[rules[MILITARY]][rules[DEVELOPED_INFRAESTRUCTURE]])===0) {			
+			if (rollNumber < rules[DEVELOPED_INFRAESTRUCTURE_ROLL]) {
+				res[rules[MILITARY]][rules[RESERVES]] = 0.0;
 			}
 		}
 		return res;
@@ -306,9 +305,9 @@
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>");
-			if (countries[key][turn]["navales"]["naval_power"] === 1.0) {
-				var intervention = countries[key][turn]["navales"];
-				// TODO: Download via ajax a mapping of this
+			// TODO: FIX THE CSV AND FIX THIS
+			if (Math.round(countries[key][turn]["navales"]["naval_power"]) === 1.0) {
+				var intervention = countries[key][turn]["navales"];				
 				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
 						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
 				var c1percent = 0.0
@@ -362,7 +361,7 @@
 			$(countryHeader).append(key);
 			$(firstRow).append(countryHeader);
 			// If the country is a naval power, add a row for it
-			if (countries[key][turn]["navales"]["naval_power"] === 1.0) {
+			if (Math.round(countries[key][turn]["navales"]["naval_power"]) === 1.0) {
 				var intervention = countries[key][turn]["navales"];
 				// TODO: Download via ajax a mapping of this
 				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
@@ -396,11 +395,12 @@
 
 	function drawCountryPoints(attackerPoints, defenderPoints) {
 		var table = $("#stat_table");
+		var turn = getSelectedTurn();
 		$(table).find("tr").remove();
 		// Iterate the types of attributes
 		$
 				.each(
-						attributeValuesTemplate,
+						attributeValuesTemplate[turn],
 						function(type, attributes) {
 							var header = $("<tr>");
 							$(header).append($("<th>").append(type));
@@ -419,7 +419,7 @@
 																		.append(
 																				name
 																						+ " &#10005; "
-																						+ attributeValuesTemplate[type][name]
+																						+ attributeValuesTemplate[turn][type][name]
 																						+ " pts."));
 												var at = (attackerPoints[type] == null)
 														|| isEmpty(attackerPoints[type]);
@@ -534,7 +534,8 @@
 	function downloadPointsTemplate() {
 		// TODO: Download template via ajax to do this (only once per page load)
 		// Reference table with points per attribute.
-		attributeValuesTemplate = {
+
+		attributeValueTemplate = {
 			"economicos" : {
 				"PIB ($ Geary-Khamis de 1990)" : 8.0,
 				"Población total" : 8.0,
@@ -615,9 +616,10 @@
 		var totalStats = sumCoalition([ attackerStats, defenderStats ]);
 		// Iterate the total and create an object with attacker and defender
 		// points
+		var turn = getSelectedTurn();
 		$
 				.each(
-						attributeValuesTemplate,
+						attributeValuesTemplate[turn],
 						function(type, types) {
 							attackerPoints[type] = {};
 							defenderPoints[type] = {};
@@ -627,7 +629,7 @@
 											function(name, attribute) {
 												if (!isEmpty(totalStats[type])) {
 													var total = totalStats[type][name];
-													var points = attributeValuesTemplate[type][name];
+													var points = attributeValuesTemplate[turn][type][name];
 													if (!isEmpty(attackerStats)) {
 														var at = attackerStats[type][name];
 														attackerPoints[type][name] = (total === 0) ? attackerStats[type][name]
@@ -636,40 +638,40 @@
 														// Apply modifiers:
 														// 1. Penalize infantry
 														// for attack
-														if (INFANTRY
+														if (rules[INFANTRY]
 																.includes(name)) {
-															attackerPoints[type][name] *= INFANTRY_ATTACK_PENALTY;
+															attackerPoints[type][name] *= rules[INFANTRY_ATTACK_PENALTY];
 														}
 														// Penalize for inland
 														// battles
-														if (type === INLAND_ATTRIBUTES
+														if (type === rules[NAVY]
 																&& $(
 																		"#inland_battle")
 																		.prop(
 																				"checked")) {
-															attackerPoints[type][name] *= INLAND_BATTLE_PENALTY;
+															attackerPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
 														}
 													}
 													if (!isEmpty(defenderStats)) {
-														defenderPoints[type][name] = (total === 0) ? attackerStats[type][name]
+														defenderPoints[type][name] = (total === 0) ? defenderStats[type][name]
 																: (defenderStats[type][name] / total);
 														defenderPoints[type][name] *= points;
 														var def = defenderStats[type][name];
 														// Apply modifiers
 														// 1. Bonus to infantry
 														// for defense
-														if (INFANTRY
+														if (rules[INFANTRY]
 																.includes(name)) {
-															defenderPoints[type][name] *= INFANTRY_DEFENSE_BONUS;
+															defenderPoints[type][name] *= rules[INFANTRY_DEFENSE_BONUS];
 														}
 														// 2. Penalize navies
 														// for inland battles
-														if (type === INLAND_ATTRIBUTES
+														if (type === rules[NAVY]
 																&& $(
 																		"#inland_battle")
 																		.prop(
 																				"checked")) {
-															defenderPoints[type][name] *= INLAND_BATTLE_PENALTY;
+															defenderPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
 														}
 													}
 												}
@@ -754,6 +756,15 @@
 						rules = response;
 					}
 				});
+				// Ajax call to get the points template
+				$.ajax({
+					type : "POST",
+					url : "/mapAttributes",
+					success : function(response) {
+						attributeValuesTemplate = response;
+					}
+				});
+				downloadPointsTemplate();
 				// Ajax call to get all country data to display in tables
 				// dynamically
 				$.ajax({
@@ -766,7 +777,6 @@
 						updateCountryPoints();
 					}
 				});
-				downloadPointsTemplate();
 			});
 </script>
 </head>

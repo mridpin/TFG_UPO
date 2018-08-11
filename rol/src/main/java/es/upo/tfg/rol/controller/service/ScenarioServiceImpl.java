@@ -136,11 +136,7 @@ public class ScenarioServiceImpl implements ScenarioService {
 		// Get all the static rules
 		Map<String, Object> rules = Rules.getRules();
 		String filename = Rules.SCENARIO_FILE_PATH + File.separator + scenario.getData();
-		List<String> navalTypes = new ArrayList<>();
-		List<String> militaryTypes = new ArrayList<>();
-		List<String> economyTypes = new ArrayList<>();
 		List<String> infantryAttrs = new ArrayList<>();
-		List<String> reserveAttrs = new ArrayList<>();
 		try (InputStream is = new FileInputStream(filename)) {
 			String line = "";
 			BufferedReader br = new BufferedReader(
@@ -162,12 +158,12 @@ public class ScenarioServiceImpl implements ScenarioService {
 							Rules.ECONOMY_TYPE_KEYWORDS);
 					boolean matchesMilitary = this.findMatches(type,
 							Rules.MILITARY_TYPE_KEYWORDS);
-					if (matchesNaval && !navalTypes.contains(type)) {
-						navalTypes.add(type);
-					} else if (matchesEconomy && !economyTypes.contains(type)) {
-						economyTypes.add(type);
-					} else if (matchesMilitary && !militaryTypes.contains(type)) {
-						militaryTypes.add(type);
+					if (matchesNaval) {
+						rules.putIfAbsent(Rules.NAVAL, dataline[1]);
+					} else if (matchesEconomy) {
+						rules.putIfAbsent(Rules.ECONOMY, dataline[1]);
+					} else if (matchesMilitary) {
+						rules.putIfAbsent(Rules.MILITARY, dataline[1]);
 					}
 					break;
 				default:
@@ -178,20 +174,16 @@ public class ScenarioServiceImpl implements ScenarioService {
 					boolean matchesReserves = this.findMatches(attr,
 							Rules.RESERVES_ATTR_KEYWORDS);
 					if (matchesInfantry && !infantryAttrs.contains(attr)) {
-						infantryAttrs.add(attr);
+						infantryAttrs.add(dataline[0]);
 					}
-					if (matchesReserves  && !reserveAttrs.contains(attr)) {
-						reserveAttrs.add(attr);
+					if (matchesReserves) {
+						rules.putIfAbsent(Rules.RESERVES, dataline[0]);
 					}
 					break;
 				}
 			}
-			br.close();
-			rules.put(Rules.NAVAL, navalTypes);
-			rules.put(Rules.ECONOMY, economyTypes);
-			rules.put(Rules.MILITARY, militaryTypes);
+			br.close();	
 			rules.put(Rules.INFANTRY, infantryAttrs);
-			rules.put(Rules.RESERVES, reserveAttrs);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

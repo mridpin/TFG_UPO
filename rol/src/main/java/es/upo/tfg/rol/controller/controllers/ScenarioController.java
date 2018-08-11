@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.ScenarioService;
+import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.User;
 
@@ -97,10 +98,30 @@ public class ScenarioController {
 	 */
 	@PostMapping(value = "/mapAttributes", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Map<String, Map<String, Double>>> mapScenario(@RequestParam(name = "scenario", required = true) Long id) {
-		Scenario scenario = scServ.findById(id);
-		Map<String, Map<String, Map<String, Double>>> rules = scServ.mapScenario(scenario);
-		return rules;
+	public Map<String, Map<String, Map<String, Double>>> mapScenario(HttpSession session) {
+		Game game = (Game) session.getAttribute("game");
+		Map<String, Map<String, Map<String, Double>>> attributes = scServ.mapScenario(game.getScenario());
+		// Remove the boolean attributes
+		for (String subscenario : attributes.keySet()) {
+			for (String type : attributes.get(subscenario).keySet()) {
+				if (findMatches(type, Rules.MILITARY_TYPE_KEYWORDS)) {
+					attributes.get(subscenario).get(type).remove(Rules.DEVELOPED_INFRAESTRUCTURE);
+				}
+				if (findMatches(type, Rules.NAVAL_TYPE_KEYWORDS)) {
+					attributes.get(subscenario).get(type).remove(Rules.NAVAL_POWER);	
+				}
+			}		
+		}
+		return attributes;
+	}
+	
+	private boolean findMatches(String type, String[] keywords) {
+		for (String keyword : keywords) {
+			if (type.contains(keyword)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
