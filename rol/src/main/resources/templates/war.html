@@ -34,17 +34,28 @@
 <script type="text/javascript">
 	// TODO: AJAX download this ruleset into a array constant
 	const BLOCKADE_PENALTY = 0.75;
+	//const BLOCKADE_PENALTY = "BLOCKADE_PENALTY";
 	const INLAND_BATTLE_PENALTY = 0.75;
+	//const INLAND_BATTLE_PENALTY = "INLAND_BATTLE_PENALTY";
 	const BLOCKABLE_ATTRIBUTES = "economicos";
+	//const ECONOMY = "ECONOMY";
 	const MILITARY_ATTRIBUTES = "militares";
+	//const MILITARY = "MILITARY"
 	const INLAND_ATTRIBUTES = "navales";
+	//const NAVY = "NAVY";
 	const INFANTRY = [ "Soldados -de todos los ejércitos-",
 			"Reservistas -de todos los ejércitos-" ];
+	//const INFANTRY = "INFANTRY";
 	const RESERVES = "Reservistas -de todos los ejércitos-";
+	//const RESERVES = "RESERVES";
 	const DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
+	//const DEVELOPED_INFRAESTRUCTURE = "DEVELOPED_INFRAESTRUCTURE";
 	const DEVELOPED_INFRAESTRUCTURE_ROLL = 3;
+	//const DEVELOPED_INFRAESTRUCTURE_ROLL = "DEVELOPED_INFRAESTRUCTURE_ROLL";
 	const INFANTRY_ATTACK_PENALTY = 1 - 0.10;
+	//const INFANTRY_ATTACK_PENALTY = "INFANTRY_ATTACK_PENALTY";
 	const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
+	//const INFANTRY_DEFENSE_BONUS = "INFANTRY_DEFENSE_BONUS;
 	
 	function getRollNumber() {
 		var res = 1;
@@ -309,7 +320,7 @@
 				var blockadeAttackerCheckbox = $("<input>");
 				$(blockadeAttackerCheckbox).attr({
 					type : "checkbox",
-					//form : "war_form",
+					// form : "war_form",
 					name : "block_attacker",
 					value : key.replaceAll(" ", "") + "_blocks_" + "attacker",
 					onchange : "updateCountryPoints();",
@@ -320,7 +331,7 @@
 				var blockadeDefenderCheckbox = $("<input>");
 				$(blockadeDefenderCheckbox).attr({
 					type : "checkbox",
-					//form : "war_form",
+					// form : "war_form",
 					name : "block_defender",
 					value : key.replaceAll(" ", "") + "_blocks_" + "defender",
 					onchange : "updateCountryPoints();",
@@ -367,7 +378,7 @@
 					$(blockadeCheckbox).attr(
 							{
 								type : "checkbox",
-								//form : "war_form",
+								// form : "war_form",
 								name : "block_" + c.replaceAll(" ", ""),
 								value : key.replaceAll(" ", "") + "_blocks_"
 										+ c.replaceAll(" ", ""),
@@ -668,7 +679,8 @@
 	}
 	
 	/**
-	 * Loads the previous coalitions in the coalition boxes, by searching for names in the last result table
+	 * Loads the previous coalitions in the coalition boxes, by searching for
+	 * names in the last result table
 	 */
 	function loadPreviousCoalitions() {
 		var lastAttackersTDs = $("td.last_attacker_country_name");

@@ -26,6 +26,7 @@ import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
+import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;
@@ -149,9 +150,10 @@ public class WarController {
 	 */
 	@PostMapping(value = "/mapRules", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Object> mapRules() {
-		Map<String, Object> rules = scServ.mapRules();
+	public Map<String, Object> mapRules(HttpSession session) {
+		Game game = (Game) session.getAttribute("game");
+		Map<String, Object> rules = scServ.mapRules(game.getScenario());
 		return rules;
 	}
-
+	
 }

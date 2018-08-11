@@ -28,9 +28,16 @@ public class Rules {
 	// Keywords to look for to detect which attributes or types of attributes must be modified
 	public final static String[] INFANTRY_ATTR_KEYWORDS = { "infanteria", "infantería",
 			"soldados", "soldado", "reserva", "reservas", "reservistas", "caballeria", "caballería", "caballeros"};
-	public final static String[] RESERVES_ATTR_KEYWORDS = {"reserva", "reservas", "reservistas"};
+	public final static String[] RESERVES_ATTR_KEYWORDS = {"reserva", "reservas", "reservistas", "reservista"};
 	public final static String[] NAVAL_TYPE_KEYWORDS = {"navales", "naval", "marina", "armada"};
 	public final static String[] ECONOMY_TYPE_KEYWORDS = {"economía", "economia", "económicos", "económico", "economicos", "economico"};
+	public final static String[] MILITARY_TYPE_KEYWORDS = {"militar", "militares"};
+	// Used to tag relevant attributes and types so that the client can identify them and apply the logic
+	public final static String ECONOMY = "ECONOMY";
+	public final static String NAVAL = "NAVAL";
+	public final static String MILITARY = "MILITARY";
+	public final static String INFANTRY = "INFANTRY";
+	public final static String RESERVES = "RESERVES";
 	// Die constants
 	public static final Map<Integer, Double> DIE;
 	static {
@@ -65,17 +72,20 @@ public class Rules {
 
 	public static Map<String, Object> getRules() {
 		Map<String, Object> rules = new HashMap<>();
+		// Add the numeric rules
 		rules.put("BLOCKADE_PENALTY", Rules.BLOCKADE_PENALTY);
 		rules.put("INLAND_BATTLE_PENALTY", Rules.INLAND_BATTLE_PENALTY);
 		rules.put("DEVELOPED_INFRAESTRUCTURE", Rules.DEVELOPED_INFRAESTRUCTURE);
 		rules.put("DEVELOPED_INFRAESTRUCTURE_ROLL", Rules.DEVELOPED_INFRAESTRUCTURE_ROLL);
-		rules.put("NAVAL_POWER", Rules.DEVELOPED_INFRAESTRUCTURE_ROLL);
+		rules.put("NAVAL_POWER", Rules.NAVAL_POWER);
 		rules.put("INFANTRY_ATTACK_PENALTY", Rules.INFANTRY_ATTACK_PENALTY);
 		rules.put("INFANTRY_DEFENSE_BONUS", Rules.INFANTRY_DEFENSE_BONUS);
+		// Add the keywords
 		rules.put("INFANTRY_ATTR_KEYWORDS", Rules.INFANTRY_ATTR_KEYWORDS);
 		rules.put("RESERVES_ATTR_KEYWORDS", Rules.RESERVES_ATTR_KEYWORDS);
 		rules.put("NAVAL_TYPE_KEYWORDS", Rules.NAVAL_TYPE_KEYWORDS);
 		rules.put("ECONOMY_TYPE_KEYWORDS", Rules.ECONOMY_TYPE_KEYWORDS);
+		rules.put("MILITARY_TYPE_KEYWORDS", Rules.MILITARY_TYPE_KEYWORDS);
 		return rules;
 	}
 

@@ -89,5 +89,18 @@ public class ScenarioController {
 		session.setAttribute("map", scenarioMap);
 		return "redirect:/scenario-resumen";
 	}
+	
+	/**
+	 * Ajax call that returns a map of the attributes of the game
+	 * 
+	 * @return a map all the attributes in the scenario file
+	 */
+	@PostMapping(value = "/mapAttributes", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Map<String, Map<String, Double>>> mapScenario(@RequestParam(name = "scenario", required = true) Long id) {
+		Scenario scenario = scServ.findById(id);
+		Map<String, Map<String, Map<String, Double>>> rules = scServ.mapScenario(scenario);
+		return rules;
+	}
 
 }

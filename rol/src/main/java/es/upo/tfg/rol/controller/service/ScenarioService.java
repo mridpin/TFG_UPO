@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
@@ -45,8 +46,9 @@ public interface ScenarioService {
 
 	/**
 	 * Reads the file of the scenario and returns a map with the rules
+	 * @param scenario 
 	 * @return map of rules 
 	 */
-	Map<String, Object> mapRules();
+	Map<String, Object> mapRules(Scenario scenario);
 	
 }

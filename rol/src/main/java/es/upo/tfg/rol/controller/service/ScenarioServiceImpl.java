@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import com.mysql.fabric.xmlrpc.base.Array;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.ScenarioRepository;
+import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.User;
 
@@ -42,7 +44,8 @@ public class ScenarioServiceImpl implements ScenarioService {
 	}
 
 	@Override
-	public Scenario createScenario(String name, String description, MultipartFile data, User user) {
+	public Scenario createScenario(String name, String description, MultipartFile data,
+			User user) {
 		// TODO: Raise exceptions with non valid csvs or non utf8 ones
 		Scenario scenario = new Scenario();
 		scenario.setName(name);
@@ -72,8 +75,9 @@ public class ScenarioServiceImpl implements ScenarioService {
 		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
 		Map<String, Double> typeAttributes = new HashMap<>();
 		String filename = Rules.SCENARIO_FILE_PATH + File.separator + scenario.getData();
-		try (InputStream is = new FileInputStream(filename)){			
-			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+		try (InputStream is = new FileInputStream(filename)) {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
 			while ((line = br.readLine()) != null) {
 				String[] dataline = line.split(";");
 				String whatDo = dataline[0].trim().toLowerCase();
@@ -128,11 +132,87 @@ public class ScenarioServiceImpl implements ScenarioService {
 	}
 
 	@Override
-	public Map<String, Object> mapRules() {
+	public Map<String, Object> mapRules(Scenario scenario) {
 		// Get all the static rules
 		Map<String, Object> rules = Rules.getRules();
-		// TODO:RETOMAR AQUI: CONSTRUIR MAPA DEL FICHERO usando las keywords
-		return null;
+		String filename = Rules.SCENARIO_FILE_PATH + File.separator + scenario.getData();
+		List<String> navalTypes = new ArrayList<>();
+		List<String> militaryTypes = new ArrayList<>();
+		List<String> economyTypes = new ArrayList<>();
+		List<String> infantryAttrs = new ArrayList<>();
+		List<String> reserveAttrs = new ArrayList<>();
+		try (InputStream is = new FileInputStream(filename)) {
+			String line = "";
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String whatDo = dataline[0].trim().toLowerCase();
+				switch (whatDo) {
+				case "nombre":
+					break;
+				case "subescenario":
+					break;
+				case "tipo":
+					// Attribute types are exclusive
+					String type = dataline[1].toLowerCase();
+					boolean matchesNaval = this.findMatches(type,
+							Rules.NAVAL_TYPE_KEYWORDS);
+					boolean matchesEconomy = this.findMatches(type,
+							Rules.ECONOMY_TYPE_KEYWORDS);
+					boolean matchesMilitary = this.findMatches(type,
+							Rules.MILITARY_TYPE_KEYWORDS);
+					if (matchesNaval && !navalTypes.contains(type)) {
+						navalTypes.add(type);
+					} else if (matchesEconomy && !economyTypes.contains(type)) {
+						economyTypes.add(type);
+					} else if (matchesMilitary && !militaryTypes.contains(type)) {
+						militaryTypes.add(type);
+					}
+					break;
+				default:
+					// Attributes aren't exclusive
+					String attr = dataline[0].toLowerCase();
+					boolean matchesInfantry = this.findMatches(attr,
+							Rules.INFANTRY_ATTR_KEYWORDS);
+					boolean matchesReserves = this.findMatches(attr,
+							Rules.RESERVES_ATTR_KEYWORDS);
+					if (matchesInfantry && !infantryAttrs.contains(attr)) {
+						infantryAttrs.add(attr);
+					}
+					if (matchesReserves  && !reserveAttrs.contains(attr)) {
+						reserveAttrs.add(attr);
+					}
+					break;
+				}
+			}
+			br.close();
+			rules.put(Rules.NAVAL, navalTypes);
+			rules.put(Rules.ECONOMY, economyTypes);
+			rules.put(Rules.MILITARY, militaryTypes);
+			rules.put(Rules.INFANTRY, infantryAttrs);
+			rules.put(Rules.RESERVES, reserveAttrs);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return rules;
+	}
+
+	/**
+	 * Returns whether the type contains any of the keywords
+	 * 
+	 * @param type
+	 * @param keywords
+	 * @return true if at least there is 1 match
+	 */
+	private boolean findMatches(String type, String[] keywords) {
+		for (String keyword : keywords) {
+			if (type.contains(keyword)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
