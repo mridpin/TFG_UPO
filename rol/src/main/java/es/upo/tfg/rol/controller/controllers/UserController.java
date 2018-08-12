@@ -52,11 +52,6 @@ public class UserController {
 		return "profile";
 	}
 
-	// @GetMapping("/landing")
-	// public String landing(HttpSession session, Model model) {
-	// return "landing";
-	// }
-
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
 		session.removeAttribute("user");
@@ -66,10 +61,11 @@ public class UserController {
 	@PostMapping("/login")
 	public String submitLogin(
 			@RequestParam(name = "nickname", required = true, defaultValue = "") String name,
-			@RequestParam(name = "pass", required = true, defaultValue = "") String pass,
+			@RequestParam(name = "pass", required = true, defaultValue = "") String pass, Model model,
 			HttpSession session) {
 		User user = uServ.findByLogin(name, pass);
 		if (user == null) {
+			model.addAttribute("loginfail", "Credenciales incorrectas");
 			return "index";
 		} else {
 			session.setAttribute("user", user);
@@ -85,7 +81,7 @@ public class UserController {
 		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
 		if (nicknameExists) {
 			bindingResult.rejectValue("nickname", "nickname.unavailable",
-					"Nickname is not available");
+					"El apodo ya existe");
 		}
 		// Reject used nicknames or bad formats
 		if (bindingResult.hasErrors()) {
@@ -117,7 +113,7 @@ public class UserController {
 			boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
 			if (nicknameExists) {
 				bindingResult.rejectValue("nickname", "nickname.unavailable",
-						"Nickname is not available");
+						"El apodo ya está en uso");
 			}
 		}
 		if (bindingResult.hasErrors()) {

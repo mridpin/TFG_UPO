@@ -41,7 +41,8 @@
 	// const MILITARY = "militares";
 	const MILITARY = "MILITARY"
 	// const NAVY = "navales";
-	const NAVY = "NAVY";
+	const NAVAL = "NAVAL";
+	const NAVAL_POWER = "NAVAL_POWER";
 	// const INFANTRY = [ "Soldados -de todos los ejércitos-", "Reservistas -de
 	// todos los ejércitos-"];
 	const INFANTRY = "INFANTRY";
@@ -304,12 +305,16 @@
 	function drawCoalitionNavies(turn, attackerNavy, defenderNavy) {
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
-			var row = $("<tr>");
-			// TODO: FIX THE CSV AND FIX THIS
-			if (Math.round(countries[key][turn]["navales"]["naval_power"]) === 1.0) {
-				var intervention = countries[key][turn]["navales"];				
-				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
-						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var row = $("<tr>")
+			if (Math.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
+				var intervention = countries[key][turn][rules[NAVAL]];				
+				var navalPowerNavy = 0;
+				for (var navy in intervention) {
+					// Check that avoids the naval power true/false
+					if (navy!=rules[NAVAL_POWER]) {
+						navalPowerNavy += intervention[navy];
+					}
+				}
 				var c1percent = 0.0
 				c1percent += attackerNavy / navalPowerNavy;
 				var c2percent = 0.0
@@ -361,11 +366,15 @@
 			$(countryHeader).append(key);
 			$(firstRow).append(countryHeader);
 			// If the country is a naval power, add a row for it
-			if (Math.round(countries[key][turn]["navales"]["naval_power"]) === 1.0) {
-				var intervention = countries[key][turn]["navales"];
-				// TODO: Download via ajax a mapping of this
-				var navalPowerNavy = intervention["Tonelaje desplazado por la Armada (Tm)"]
-						+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			if (Math.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
+				var intervention = countries[key][turn][rules[NAVAL]];
+				var navalPowerNavy = 0;
+				for (var navy in intervention) {
+					// Check that avoids the naval power true/false
+					if (navy!=rules[NAVAL_POWER]) {
+						navalPowerNavy += intervention[navy];
+					}
+				}
 				var row = $("<tr>");
 				var npcell = $("<td>");
 				$(npcell).append(key);
@@ -471,11 +480,14 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var intervention = countries[name][turn]["navales"];
-			// TODO: Download via ajax a mapping of this
-			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
-					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
-			// Este name da el fallo
+			var intervention = countries[name][turn][rules[NAVAL]];
+			var navies = 0;
+			for (var navy in intervention) {
+				// Check that avoids the naval power true/false
+				if (navy!=rules[NAVAL_POWER]) {
+					navies += intervention[navy];
+				}
+			}
 			var commitment = $(
 					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
@@ -489,10 +501,14 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var intervention = countries[name][turn]["navales"];
-			// TODO: Download via ajax a mapping of this
-			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
-					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var intervention = countries[name][turn][rules[NAVAL]];
+			var navies = 0;
+			for (var navy in intervention) {
+				// Check that avoids the naval power true/false
+				if (navy!=rules[NAVAL_POWER]) {
+					navies += intervention[navy];
+				}
+			}
 			var commitment = $(
 					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
@@ -514,9 +530,14 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var intervention = countries[name][turn]["navales"];
-			var navies = intervention["Tonelaje desplazado por la Armada (Tm)"]
-					+ intervention["Tonelaje desplazado por la marina mercante (Tm)"];
+			var intervention = countries[name][turn][rules[NAVAL]];
+			var navies = 0;
+			for (var navy in intervention) {
+				// Check that avoids the naval power true/false
+				if (navy!=rules[NAVAL_POWER]) {
+					navies += intervention[navy];
+				}
+			}
 			var commitment = $(
 					"#" + longname.replaceAll(" ", "") + "_percent_input")
 					.val();
@@ -532,7 +553,6 @@
 	}
 
 	function downloadPointsTemplate() {
-		// TODO: Download template via ajax to do this (only once per page load)
 		// Reference table with points per attribute.
 
 		attributeValueTemplate = {
@@ -644,7 +664,7 @@
 														}
 														// Penalize for inland
 														// battles
-														if (type === rules[NAVY]
+														if (type === rules[NAVAL]
 																&& $(
 																		"#inland_battle")
 																		.prop(
@@ -666,7 +686,7 @@
 														}
 														// 2. Penalize navies
 														// for inland battles
-														if (type === rules[NAVY]
+														if (type === rules[NAVAL]
 																&& $(
 																		"#inland_battle")
 																		.prop(
@@ -781,6 +801,29 @@
 </script>
 </head>
 <body>
+<nav>
+<form
+	action="#"
+	th:action="@{/openGame}"
+	method="get">
+<input type="hidden"
+	name="game_id"
+	th:value="${session.game.id}">
+	<input
+		type="submit"
+		value="Volver a la p&aacute;gina del enfrentamiento">
+</form>
+<nav>
+<form
+	action="#"
+	th:action="@{/landing}"
+	method="get">
+	<input
+		type="submit"
+		value="Volver a la p&aacute;gina principal">
+</form>
+</nav>
+</nav>
 	<article>
 		<th:block th:if="${rolls!=null and !rolls.empty}">
 			<section

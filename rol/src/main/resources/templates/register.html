@@ -45,7 +45,7 @@
 				placeholder="Nickname"
 				required
 				autofocus>
-				<span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">Nickname error</span>
+				<span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
 			<label
 				for="name"
 				class="">Nombre</label>
@@ -56,7 +56,7 @@
 				class="form-control"
 				placeholder="Name"
 				required>
-				<span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</span>
+				<span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
 			<label
 				for="avatar"
 				class="">Avatar</label>
@@ -69,7 +69,7 @@
 			<label
 				for="inputPassword"
 				class="">Contrase&ntilde;a</label>
-				<span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</span>
+				<span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
 			<input
 				type="password"
 				th:field="*{password}"

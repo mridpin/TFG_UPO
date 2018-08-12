@@ -175,6 +175,12 @@ public class GameServiceImpl implements GameService {
 		this.restoreCountries(game, currentTurn);
 	}
 
+	/**
+	 * Restores the atributes to the values of the original file. Only countries
+	 * that didn't participate in any war in a turn will get restored	 * 
+	 * @param game in question
+	 * @param turn that has just been played
+	 */
 	private void restoreCountries(Game game, Turn turn) {
 		List<Country> countries = countryService.findCountries(game);
 		Set<Country> warringCountries = new HashSet<>();
@@ -206,7 +212,7 @@ public class GameServiceImpl implements GameService {
 		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING,
 				StandardCopyOption.COPY_ATTRIBUTES };
 		try {
-			Files.deleteIfExists(Paths.get(currFilename));
+			//Files.deleteIfExists(Paths.get(currFilename));
 			Files.copy(Paths.get(ogFilename), Paths.get(currFilename), options);
 		} catch (IOException e) {
 			// TODO: HANDLE THIS EXCEPTION? PRIORITY = 3

@@ -171,6 +171,10 @@ public class WarServiceImpl implements WarService {
 		return roll;
 	}
 
+	/**
+	 * Applies damage to the attributes of the attackers and defenders of the roll
+	 * @param roll
+	 */
 	private void applyCostOfWar(Roll roll) {
 		// Separate countries into winners and losers
 		List<Involvement> winners;
@@ -194,6 +198,11 @@ public class WarServiceImpl implements WarService {
 		}
 	}
 
+	/**
+	 * Applies damage to a country according to its participation in a roll
+	 * @param costOfWar the damage to apply to winners and losers, according to the Rules
+	 * @param i involvement of the country. countains the country and its participation percent
+	 */
 	private void damageCountry(Double costOfWar, Involvement i) {
 		Country c = i.getCountry();
 		// Map the country
@@ -213,6 +222,12 @@ public class WarServiceImpl implements WarService {
 		countryServ.demapCountry(attributes, c);
 	}
 	
+	/**
+	 * Finds a country in a list of countries from a game by name.
+	 * @param name of the country
+	 * @param countries that participated in a game
+	 * @return the Country if it exists, null if it doesn't
+	 */
 	private Country findCountryByName(String name, List<Country> countries) {
 		for (Country c : countries) {
 			if (c.getName().equals(name)) {
@@ -222,6 +237,12 @@ public class WarServiceImpl implements WarService {
 		return null;
 	}
 
+	/**
+	 * Finds a turn from a game by name
+	 * @param turns of the game
+	 * @param subscenario name of the turn to look for
+	 * @return the Turn if it exists, null if it doesn't
+	 */
 	private Turn findTurnFromGame(List<Turn> turns, String subscenario) {
 		for (Turn turn : turns) {
 			if (turn.getSubscenario().equals(subscenario)) {

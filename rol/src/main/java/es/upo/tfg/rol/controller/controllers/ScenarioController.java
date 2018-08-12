@@ -83,6 +83,11 @@ public class ScenarioController {
 			@RequestParam(name = "description") String description,
 			@RequestParam(name = "data", required = true) MultipartFile data) {
 		User user = (User) session.getAttribute("user");
+		// Perform trivial validations
+		if (name.length() < 2 || name.length() > 256) {
+			model.addAttribute("name.fail", "El nombre debe tener entre 2 y 256 caracteres");
+		}
+		// TODO: RETOMAR AQUI VALIDATE VVALIDAET VALIDATE
 		Scenario scenario = scServ.createScenario(name, description, data, user);
 		session.setAttribute("scenario", scenario);
 		Map<String, Map<String, Map<String, Double>>> scenarioMap = scServ

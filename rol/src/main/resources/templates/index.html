@@ -22,7 +22,7 @@
 		<h1>BIENVENIDO A "APP"</h1>
 	</header>
 	<article class="container">
-		<div th:text="${param.fail}">Error de login:</div>
+			<div th:text="${loginfail}"></div>
 		<form
 			class="form-signin"
 			action="#"
@@ -67,7 +67,6 @@
 			</form>
 		</section>
 	</article>
-	<footer class="container">
-	</footer>
+	<footer class="container"> </footer>
 </body>
 </html>
