@@ -65,7 +65,12 @@ public class Rules {
 	public final static Double LOWEST_ROLL_MODIFIER = 0.95;
 	public final static Double COST_OF_WAR_LOSER = 0.05;
 	public final static Double COST_OF_WAR_WINNER = 0.02;
-
+	
+	// Validation rules
+	public final static Integer MIN_NAME_LENGTH = 2;
+	public final static Integer MAX_NAME_LENGTH = 255;
+	public final static Integer MAX_TEXT_LENGTH = 511;
+	
 	public Rules() {
 		// TODO Auto-generated constructor stub
 	}

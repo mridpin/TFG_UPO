@@ -104,9 +104,57 @@ public class WarController {
 			@RequestParam(name = "subscenario", required = true) String subscenario) {
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
+		// Perform trivial validation
+		if (name.length() > Rules.MAX_NAME_LENGTH) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failname",
+					"El nombre debe tener entre 0 y 255 caracteres");
+		}
+		if (attackerName.length() > Rules.MAX_NAME_LENGTH) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failattackername",
+					"El nombre debe tener entre 0 y 255 caracteres");
+		}
+		if (defenderName.length() > Rules.MAX_NAME_LENGTH) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("faildefendername",
+					"El nombre debe tener entre 0 y 255 caracteres");
+		}
+		// Perform business logic validation
+		String[] attackers = attackerCountries.split(Rules.COALITION_SEPARATOR);
+		String[] defenders = defenderCountries.split(Rules.COALITION_SEPARATOR);
+		int nCountries = cServ.findCountries(game).size();
+		if (attackers.length >= nCountries) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failattacker",
+					"La coalición atacante tiene demasiados países");
+		}
+		if (defenders.length >= nCountries) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("faildefender",
+					"La coalición defensora tiene demasiados países");
+		}
+		if (attackerCountries.length() == 0) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failattacker",
+					"La coalición atacante no tiene ningún país");
+		}
+		if (defenderCountries.length() == 0) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failattacker",
+					"La coalición defensora no tiene ningún país");
+		}
+		if (model.asMap().get("fail") != null) {
+			model.addAttribute("name", name);
+			model.addAttribute("attackerString", attackerName);
+			model.addAttribute("defenderString", defenderName);
+			redirectAttributes.addAttribute("war_id", war.getId());
+			return "redirect:/war";
+		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
 				attackerCountries, defenderCountries, defenderName, attackerName,
 				subscenario);
+		// TODO: Calculate and show the winning coalition
 		if (roll == null) {
 			// TODO: Handle logic error
 			return "redirect:/landing";
@@ -155,5 +203,5 @@ public class WarController {
 		Map<String, Object> rules = scServ.mapRules(game.getScenario());
 		return rules;
 	}
-	
+
 }

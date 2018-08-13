@@ -774,27 +774,28 @@
 					url : "/mapRules",
 					success : function(response) {
 						rules = response;
-					}
-				});
-				// Ajax call to get the points template
-				$.ajax({
-					type : "POST",
-					url : "/mapAttributes",
-					success : function(response) {
-						attributeValuesTemplate = response;
-					}
-				});
-				downloadPointsTemplate();
-				// Ajax call to get all country data to display in tables
-				// dynamically
-				$.ajax({
-					type : "POST",
-					url : "/mapCountries",
-					success : function(response) {
-						countries = response;
-						updateCoalitionNavies();
-						updateCountryNavies();
-						updateCountryPoints();
+						// Ajax call to get the points template
+						$.ajax({
+							type : "POST",
+							url : "/mapAttributes",
+							success : function(response) {
+								attributeValuesTemplate = response;
+								downloadPointsTemplate();
+								// Ajax call to get all country data to display
+								// in tables
+								// dynamically
+								$.ajax({
+									type : "POST",
+									url : "/mapCountries",
+									success : function(response) {
+										countries = response;
+										updateCoalitionNavies();
+										updateCountryNavies();
+										updateCountryPoints();
+									}
+								});
+							}
+						});
 					}
 				});
 			});
@@ -822,7 +823,6 @@
 		type="submit"
 		value="Volver a la p&aacute;gina principal">
 </form>
-</nav>
 </nav>
 	<article>
 		<th:block th:if="${rolls!=null and !rolls.empty}">
@@ -903,7 +903,7 @@
 						th:case="${true}"
 						type="text"
 						name="name"
-						required="required">
+						th:value="${name}">
 					<input
 						th:case="${false}"
 						type="text"
@@ -965,7 +965,7 @@
 				<input
 					type="text"
 					name="attacker_name"
-					th:value="${lastRoll?.attacker?.name}"
+					th:value="${lastRoll?.attacker?.name} != null ? ${lastRoll?.attacker?.name} : ${attackerString}"
 					th:readonly="${lastRoll!=null}"
 					form="war_form">
 				<h4>Coalici&oacute;n Defensora</h4>
@@ -980,7 +980,7 @@
 				<input
 					type="text"
 					name="defender_name"					
-					th:value="${lastRoll?.defender?.name}"
+					th:value="${lastRoll?.defender?.name} != null ? ${lastRoll?.defender?.name} : ${defenderString}"
 					th:readonly="${lastRoll!=null}"
 					form="war_form">
 			</div>
