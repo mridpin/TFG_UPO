@@ -72,6 +72,7 @@ public class WarController {
 		if (war == null) {
 			return Access.reject();
 		}
+		// TODO: TO SHOW SERVER SIDE VALIDATION YOU WOULD HAVE TO STORE THESE IN THE SESSION. BETTER DO JAVASCRIPT VALIDATION AND MAKE THE SERVER JUST REDIRECT?
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
 		model.addAttribute("rolls", rolls);
@@ -105,7 +106,7 @@ public class WarController {
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
 		// Perform trivial validation
-		if (name.length() > Rules.MAX_NAME_LENGTH) {
+		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
 			model.addAttribute("fail", "fail");
 			model.addAttribute("failname",
 					"El nombre debe tener entre 0 y 255 caracteres");
@@ -148,7 +149,7 @@ public class WarController {
 			model.addAttribute("name", name);
 			model.addAttribute("attackerString", attackerName);
 			model.addAttribute("defenderString", defenderName);
-			redirectAttributes.addAttribute("war_id", war.getId());
+			redirectAttributes.addAttribute("war_id", "");
 			return "redirect:/war";
 		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
