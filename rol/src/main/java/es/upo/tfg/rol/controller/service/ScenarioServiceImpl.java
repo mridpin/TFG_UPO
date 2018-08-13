@@ -182,7 +182,7 @@ public class ScenarioServiceImpl implements ScenarioService {
 					break;
 				}
 			}
-			br.close();	
+			br.close();
 			rules.put(Rules.INFANTRY, infantryAttrs);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -205,6 +205,62 @@ public class ScenarioServiceImpl implements ScenarioService {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public List<String> validateScenarioFile(MultipartFile data) {
+		List<String> res = new ArrayList<>();
+		String value = "";
+		int n = 1;
+		try (InputStream is = data.getInputStream()) {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String attribute = dataline[0].trim().toLowerCase();
+				value = dataline[1].trim().toLowerCase();
+				String infraestructure = Rules.DEVELOPED_INFRAESTRUCTURE.trim()
+						.toLowerCase();
+				String navalPower = Rules.NAVAL_POWER.trim().toLowerCase();
+				switch (attribute) {
+				case "subescenario":
+					break;
+				case "tipo":
+					break;
+				default:
+					if (attribute.equals(navalPower)
+							|| attribute.equals(infraestructure)) {
+						boolean valid = "true".equals(value) || "sí".equals(value)
+								|| "si".equals(value) || "verdadero".equals(value)
+								|| "1".equals(value) || "1.0".equals(value);
+						if (!valid) {
+							res.add("Error de lectura de fichero: no se reconoce el valor '" + value + "' en la línea "
+									+ n);
+						}
+					} else {
+						Double number = Double.parseDouble(value);
+						if (number < 0) {
+							res.add("Error de lectura de fichero: número negativo detectado en la línea "
+									+ n);
+						}
+					}
+					break;
+				}
+				n++;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			res.add("Error de apertura de fichero");
+		} catch (IndexOutOfBoundsException ioobe) {
+			ioobe.printStackTrace();
+			res.add("Error de lectura de fichero: línea " + n + ", el fichero debe tener dos columnas separadas por ';'");
+		} catch (NumberFormatException nfe) {
+			nfe.printStackTrace();
+			res.add("Error de lectura de fichero: no se reconoce el valor '" + value + "' en la línea "
+					+ n);
+		}
+		return res;
 	}
 
 }

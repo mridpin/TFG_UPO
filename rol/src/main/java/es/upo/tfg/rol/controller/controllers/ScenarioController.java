@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +66,6 @@ public class ScenarioController {
 			try {
 				StreamUtils.copy(file.getInputStream(), response.getOutputStream());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -85,9 +85,24 @@ public class ScenarioController {
 		User user = (User) session.getAttribute("user");
 		// Perform trivial validations
 		if (name.length() < 2 || name.length() > 256) {
-			model.addAttribute("name.fail", "El nombre debe tener entre 2 y 256 caracteres");
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failname", "El nombre debe tener entre 2 y 256 caracteres");
 		}
-		// TODO: RETOMAR AQUI VALIDATE VVALIDAET VALIDATE
+		if (description.length() > 512) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("faildesc", "Las etiquetas deben tener como m&aacute;ximo 512 caracteres");
+		}
+		// Perform logic validations
+		List<String> res = scServ.validateScenarioFile(data);
+		if (res.size() != 0) {
+			model.addAttribute("fail", "fail");
+			model.addAttribute("failfile", res);
+		}
+		if (model.asMap().get("fail") != null) {
+			model.addAttribute("name", name);
+			model.addAttribute("description", description);
+			return "scenario";
+		}
 		Scenario scenario = scServ.createScenario(name, description, data, user);
 		session.setAttribute("scenario", scenario);
 		Map<String, Map<String, Map<String, Double>>> scenarioMap = scServ

@@ -39,7 +39,8 @@
 					placeholder="Nombre del escenario"
 					required
 					autofocus
-					maxlength="256">
+					maxlength="256"
+					th:value="${name}">
 				<label
 					for="description"
 					class="">Etiquetas</label>
@@ -48,7 +49,8 @@
 					id="description"
 					name="description"
 					placeholder="Etiquetas que ayuden a la b&uacute;squeda..."
-					maxlength="512">
+					maxlength="512"
+					th:value="${description}">
 				<input
 					type="file"
 					id="data"
@@ -59,6 +61,17 @@
 					type="submit"
 					value="Crear Escenario">
 			</form>
+			<div th:if="${failname != null or faildesc != null or failfile != null}">
+				<h3>Se han encontrado los siguientes errores:</h3>
+				<ul>
+				<li th:if="${failname}" th:text="${failname}"></li>
+				<li th:if="${faildesc}" th:text="${faildesc}"></li>
+					<li th:if="${failfile}">
+						<ul th:each="error : ${failfile}">
+							<li th:text="${error}"></li>
+						</ul>
+				</ul>
+			</div>
 		</section>
 	</article>
 </body>

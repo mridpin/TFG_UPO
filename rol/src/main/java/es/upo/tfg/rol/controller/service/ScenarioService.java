@@ -50,5 +50,7 @@ public interface ScenarioService {
 	 * @return map of rules 
 	 */
 	Map<String, Object> mapRules(Scenario scenario);
+
+	List<String> validateScenarioFile(MultipartFile data);
 	
 }
