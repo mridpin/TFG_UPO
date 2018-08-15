@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.upo.tfg.rol.Rules;
+import es.upo.tfg.rol.controller.controllers.validators.GameValidator;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.GameService;
 import es.upo.tfg.rol.controller.service.RollService;
@@ -148,15 +149,35 @@ public class GameController {
 			@RequestParam(name = "scenario_id", required = true) Long id,
 			@RequestParam(name = "name", required = true) String name,
 			HttpSession session) {
-		// Add the scenario to the session
-		session.setAttribute("newGameName", name);
-		Scenario scenario = scServ.findById(id);
-		session.setAttribute("scenario", scenario);
-		// Create a list of turns with the scenario and add them to the session
-		Game game = (Game) session.getAttribute("game");
-		List<Turn> turns = tServ.generateTurns(scenario, game);
-		session.setAttribute("turns", turns);
-		return "redirect:/create_game";
+		// Perform validation
+		GameValidator validator = new GameValidator();
+		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
+			validator.setGameNameError("El nombre debe tener entre 2 y 255 caracteres");
+		}
+		if (id == null) {
+			validator.setScenarioError("No se ha seleccionado ningún escenario");
+		}
+		if (validator.validate()) {
+			Scenario scenario = scServ.findById(id);
+			if (scenario == null) {
+				validator.setScenarioError(
+						"No se ha encontrado el escenario que buscabas");
+				return "redirect:/create_game";
+			} else {
+				// Add the scenario to the session
+				session.setAttribute("newGameName", name);
+				session.setAttribute("scenario", scenario);
+				// Create a list of turns with the scenario and add them to the session
+				Game game = (Game) session.getAttribute("game");
+				List<Turn> turns = tServ.generateTurns(scenario, game);
+				session.setAttribute("turns", turns);
+				session.removeAttribute(Rules.FAIL);
+				return "redirect:/create_game";
+			}
+		} else {
+			session.setAttribute(Rules.FAIL, validator);
+			return "redirect:/create_game";
+		}
 	}
 
 	@PostMapping("/removePlayer")
@@ -170,6 +191,7 @@ public class GameController {
 		files.remove(index);
 		session.setAttribute("countries", countries);
 		session.setAttribute("files", files);
+		session.removeAttribute(Rules.FAIL);
 		return "redirect:/create_game";
 	}
 
@@ -193,32 +215,63 @@ public class GameController {
 			@RequestParam(name = "player_nickname", required = true) String nickname,
 			@RequestParam(name = "country_data", required = true) MultipartFile data,
 			HttpSession session) {
-		// TODO: Validate so player are unique
-		// TODO: Validate so countries are unique
-		// TODO: Reject file if it's not a CSV
-		// TODO: reject file if it doesn't comply with format, explaining why if
-		// possible
 		// Assemble country with data from file
 		User player = uServ.findByNickname(nickname);
-		if (player != null) { // TODO: Mostrar mensaje de error aqui si no existe
-			Country country = cServ.assembleCountry(player, data);
-			List<Country> countries = (List<Country>) session.getAttribute("countries");
-			List<MultipartFile> files = (List<MultipartFile>) session
-					.getAttribute("files");
-			// Create lists in session if they don't exist. if they do, store the data
-			// there
-			if (countries == null) {
-				countries = new ArrayList<>();
-				countries.add(country);
-				files = new ArrayList<>();
-				files.add(data);
-			} else {
-				countries.add(country);
-				files.add(data);
-			}
-			session.setAttribute("countries", countries);
-			session.setAttribute("files", files);
+		GameValidator validator = new GameValidator();
+		User gm = (User) session.getAttribute("user");
+		if (Objects.equals(player, gm)) {
+			validator.setAddedGMError("Se ha añadido al Game Master como jugador");
 		}
+		if (player != null) {
+			Scenario scenario = (Scenario) session.getAttribute("scenario");
+			List<String> fileErrors = cServ.validateCountryFile(scenario, data);
+			if (fileErrors.isEmpty()) {
+				Country country = cServ.assembleCountry(player, data);
+				List<Country> countries = (List<Country>) session
+						.getAttribute("countries");
+				List<MultipartFile> files = (List<MultipartFile>) session
+						.getAttribute("files");
+				// Create lists in session if they don't exist. if they do, store the data
+				// there
+				if (countries == null) {
+					countries = new ArrayList<>();
+					countries.add(country);
+					files = new ArrayList<>();
+					files.add(data);
+				} else {
+					// Validate so players and countries are unique
+					List<User> players = new ArrayList<>();
+					for (Country c : countries) {
+						players.add(c.getPlayer());
+					}
+					if (players.contains(country.getPlayer())) {
+						validator.setDuplicatePlayerError(
+								"Ese jugador ya ha sido añadido a la partida");
+					}
+					if (countries.contains(country)) {
+						validator.setDuplicateCountryError(
+								"Ese país ya ha sido añadido a la partida");
+					}
+					if (validator.validate()) {
+						players.add(country.getPlayer());
+						countries.add(country);
+						files.add(data);
+					}
+				}
+				session.setAttribute("countries", countries);
+				session.setAttribute("files", files);
+			} else {
+				validator.setCountryFileError(fileErrors);
+			}
+		} else {
+			validator.setPlayerDoesntExistError(
+					"El apodo introducido no corresponde a ningún jugador");
+		}
+		if (!validator.validate()) {
+			session.setAttribute(Rules.FAIL, validator);
+			return "redirect:/create_game";
+		}
+		session.removeAttribute(Rules.FAIL);
 		return "redirect:/create_game";
 	}
 
@@ -236,13 +289,23 @@ public class GameController {
 		List<Country> countries = (List<Country>) session.getAttribute("countries");
 		List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
 		List<Turn> turns = (List<Turn>) session.getAttribute("turns");
-		Game game = gServ.createGame(name, user, turns, countries, files, scenario);
-		if (game == null) {
-			// TODO: HANDLE ERROR
+		GameValidator validator = new GameValidator();
+		// Perform validation
+		if (countries == null || countries.size() <= 1) {
+			validator.setPlayerCountError("Al menos debes añadir dos jugadores");
+		}
+		if (validator.validate()) {
+			Game game = gServ.createGame(name, user, turns, countries, files, scenario);
+			if (game == null) {
+				// TODO: HANDLE ERROR
+			} else {
+				session.removeAttribute(Rules.FAIL);
+				session.setAttribute("game", game);
+				redirect.addAttribute("game_id", game.getId());
+			}
 		} else {
-			// TODO: post-redirect-get
-			session.setAttribute("game", game);
-			redirect.addAttribute("game_id", game.getId());
+			session.setAttribute(Rules.FAIL, validator);
+			return "redirect:/create_game";
 		}
 		return "redirect:/landing";
 	}

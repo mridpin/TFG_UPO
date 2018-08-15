@@ -34,7 +34,7 @@ public class Country implements Serializable {
 	@Column(name = "data_file")
 	private String data;
 	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "player")
 	private User player;
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -87,7 +87,7 @@ public class Country implements Serializable {
 
 	public void setData(String data) {
 		this.data = data;
-	}	
+	}
 
 	public User getPlayer() {
 		return player;
@@ -117,11 +117,9 @@ public class Country implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((data == null) ? 0 : data.hashCode());
 		result = prime * result + ((game == null) ? 0 : game.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((player == null) ? 0 : player.hashCode());
 		return result;
 	}
 
@@ -134,11 +132,6 @@ public class Country implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Country other = (Country) obj;
-		if (data == null) {
-			if (other.data != null)
-				return false;
-		} else if (!data.equals(other.data))
-			return false;
 		if (game == null) {
 			if (other.game != null)
 				return false;
@@ -153,11 +146,6 @@ public class Country implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
-			return false;
-		if (player == null) {
-			if (other.player != null)
-				return false;
-		} else if (!player.equals(other.player))
 			return false;
 		return true;
 	}

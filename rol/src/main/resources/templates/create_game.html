@@ -56,6 +56,23 @@
 		<h2 th:if="${session.scenario != null}">
 			Creando partida: <span th:text="${session.newGameName}"></span>
 		</h2>
+		<div th:if="${session.fail?.validate() == false}">
+			<h4>Se han detectado los siguientes errores:</h4>
+			<ul>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.gameNameError != null}"
+					th:text="${session?.fail?.gameNameError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.playerCountError != null}"
+					th:text="${session?.fail?.playerCountError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.scenarioError != null}"
+					th:text="${session?.fail?.scenarioError}"></li>
+			</ul>
+		</div>
 		<form
 			th:if="${session.scenario != null}"
 			action="#"
@@ -85,9 +102,6 @@
 					th:readonly="${session.newGameName != null}"
 					required
 					autofocus>
-				<!-- 			<span -->
-				<!-- 				th:if="${#fields.hasErrors('name')}" -->
-				<!-- 				th:errors="*{name}">Errores en nombre</span> -->
 				<label
 					for="scenario"
 					class="">Escenario</label>
@@ -105,9 +119,6 @@
 					name="scenario_id"
 					id="scenario_id"
 					th:value="${session.scenario?.id}">
-				<!-- 			<span -->
-				<!-- 				th:if="${#fields.hasErrors('scenario')}" -->
-				<!-- 				th:errors="*{scenario}">Errores en el escenario</span> -->
 				<input
 					class="btn btn-lg btn-primary btn-block"
 					type="submit"
@@ -121,6 +132,11 @@
 				<li th:text="${'Nombre: ' + session.scenario.name}"></li>
 				<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
 				<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
+				<li>
+					<a
+						th:href="@{|/downloads/scenarios?id=${session.scenario.id}|}"
+						download>Descargar Escenario</a>
+				</li>
 			</ul>
 		</section>
 		<section th:if="${session.scenario == null}">
@@ -184,6 +200,39 @@
 		</section>
 		<section th:if="${session.scenario != null}">
 			<h3>Ahora, invita a tus jugadores</h3>
+			<div th:if="${session.fail?.validate() == false}">
+				<h4>Se han detectado los siguientes errores con ese jugador:</h4>
+				<ul>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.addedGMError != null}"
+						th:text="${session?.fail?.addedGMError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.playerDoesntExistError != null}"
+						th:text="${session?.fail?.playerDoesntExistError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.duplicatePlayerError != null}"
+						th:text="${session?.fail?.duplicatePlayerError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.duplicateCountryError != null}"
+						th:text="${session?.fail?.duplicateCountryError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.countryFileError != null}">Errores en
+						el fichero:</li>
+					<li
+						style="list-style: none;"
+						class="valdiation_error_file"
+						th:if="${session?.fail?.countryFileError != null}">
+						<ul th:each="error : ${session?.fail?.countryFileError}">
+							<li th:text="${error}"></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 			<div>
 				<h4>Jugadores a&ntilde;adidos</h4>
 				<table border="2">
@@ -229,6 +278,7 @@
 						name="player_nickname"
 						class="form-control"
 						placeholder="Apodo..."
+						th:value="${playerName}"
 						required
 						autofocus>
 					<label

@@ -82,6 +82,11 @@
 		</section>
 		<section>
 			<h3>Enfrentamientos</h3>
+			<p>
+				<a
+					th:href="@{|/downloads/scenarios?id=${session.game.scenario.id}|}"
+					download>Descargar Escenario</a>
+			<p>
 			<ul id="turn_list">
 				<li th:each="turn, turnStats : ${turns}">
 					<span th:text="${turn.subscenario}"></span>
@@ -189,8 +194,13 @@
 			</th:block>
 		</section>
 		<section>
-			<h3>Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span></h3>
-			<p>Turno siguiente: <span th:text="${nextTurn==null ? 'Ya es el &uacute;ltimo turno' : nextTurn.subscenario}"></span></p>
+			<h3>
+				Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span>
+			</h3>
+			<p>
+				Turno siguiente: <span
+					th:text="${nextTurn==null ? 'Ya es el &uacute;ltimo turno' : nextTurn.subscenario}"></span>
+			</p>
 			<form
 				class="form"
 				action="#"

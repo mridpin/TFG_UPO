@@ -26,6 +26,7 @@ import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.CountryRepository;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
+import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.User;
 
 @Service("countryService")
@@ -114,7 +115,8 @@ public class CountryServiceImpl implements CountryService {
 		try {
 			String filename = "countryData" + File.separator + country.getData();
 			InputStream is = new FileInputStream(filename);
-			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
 			while ((line = br.readLine()) != null) {
 				String[] dataline = line.split(";");
 				String whatDo = dataline[0].trim().toLowerCase();
@@ -165,19 +167,23 @@ public class CountryServiceImpl implements CountryService {
 		String filename = "countryData" + File.separator + country.getData();
 		try (OutputStreamWriter os = new OutputStreamWriter(
 				new FileOutputStream(filename, false), StandardCharsets.UTF_8)) {
-			String nameline = Rules.COUNTRY_NAME + Rules.SEMICOLON + country.getName() + Rules.SEMICOLON + System.lineSeparator();
+			String nameline = Rules.COUNTRY_NAME + Rules.SEMICOLON + country.getName()
+					+ Rules.SEMICOLON + System.lineSeparator();
 			os.write(nameline);
 			for (String subscenario : attributes.keySet()) {
 				Map<String, Map<String, Double>> subscenarioAttributes = attributes
 						.get(subscenario);
-				String subscenarioline = Rules.COUNTRY_SUBSCENARIO + Rules.SEMICOLON + subscenario + Rules.SEMICOLON + System.lineSeparator();
+				String subscenarioline = Rules.COUNTRY_SUBSCENARIO + Rules.SEMICOLON
+						+ subscenario + Rules.SEMICOLON + System.lineSeparator();
 				os.write(subscenarioline);
 				for (String type : subscenarioAttributes.keySet()) {
 					Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
-					String typeline = Rules.COUNTRY_TYPE + Rules.SEMICOLON + type + Rules.SEMICOLON + System.lineSeparator();
+					String typeline = Rules.COUNTRY_TYPE + Rules.SEMICOLON + type
+							+ Rules.SEMICOLON + System.lineSeparator();
 					os.write(typeline);
 					for (String key : typeAttributes.keySet()) {
-						String value = key + Rules.SEMICOLON + typeAttributes.get(key) + Rules.SEMICOLON + System.lineSeparator();
+						String value = key + Rules.SEMICOLON + typeAttributes.get(key)
+								+ Rules.SEMICOLON + System.lineSeparator();
 						os.write(value);
 					}
 				}
@@ -185,6 +191,72 @@ public class CountryServiceImpl implements CountryService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public List<String> validateCountryFile(Scenario scenario, MultipartFile data) {
+		List<String> res = new ArrayList<>();
+		// First, parse the scenario file and save its attribute names in a list, to
+		// compare them later
+		List<String> scenarioFile = new ArrayList<>();
+		String filename = Rules.SCENARIO_FILE_PATH + File.separator + scenario.getData();
+		try (InputStream is = new FileInputStream(filename)) {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String attribute = dataline[0].trim().toLowerCase();
+				scenarioFile.add(attribute);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			res.add("Error de apertura de fichero");
+		}
+		// Now, compare each row of both files to see if they match. They must be
+		// EXACTLY the same. Also, catch exceptions in case of unparseable doubles or
+		// rows with less than two columns
+		int n = 0;
+		String value = "";
+		try (InputStream is = data.getInputStream()) {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(is, StandardCharsets.UTF_8));
+			String line = br.readLine(); // Skip the name in the country file
+			while ((line = br.readLine()) != null) {
+				String[] dataline = line.split(";");
+				String attribute = dataline[0].trim().toLowerCase();
+				String scenarioAttr = scenarioFile.get(n);
+				n++;
+				if (!attribute.equals(scenarioAttr)) {
+					res.add("El atributo '" + attribute + "' en la línea " + (n + 1)
+							+ " no coincide con el atributo '" + scenarioAttr
+							+ "' del escenario");
+				}
+				if (!attribute.equals(Rules.COUNTRY_NAME.toLowerCase())
+						&& !attribute.equals(Rules.COUNTRY_TYPE.toLowerCase())
+						&& !attribute.equals(Rules.COUNTRY_SUBSCENARIO.toLowerCase())) {
+					value = dataline[1];
+					Double.parseDouble(dataline[1]);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			res.add("Error de apertura de fichero");
+		} catch (IndexOutOfBoundsException ioobe) {
+			ioobe.printStackTrace();
+			if (n >= scenarioFile.size()) {
+				res.add("Error de lectura de fichero: línea " + (n + 1)
+						+ " no existe en el fichero del escenario");
+			} else {
+				res.add("Error de lectura de fichero: línea " + (n + 1)
+						+ ", el fichero debe tener dos columnas separadas por ';'");
+			}
+		} catch (NumberFormatException nfe) {
+			nfe.printStackTrace();
+			res.add("Error de lectura de fichero: no se reconoce el valor '" + value
+					+ "' en la línea " + (n + 1));
+		}
+		return res;
 	}
 
 }

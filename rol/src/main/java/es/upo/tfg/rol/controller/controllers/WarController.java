@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.upo.tfg.rol.Rules;
+import es.upo.tfg.rol.controller.controllers.validators.RollValidator;
+import es.upo.tfg.rol.controller.controllers.validators.Validator;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.RollService;
 import es.upo.tfg.rol.controller.service.ScenarioService;
@@ -72,7 +74,6 @@ public class WarController {
 		if (war == null) {
 			return Access.reject();
 		}
-		// TODO: TO SHOW SERVER SIDE VALIDATION YOU WOULD HAVE TO STORE THESE IN THE SESSION. BETTER DO JAVASCRIPT VALIDATION AND MAKE THE SERVER JUST REDIRECT?
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
 		model.addAttribute("rolls", rolls);
@@ -89,6 +90,7 @@ public class WarController {
 		wServ.endWar(war);
 		// TODO: Calculate and show the winning coalition
 		redirectAttributes.addAttribute("game_id", game.getId());
+		session.removeAttribute(Rules.FAIL);
 		return "redirect:/openGame";
 	}
 
@@ -105,50 +107,35 @@ public class WarController {
 			@RequestParam(name = "subscenario", required = true) String subscenario) {
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
+		RollValidator fails = new RollValidator();
 		// Perform trivial validation
 		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("failname",
-					"El nombre debe tener entre 0 y 255 caracteres");
+			fails.setWarNameError("El nombre del enfrentamiento debe tener entre 2 y 255 caracteres");
 		}
 		if (attackerName.length() > Rules.MAX_NAME_LENGTH) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("failattackername",
-					"El nombre debe tener entre 0 y 255 caracteres");
+			fails.setAttackerNameError("El nombre de la coalición atacante debe tener entre 0 y 255 caracteres");
 		}
 		if (defenderName.length() > Rules.MAX_NAME_LENGTH) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("faildefendername",
-					"El nombre debe tener entre 0 y 255 caracteres");
+			fails.setDefenderNameError("El nombre de la coalición defensora debe tener entre 0 y 255 caracteres");
 		}
 		// Perform business logic validation
 		String[] attackers = attackerCountries.split(Rules.COALITION_SEPARATOR);
 		String[] defenders = defenderCountries.split(Rules.COALITION_SEPARATOR);
 		int nCountries = cServ.findCountries(game).size();
 		if (attackers.length >= nCountries) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("failattacker",
-					"La coalición atacante tiene demasiados países");
+			fails.setAttackerOverCountError("La coalición atacante tiene demasiados países");
 		}
 		if (defenders.length >= nCountries) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("faildefender",
-					"La coalición defensora tiene demasiados países");
+			fails.setDefenderOverCountError("La coalición defensora tiene demasiados países");
 		}
 		if (attackerCountries.length() == 0) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("failattacker",
-					"La coalición atacante no tiene ningún país");
+			fails.setAttackerZeroCountError("La coalición atacante no tiene ningún país");
 		}
 		if (defenderCountries.length() == 0) {
-			model.addAttribute("fail", "fail");
-			model.addAttribute("failattacker",
-					"La coalición defensora no tiene ningún país");
+			fails.setDefenderZeroCountError("La coalición defensora no tiene ningún país");
 		}
-		if (model.asMap().get("fail") != null) {
-			model.addAttribute("name", name);
-			model.addAttribute("attackerString", attackerName);
-			model.addAttribute("defenderString", defenderName);
+		if (!fails.validate()) {
+			session.setAttribute(Rules.FAIL, fails);
 			redirectAttributes.addAttribute("war_id", "");
 			return "redirect:/war";
 		}
@@ -160,6 +147,7 @@ public class WarController {
 			// TODO: Handle logic error
 			return "redirect:/landing";
 		} else {
+			session.removeAttribute(Rules.FAIL);
 			int nRolls = rServ.findByWar(war).size();
 			redirectAttributes.addAttribute("war_id", war.getId());
 			if (nRolls < Rules.MAX_ROLLS_PER_WAR) {
