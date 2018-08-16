@@ -6,6 +6,9 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script
+	src="js/jquery.validate.js"
+	type="text/javascript"></script>
+<script
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
@@ -37,6 +40,100 @@
 		$("#scenario").val(name);
 		$("#scenario_id").val(id);
 	}
+	
+	$.validator.addMethod("validUser", function(value, element) {
+		var res = true;
+		var players = [];
+		$.each($("td.nickname_cell"), function(index, val) {
+			players.push($(val).text());
+		});
+	    res = res && (players.indexOf(value) == -1);
+	    return res;
+	});
+	
+	$(document).ready(function () {
+		 $("#game_form").validate({
+			 focusCleanup: true,
+			 rules: {
+				 name: {
+					 required: true,
+					 minlength: 2,
+					 maxlength: 64
+				 },
+				 scenario_id: {
+					 required: true,
+				 },
+				 scenario: {
+					 required: true,
+				 },
+				 player_nickname: {
+					 required: true,
+					 minlength: 2,
+					 maxlength: 32,					 
+				 }
+			 },
+			 messages: {
+				 name: {
+	                required: "Especifica un nombre para la partida",
+	                minlength: "El nombre debe tener 2 caracteres como mínimo",
+	                maxlength: "Máximo 64 caracteres",
+				 },
+				 scenario_id: {
+					 required: "Debes elegir un escenario de la lista de abajo"
+				 },
+				 scenario: {
+					 required: "Debes elegir un escenario de la lista de abajo"
+				 },
+				 player_nickname: {
+		                required: "Especifica un apodo de jugador",
+		                minlength: "El apodo debe tener 2 caracteres como mínimo",
+		                maxlength: "Máximo 32 caracteres",
+				 }
+			 },
+			 errorPlacement: function(error, element) {
+		            error.insertBefore(element);
+		            error.addClass("red");
+			 },
+			 highlight: function (element) {
+				 $(element).removeClass("border-red");
+		     },
+		     unhighlight: function (element) {
+		    	 $(element).removeClass("border-red");
+		    	 // TODO: RED STYLE ERRORS
+		     },
+		 });
+		 $("#country_form").validate({
+			 focusCleanup: true,
+			 rules: {
+				 player_nickname: {
+					 required: true,
+					 minlength: 2,
+					 maxlength: 32,	
+					 validUser: true,
+					 noPlayers: true,
+				 }
+			 },
+			 messages: {
+				 player_nickname: {
+		                required: "Especifica un apodo de jugador",
+		                minlength: "El apodo debe tener 2 caracteres como mínimo",
+		                maxlength: "Máximo 32 caracteres",
+		                validUser: "El usuario ya ha sido añadido a la partida"
+				 }
+			 },
+			 errorPlacement: function(error, element) {
+		            error.insertBefore(element);
+		            error.addClass("red");
+			 },
+			 highlight: function (element) {
+				 $(element).removeClass("border-red");
+		     },
+		     unhighlight: function (element) {
+		    	 $(element).removeClass("border-red");
+		    	 // TODO: RED STYLE ERRORS
+		     },
+		 });
+	});
 </script>
 
 </head>
@@ -87,6 +184,7 @@
 			<form
 				class="form"
 				action="#"
+				id="game_form"
 				th:action="@{/addScenario}"
 				method="post">
 				<label
@@ -120,7 +218,6 @@
 					id="scenario_id"
 					th:value="${session.scenario?.id}">
 				<input
-					class="btn btn-lg btn-primary btn-block"
 					type="submit"
 					value="Confirmar Escenario">
 			</form>
@@ -242,8 +339,8 @@
 						<th></th>
 					</tr>
 					<tr th:each="country, countryStat : ${session.countries}">
-						<td th:text="${country?.player?.nickname}"></td>
-						<td th:text="${country?.name}"></td>
+						<td class="nickname_cell" th:text="${country?.player?.nickname}"></td>
+						<td class="country_cell" th:text="${country?.name}"></td>
 						<td>
 							<form
 								action="#"
@@ -266,6 +363,7 @@
 				<form
 					class="form"
 					action="#"
+					id="country_form"
 					th:action="@{/addCountry}"
 					method="post"
 					enctype="multipart/form-data">

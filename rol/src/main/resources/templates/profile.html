@@ -3,13 +3,6 @@
 <head>
 <head>
 <meta charset="utf-8">
-<meta
-	http-equiv="X-UA-Compatible"
-	content="IE=edge">
-<meta
-	name="viewport"
-	content="width=device-width, initial-scale=1">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <link
 	rel="icon"
 	href="../../favicon.ico">
@@ -20,19 +13,73 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script
+	src="js/jquery.validate.js"
+	type="text/javascript"></script>
+<script
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		$("#editButton").on("click", function() {
-			makeEditable();
-			return false;
-		});
+	$(document)
+			.ready(
+					function() {
+						$("#editButton").on("click", function() {
+							makeEditable();
+							return false;
+						});
 
-		$("#saveChanges").click(function() {
-			return matchPasswords();
-		});
-	});
+						$("#saveChanges").click(function() {
+							return matchPasswords();
+						});
+
+						$("#profile_form")
+								.validate(
+										{
+											focusCleanup : true,
+											rules : {
+												nickname : {
+													minlength : 2,
+													maxlength : 32
+												},
+												name : {
+													minlength : 2,
+													maxlength : 64
+												},
+												password : {
+													minlength : 5,
+													maxlength : 64
+												},
+											},
+											messages : {
+												nickname : {
+													required : "Especifica un apodo",
+													minlength : "El apodo debe tener 2 caracteres como mínimo",
+													maxlength : "Máximo 32 caracteres",
+												},
+												name : {
+													minlength : "El nombre debe tener 2 caracteres como mínimo",
+													maxlength : "Máximo 64 caracteres",
+												},
+												password : {
+													minlength : "La contraseña debe tener al menos 5 caracteres",
+													maxlength : "Máximo 64 caracteres",
+												},
+											},
+											errorPlacement : function(error,
+													element) {
+												error.insertBefore(element);
+												error.addClass("red");
+											},
+											highlight : function(element) {
+												$(element).removeClass(
+														"border-red");
+											},
+											unhighlight : function(element) {
+												$(element).removeClass(
+														"border-red");
+												// TODO: RED STYLE ERRORS
+											},
+										});
+					});
 </script>
 </head>
 <body>
@@ -52,6 +99,7 @@
 		<form
 			class="form"
 			action="#"
+			id="profile_form"
 			th:action="@{/updateUser}"
 			th:object="${user}"
 			method="post"
@@ -64,6 +112,7 @@
 				type="text"
 				th:field="*{nickname}"
 				id="nickname"
+				name="nickname"
 				class="form-control editable"
 				th:placeholder="*{nickname}"
 				required
@@ -79,6 +128,7 @@
 				type="text"
 				th:field="*{name}"
 				id="name"
+				name="name"
 				class="form-control editable"
 				th:placeholder="*{name}"
 				required
@@ -102,6 +152,7 @@
 				type="password"
 				th:field="*{password}"
 				id="inputPassword"
+				name="password"
 				class="form-control editable"
 				placeholder="Insert password to confirm"
 				required
@@ -120,7 +171,7 @@
 				disabled="disabled"
 				readonly="readonly">
 			<input
-				class="btn btn-lg btn-primary btn-block editable"
+				class="editable"
 				type="submit"
 				id="saveChanges"
 				value="Save Changes"

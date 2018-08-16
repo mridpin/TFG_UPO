@@ -84,7 +84,7 @@ public interface GameService {
 	void saveTurn(Turn t);
 
 	/**
-	 * Advance the turn in the game. Resets countries that havent fought wars in
+	 * Advance the turn in the game. Resets countries that haven't fought wars in
 	 * this turn
 	 * 
 	 * @param game

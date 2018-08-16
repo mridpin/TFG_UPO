@@ -7,6 +7,9 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script
+	src="js/jquery.validate.js"
+	type="text/javascript"></script>
+<script
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <style>
@@ -56,6 +59,75 @@
 	const INFANTRY_ATTACK_PENALTY = "INFANTRY_ATTACK_PENALTY";
 	// const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
 	const INFANTRY_DEFENSE_BONUS = "INFANTRY_DEFENSE_BONUS";
+
+	function validateAttackers() {
+		var res = [];
+		var attackerCountries = $("#coal1_box").find("span.country_names",
+				"li.ui-sortable-handle");
+		if (attackerCountries.length === 0) {
+			res.push("La coalici&oacute;n atacante est&aacute; vac&iacute;a");
+		}
+		if (attackerCountries.length === countries.length) {
+			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n atacante");
+		}
+		// These validate for both attackers and defenders
+		var countrynames = [];
+		for (var key in countries) {
+			var clazz = key.replaceAll(" ", "") + "_listitem";
+			countrynames[key] = $("."+clazz);
+		}
+		for (var key in countrynames) {
+			var countryInvolvement = 0;
+			for (var inv = 0; inv < countrynames[key].length; inv++) {
+				countryInvolvement += parseFloat($(countrynames[key][inv]).find("input[type=number]").val());
+			}
+			if (countryInvolvement > 1.0) {
+				res.push("El pa&iacute;s " + key + " est&aacute; usando m&aacute;s del 100% de sus recursos");
+			}
+		}
+		return res;
+	}
+
+	function validateDefenders() {
+		var res = [];
+		var defenderCountries = $("#coal2_box").find("span.country_names",
+				"li.ui-sortable-handle");
+		if (defenderCountries.length === 0) {
+			res.push("La coalici&oacute;n defensora est&aacute; vac&iacute;a");
+		}
+		if (defenderCountries.length === countries.length) {
+			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n defensora");
+		}
+		return res;
+	}
+
+	function validateDieRoll() {
+		var res = [];
+		var ret = true;
+		$("ul#error_list").empty();
+		var attackerErrors = validateAttackers();
+		var defenderErrors = validateDefenders();
+		if (attackerErrors.length > 0) {
+			res.push(attackerErrors);
+			ret = false;
+		}
+		if (defenderErrors.length > 0) {
+			res.push(defenderErrors);
+			ret = false;
+		}
+		if (res.length !== 0) {
+			for (var i in res) {
+				if (res[i] != "") {
+					var li = $("<li>").append(res[i]);
+					$("ul#error_list").append(li);
+				}
+			}
+			$("#error_section").show();
+		} else {
+			$("#error_section").hide();
+		}
+		return ret;
+	}
 
 	function getRollNumber() {
 		var res = 1;
@@ -725,85 +797,155 @@
 		}
 	}
 
-	$(document).ready(
-			function() {
-				// Load the previous coalitions if they exist
-				loadPreviousCoalitions();
-				// Sortable list to drag countries to coalitions
-				$("ul#country_list, ul#attacker_list, ul#defender_list")
-						.sortable({
-							connectWith : ".coalition_lists",
-							dropOnEmpty : true,
-							placeholder : "ui-state-highlight",
-							update : function() {
-								updateCoalitionNavies();
-								updateCountryNavies();
-								updateCountryPoints();
-								$(this).clone()
-							},
-						});
-
-				$("ul.coalition_lists").disableSelection();
-
-				$("#war_form").submit(
-						function() {
-							// Submit the scores
-							$("#attacker_score").val(
-									$("#total_attack_score").text());
-							$("#defender_score").val(
-									$("#total_defender_score").text());
-							// Submit the coalitions as a string list such as
-							// country,percent; to be parsed by the server
-							var attacker = "";
-							$.each($("#coal1_box").find("li"), function(key,
-									val) {
-								attacker += $(val).attr("name")
-										+ ","
-										+ $(val).find("input[type=number]")
-												.val() + ";";
-							});
-							$("#attacker_countries").val(attacker);
-							var defender = "";
-							$.each($("#coal2_box").find("li"), function(key,
-									val) {
-								defender += $(val).attr("name")
-										+ ","
-										+ $(val).find("input[type=number]")
-												.val() + ";";
-							});
-							$("#defender_countries").val(defender);
-							return true;
-						});
-				// Ajax call to get all rules
-				$.ajax({
-					type : "POST",
-					url : "/mapRules",
-					success : function(response) {
-						rules = response;
-						// Ajax call to get the points template
-						$.ajax({
-							type : "POST",
-							url : "/mapAttributes",
-							success : function(response) {
-								attributeValuesTemplate = response;
-								downloadPointsTemplate();
-								// Ajax call to get all country data to display
-								// in tables dynamically
-								$.ajax({
-									type : "POST",
-									url : "/mapCountries",
-									success : function(response) {
-										countries = response;
+	$(document)
+			.ready(
+					function() {
+						// Load the previous coalitions if they exist
+						loadPreviousCoalitions();
+						// Sortable list to drag countries to coalitions
+						$("ul#country_list, ul#attacker_list, ul#defender_list")
+								.sortable({
+									connectWith : ".coalition_lists",
+									dropOnEmpty : true,
+									placeholder : "ui-state-highlight",
+									update : function() {
 										updateCoalitionNavies();
 										updateCountryNavies();
 										updateCountryPoints();
+										$(this).clone()
+									},
+								});
+
+						$("ul.coalition_lists").disableSelection();
+
+						$("#war_form")
+								.submit(
+										function() {
+											// Submit the scores
+											$("#attacker_score").val(
+													$("#total_attack_score")
+															.text());
+											$("#defender_score").val(
+													$("#total_defender_score")
+															.text());
+											// Submit the coalitions as a string list such as
+											// country,percent; to be parsed by the server
+											var attacker = "";
+											$
+													.each(
+															$("#coal1_box")
+																	.find("li"),
+															function(key, val) {
+																attacker += $(
+																		val)
+																		.attr(
+																				"name")
+																		+ ","
+																		+ $(val)
+																				.find(
+																						"input[type=number]")
+																				.val()
+																		+ ";";
+															});
+											$("#attacker_countries").val(
+													attacker);
+											var defender = "";
+											$
+													.each(
+															$("#coal2_box")
+																	.find("li"),
+															function(key, val) {
+																defender += $(
+																		val)
+																		.attr(
+																				"name")
+																		+ ","
+																		+ $(val)
+																				.find(
+																						"input[type=number]")
+																				.val()
+																		+ ";";
+															});
+											$("#defender_countries").val(
+													defender);
+											return true;
+										});
+						// Ajax call to get all rules
+						$.ajax({
+							type : "POST",
+							url : "/mapRules",
+							success : function(response) {
+								rules = response;
+								// Ajax call to get the points template
+								$.ajax({
+									type : "POST",
+									url : "/mapAttributes",
+									success : function(response) {
+										attributeValuesTemplate = response;
+										downloadPointsTemplate();
+										// Ajax call to get all country data to display
+										// in tables dynamically
+										$.ajax({
+											type : "POST",
+											url : "/mapCountries",
+											success : function(response) {
+												countries = response;
+												updateCoalitionNavies();
+												updateCountryNavies();
+												updateCountryPoints();
+											}
+										});
 									}
 								});
 							}
 						});
-					}
-				});
-			});
+						$("#error_section").hide();
+						$("#war_form")
+								.validate(
+										{
+											focusCleanup : true,
+											rules : {
+												name : {
+													required : true,
+													minlength : 2,
+													maxlength : 256
+												},
+												attacker_name : {
+													maxlength : 256
+												},
+												defender_name : {
+													maxlength : 256
+												}
+											},
+											messages : {
+												name : {
+													required : "Especifica un nombre para el enfrentamiento",
+													minlength : "El nombre debe tener 2 caracteres como mínimo",
+													maxlength : "Máximo 256 caracteres",
+												},
+												attacker_name : {
+													maxlength : "Máximo 256 caracteres",
+												},
+												defender_name : {
+													maxlength : "Máximo 256 caracteres",
+												}
+											},
+											errorPlacement : function(error,
+													element) {
+												error.insertBefore(element);
+												error.addClass("red");
+											},
+											highlight : function(element) {
+												$(element).removeClass(
+														"border-red");
+											},
+											unhighlight : function(element) {
+												$(element).removeClass(
+														"border-red");
+												// TODO: RED STYLE ERRORS
+											},
+										});
+					});
 </script>
 </head>
 <body>
@@ -894,6 +1036,10 @@
 			</section>
 		</th:block>
 		<h2>Comenzar una tirada</h2>
+		<section id="error_section">
+		<h3>Se han detectado los siguientes errores: </h3>
+			<ul id="error_list"></ul>
+		</section>
 		<section>
 			<h3>Nombre</h3>
 			<form
@@ -1089,7 +1235,8 @@
 			<input
 				type="submit"
 				value="Tirar dado"
-				form="war_form">
+				form="war_form"
+				onclick="return validateDieRoll();">
 		</section>
 		<section th:if="${session.war.id != null}">
 			<h3>Puntos acumulados</h3>

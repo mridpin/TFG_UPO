@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <title>Crea un escenario</title>
-<link rel="stylesheet" href="css/styles.css">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script
@@ -19,12 +18,19 @@ $(document).ready(function(){
 			name: {
 				required: true,
 				minlength: 2
+			},
+			description: {
+				maxlength: 511
 			}
 		},
 		messages: {
 			name: {
 				required: "Introduce un nombre v&aacute;lido para tu escenario",
-				minlength: "Nombre debe tener al menos 2 caracteres"
+				minlength: "Nombre debe tener al menos 2 caracteres",
+				maxlength: "Máximo 64 caracteres"
+			},
+			description: {
+				maxlength: "M&aacute;ximo 511 caracteres",			
 			}
 		}
 	});
@@ -72,7 +78,6 @@ $(document).ready(function(){
 					id="description"
 					name="description"
 					placeholder="Etiquetas que ayuden a la b&uacute;squeda..."
-					maxlength="512"
 					th:value="${description}">
 				<input
 					type="file"
