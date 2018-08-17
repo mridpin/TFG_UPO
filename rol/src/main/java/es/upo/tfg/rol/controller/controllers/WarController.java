@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
+import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -110,33 +112,70 @@ public class WarController {
 		RollValidator fails = new RollValidator();
 		// Perform trivial validation
 		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
-			fails.setWarNameError("El nombre del enfrentamiento debe tener entre 2 y 255 caracteres");
+			fails.setWarNameError(
+					"El nombre del enfrentamiento debe tener entre 2 y 255 caracteres");
 		}
 		if (attackerName.length() > Rules.MAX_NAME_LENGTH) {
-			fails.setAttackerNameError("El nombre de la coalición atacante debe tener entre 0 y 255 caracteres");
+			fails.setAttackerNameError(
+					"El nombre de la coalición atacante debe tener entre 0 y 255 caracteres");
 		}
 		if (defenderName.length() > Rules.MAX_NAME_LENGTH) {
-			fails.setDefenderNameError("El nombre de la coalición defensora debe tener entre 0 y 255 caracteres");
+			fails.setDefenderNameError(
+					"El nombre de la coalición defensora debe tener entre 0 y 255 caracteres");
 		}
 		// Perform business logic validation
 		String[] attackers = attackerCountries.split(Rules.COALITION_SEPARATOR);
 		String[] defenders = defenderCountries.split(Rules.COALITION_SEPARATOR);
-		int nCountries = cServ.findCountries(game).size();
-		if (attackers.length >= nCountries) {
-			fails.setAttackerOverCountError("La coalición atacante tiene demasiados países");
+		List<String[]> involvements = new ArrayList<>();
+		List<Country> countries = cServ.findCountries(game);
+		List<String> countryNames = new ArrayList<>();
+		for (String a : attackers) {
+			involvements.add(a.split(Rules.INVOLVEMENT_SEPARATOR));
 		}
-		if (defenders.length >= nCountries) {
-			fails.setDefenderOverCountError("La coalición defensora tiene demasiados países");
+		for (String d : defenders) {
+			involvements.add(d.split(Rules.INVOLVEMENT_SEPARATOR));
+		}
+		// Validate that involvements for a country are not greater than 1
+		for (Country c : countries) {
+			Double countryInv = 0.0;
+			for (String[] s : involvements) {
+				if (Objects.equals(c.getName(), s[0])) {
+					try {
+						Double inv = Double.parseDouble(s[1]);
+						countryInv += inv;
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			if (countryInv > 1.0) {
+				fails.setCountryInv("El país " + c.getName()
+						+ " está usando más del 100% de sus recursos");
+			}
+			countryNames.add(c.getName());
+		}
+		// Validate that the country is in the game
+		for (String[] s : involvements) {
+			if (!countryNames.contains(s[0])) {
+				String errors = fails.getCountryNotRecognized();
+				if (errors == null) {
+					fails.setCountryNotRecognized("No se reconoce el país " + s[0] + ".");
+				} else {
+					fails.setCountryNotRecognized(errors + "No se reconoce el país " + s[0] + ".");
+				}
+			}
 		}
 		if (attackerCountries.length() == 0) {
 			fails.setAttackerZeroCountError("La coalición atacante no tiene ningún país");
 		}
 		if (defenderCountries.length() == 0) {
-			fails.setDefenderZeroCountError("La coalición defensora no tiene ningún país");
+			fails.setDefenderZeroCountError(
+					"La coalición defensora no tiene ningún país");
 		}
 		if (!fails.validate()) {
 			session.setAttribute(Rules.FAIL, fails);
-			redirectAttributes.addAttribute("war_id", "");
+			redirectAttributes.addAttribute("war_id",
+					(war.getId() == null) ? "" : war.getId());
 			return "redirect:/war";
 		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
@@ -144,7 +183,8 @@ public class WarController {
 				subscenario);
 		// TODO: Calculate and show the winning coalition
 		if (roll == null) {
-			// TODO: Handle logic error
+			fails.setGenericRollError(
+					"Se ha producido un error al crear la tirada. Prueba a cerrar sesión y ha intentarlo otra vez. Si el error persiste es posible que la información de tu partida esté corrupta");
 			return "redirect:/landing";
 		} else {
 			session.removeAttribute(Rules.FAIL);

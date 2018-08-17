@@ -10,10 +10,11 @@ public class RollValidator implements Validator {
 	private String warNameError;
 	private String attackerNameError;
 	private String defenderNameError;
-	private String attackerOverCountError;
-	private String defenderOverCountError;
 	private String attackerZeroCountError;
 	private String defenderZeroCountError;
+	private String countryInv;
+	private String countryNotRecognized;
+	private String genericRollError;
 
 	public RollValidator() {
 		// TODO Auto-generated constructor stub
@@ -43,22 +44,6 @@ public class RollValidator implements Validator {
 		this.defenderNameError = defenderNameError;
 	}
 
-	public String getAttackerOverCountError() {
-		return attackerOverCountError;
-	}
-
-	public void setAttackerOverCountError(String attackerOverCountError) {
-		this.attackerOverCountError = attackerOverCountError;
-	}
-
-	public String getDefenderOverCountError() {
-		return defenderOverCountError;
-	}
-
-	public void setDefenderOverCountError(String defenderOverCountError) {
-		this.defenderOverCountError = defenderOverCountError;
-	}
-
 	public String getAttackerZeroCountError() {
 		return attackerZeroCountError;
 	}
@@ -73,6 +58,30 @@ public class RollValidator implements Validator {
 
 	public void setDefenderZeroCountError(String defenderZeroCountError) {
 		this.defenderZeroCountError = defenderZeroCountError;
+	}	
+
+	public String getCountryInv() {
+		return countryInv;
+	}
+
+	public void setCountryInv(String countryInv) {
+		this.countryInv = countryInv;
+	}	
+
+	public String getGenericRollError() {
+		return genericRollError;
+	}
+
+	public void setGenericRollError(String genericRollError) {
+		this.genericRollError = genericRollError;
+	}
+	
+	public String getCountryNotRecognized() {
+		return countryNotRecognized;
+	}
+
+	public void setCountryNotRecognized(String countryNotRecognized) {
+		this.countryNotRecognized = countryNotRecognized;
 	}
 
 	@Override
@@ -81,10 +90,11 @@ public class RollValidator implements Validator {
 		res = res && getWarNameError() == null;
 		res = res && getAttackerNameError() == null;
 		res = res && getDefenderNameError() == null;
-		res = res && getAttackerOverCountError() == null;
 		res = res && getAttackerZeroCountError() == null;
 		res = res && getDefenderZeroCountError() == null;
-		res = res && getDefenderOverCountError() == null;
+		res = res && getCountryInv() == null;
+		res = res && getGenericRollError() == null;
+		res = res && getCountryNotRecognized() == null;
 		return res;
 	}
 

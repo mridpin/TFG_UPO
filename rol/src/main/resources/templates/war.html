@@ -65,24 +65,29 @@
 		var attackerCountries = $("#coal1_box").find("span.country_names",
 				"li.ui-sortable-handle");
 		if (attackerCountries.length === 0) {
-			res.push("La coalici&oacute;n atacante est&aacute; vac&iacute;a");
+			res.push("La coalici&oacute;n atacante est&aacute; vac&iacute;a. ");
 		}
 		if (attackerCountries.length === countries.length) {
-			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n atacante");
+			res
+					.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n atacante. ");
 		}
 		// These validate for both attackers and defenders
 		var countrynames = [];
-		for (var key in countries) {
+		for ( var key in countries) {
 			var clazz = key.replaceAll(" ", "") + "_listitem";
-			countrynames[key] = $("."+clazz);
+			countrynames[key] = $("." + clazz);
 		}
-		for (var key in countrynames) {
+		for ( var key in countrynames) {
 			var countryInvolvement = 0;
 			for (var inv = 0; inv < countrynames[key].length; inv++) {
-				countryInvolvement += parseFloat($(countrynames[key][inv]).find("input[type=number]").val());
+				countryInvolvement += parseFloat($(countrynames[key][inv])
+						.find("input[type=number]").val());
 			}
 			if (countryInvolvement > 1.0) {
-				res.push("El pa&iacute;s " + key + " est&aacute; usando m&aacute;s del 100% de sus recursos");
+				res
+						.push("El pa&iacute;s "
+								+ key
+								+ " est&aacute; usando m&aacute;s del 100% de sus recursos. ");
 			}
 		}
 		return res;
@@ -93,10 +98,11 @@
 		var defenderCountries = $("#coal2_box").find("span.country_names",
 				"li.ui-sortable-handle");
 		if (defenderCountries.length === 0) {
-			res.push("La coalici&oacute;n defensora est&aacute; vac&iacute;a");
+			res.push("La coalici&oacute;n defensora est&aacute; vac&iacute;a. ");
 		}
 		if (defenderCountries.length === countries.length) {
-			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n defensora");
+			res
+					.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n defensora. ");
 		}
 		return res;
 	}
@@ -116,7 +122,7 @@
 			ret = false;
 		}
 		if (res.length !== 0) {
-			for (var i in res) {
+			for ( var i in res) {
 				if (res[i] != "") {
 					var li = $("<li>").append(res[i]);
 					$("ul#error_list").append(li);
@@ -626,29 +632,6 @@
 		drawCountryNavies(turn, countryNavies);
 	}
 
-	function downloadPointsTemplate() {
-		// Reference table with points per attribute.
-
-		attributeValueTemplate = {
-			"economicos" : {
-				"PIB ($ Geary-Khamis de 1990)" : 8.0,
-				"Población total" : 8.0,
-				"Total de la producción cerealera (trigo, maíz, centeno, avena, arroz) (Tm)" : 8.0,
-				"Producción acero (Tm)" : 8.0,
-				"Producción carbón (Tm)" : 8.0,
-			},
-			"militares" : {
-				"Densidad ferroviaria (km/km2)" : 8.0,
-				"Soldados -de todos los ejércitos-" : 11.0,
-				"Reservistas -de todos los ejércitos-" : 11.0,
-			},
-			"navales" : {
-				"Tonelaje desplazado por la Armada (Tm)" : 5.0,
-				"Tonelaje desplazado por la marina mercante (Tm)" : 3.0,
-			},
-		};
-	}
-
 	function updateCountryPoints() {
 		var attackerCountries = $("#coal1_box").find("span.country_names",
 				"li.ui-sortable-handle");
@@ -785,13 +768,13 @@
 		var defenderList = $("ul#defender_list");
 		for (var i = 0; i < lastAttackersTDs.length; i++) {
 			var countryLi = $("#"
-					+ $(lastAttackersTDs[i]).text().replace(" ", "")
+					+ $(lastAttackersTDs[i]).text().replaceAll(" ", "")
 					+ "_listitem");
 			$(attackersList).append(countryLi);
 		}
 		for (var i = 0; i < lastDefendersTDs.length; i++) {
 			var countryLi = $("#"
-					+ $(lastDefendersTDs[i]).text().replace(" ", "")
+					+ $(lastDefendersTDs[i]).text().replaceAll(" ", "")
 					+ "_listitem");
 			$(defenderList).append(countryLi);
 		}
@@ -882,7 +865,6 @@
 									url : "/mapAttributes",
 									success : function(response) {
 										attributeValuesTemplate = response;
-										downloadPointsTemplate();
 										// Ajax call to get all country data to display
 										// in tables dynamically
 										$.ajax({
@@ -1027,18 +1009,50 @@
 					<tr>
 						<th
 							colspan="2"
-							th:text="${roll.attackerScore}"></th>
+							th:text="${#numbers.formatDecimal(roll.attackerScore, 0, 2)}"></th>
 						<th
 							colspan="2"
-							th:text="${roll.defenderScore}"></th>
+							th:text="${#numbers.formatDecimal(roll.defenderScore, 0, 2)}"></th>
 					</tr>
 				</table>
 			</section>
 		</th:block>
 		<h2>Comenzar una tirada</h2>
 		<section id="error_section">
-		<h3>Se han detectado los siguientes errores: </h3>
-			<ul id="error_list"></ul>
+			<h3>Se han detectado los siguientes errores:</h3>
+			<ul id="error_list">
+			</ul>
+		</section>
+		<section
+			th:if="${session.fail != null}"
+			id="server_error_section">
+			<h3>Se han detectado los siguientes errores:</h3>
+			<ul id="server_error_list">
+				<li
+					th:if="${session.fail.warNameError != null}"
+					th:text="${session.fail.warNameError}"></li>
+				<li
+					th:if="${session.fail.attackerNameError != null}"
+					th:text="${session.fail.attackerNameError}"></li>
+				<li
+					th:if="${session.fail.defenderNameError != null}"
+					th:text="${session.fail.defenderNameError}"></li>
+				<li
+					th:if="${session.fail.attackerZeroCountError != null}"
+					th:text="${session.fail.attackerZeroCountError}"></li>
+				<li
+					th:if="${session.fail.defenderZeroCountError != null}"
+					th:text="${session.fail.defenderZeroCountError}"></li>
+				<li
+					th:if="${session.fail.countryInv != null}"
+					th:text="${session.fail.countryInv}"></li>
+				<li
+					th:if="${session.fail.countryNotRecognized != null}"
+					th:text="${session.fail.countryNotRecognized}"></li>
+				<li
+					th:if="${session.fail.genericRollError != null}"
+					th:text="${session.fail.genericRollError}"></li>
+			</ul>
 		</section>
 		<section>
 			<h3>Nombre</h3>
