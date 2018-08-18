@@ -2,56 +2,58 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<title>Insert title here</title>
+<title>P&aacute;gina principal</title>
+<link
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
+<link
+	href="css/bulma.css"
+	rel="stylesheet">
 </head>
-<body>
-	<article>
-		<nav>
-			<h4>
-				HELLO: <span th:text="${session.user.name}"></span>
-			</h4>
-			<img
-				width="200px"
-				th:src="@{/} + ${session.user.avatar}">
-
-			<form
-				action="#"
-				th:action="@{/profile}"
-				method="get">
-				<input
-					type="submit"
-					value="Edit">
-			</form>
-			<form
-				action="#"
-				th:action="@{/logout}"
-				method="post">
-				<input
-					type="submit"
-					value="Logout">
-			</form>
-		</nav>
-		<section>
-			<form
-				action="#"
-				th:action="@{/create_game}"
-				method="get">
-				<input
-					type="submit"
-					value="Crear Partida">
-			</form>
-			<form
-				action="#"
-				th:action="@{/createScenario}"
-				method="get">
-				<input
-					type="submit"
-					value="Crear escenario">
-			</form>
-		</section>
-		<section>
-			<h3>Partidas en curso</h3>
-			<table border="2">
+<body class="content">
+	<header th:replace="fragments/session_header :: header"></header>
+	<section class="section">
+		<div class="container">
+			<div class="columns is-centered">
+				<div class="column is-half has-text-centered">
+					<form
+						action="#"
+						th:action="@{/create_game}"
+						method="get">
+						<div class="field">
+							<div class="control has-icons-left">
+								<input
+									class="button is-large is-outlined is-primary is-fullwidth"
+									type="submit"
+									value="CREAR PARTIDA">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="column is-half has-text-centered">
+					<form
+						action="#"
+						th:action="@{/createScenario}"
+						method="get">
+						<div class="field">
+							<div class="control">
+								<input
+									class="button is-large is-outlined is-primary is-fullwidth"
+									type="submit"
+									value="CREAR ESCENARIO">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-3">Partidas en curso</h3>
+			<table class="table is-striped">
 				<tr>
 					<th>Nombre</th>
 					<th>Escenario</th>
@@ -76,16 +78,20 @@
 								name="game_id"
 								th:value="${game.id}">
 							<input
+								class="button is-outlined is-info"
 								type="submit"
 								value="Abrir partida">
+
 						</form>
 					</td>
 				</tr>
 			</table>
-		</section>
-		<section>
-			<h3>Partidas jugadas</h3>
-			<table border="2">
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-3">Partidas jugadas</h3>
+			<table class="table is-striped">
 				<tr>
 					<th>Nombre</th>
 					<th>Escenario</th>
@@ -111,13 +117,15 @@
 								name="game_id"
 								th:value="${game.id}">
 							<input
+								class="button is-outlined is-info"
 								type="submit"
 								value="Ver partida">
 						</form>
 					</td>
 				</tr>
 			</table>
-		</section>
-	</article>
+		</div>
+	</section>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

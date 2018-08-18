@@ -15,20 +15,18 @@
 	href="css/bulma.css"
 	rel="stylesheet">
 <body>
-	<header class="hero is-medium is-primary is-bold">
-		<div class="hero-body">
-			<div class="container">
-				<h1 class="title is-1">BIENVENIDO A "APP"</h1>
-				<h2 class="subtitle is-3">La aplicaci&oacute;n web para jugar a
-					"Game"</h2>
-			</div>
-		</div>
-	</header>
+	<header th:replace="fragments/login_header :: header"></header>
 	<article>
 		<section class="section">
 			<div class="container has-text-centered">
-				<div th:text="${loginfail}"></div>
 				<h2 class="subtitle is-5">Login requerido:</h2>
+				<div
+					class="notification is-danger"
+					th:if="${loginfail!=null}">
+					<p th:text="${loginfail}"></p>
+					<span class="icon is-small is-right"> <i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
 				<form
 					action="#"
 					th:action="@{/login}"
@@ -88,27 +86,13 @@
 							<input
 								class="button is-medium is-info is-outlined is-fullwidth"
 								type="submit"
-								value="Registrarse">
+								value="Reg&iacute;strate">
 						</div>
 					</div>
 				</form>
 			</div>
 		</section>
 	</article>
-	<footer class="footer">
-		<div class="has-text-centered">
-			<p>
-				<strong>Manuel Ridao Pineda, 2018</strong>
-			</p>
-			<p>
-				<a href="https://bulma.io"> <img
-					src="imgs/made-with-bulma.png"
-					alt="Made with Bulma"
-					width="128"
-					height="24">
-				</a>
-			</p>
-		</div>
-	</footer>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

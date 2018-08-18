@@ -26,16 +26,16 @@ public class User implements Serializable {
 	private Long id;
 	@Column(name = "avatar")	
 	private String avatar;
-	@NotNull
+	@NotNull(message = "{name.notnull}")
 	@Size(min=2, max=64)
 	@Column(name = "name")
 	private String name;
-	@NotNull
-	@Size(min=2, max=32)
+	@NotNull(message = "{nickname.notnull}")
+	@Size(min=2, max=32, message = "{nickname.size}")
 	@Column(unique = true, name = "nickname")
 	private String nickname;
-	@NotNull
-	@Size(min=5, max=64)
+	@NotNull(message = "{password.notnull}")
+	@Size(min=5, max=64, message = "{password.size}")
 	@Column(name = "password")
 	private String password;
 

@@ -2,19 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<style>
-	.red {
-		color: red;
-	}
-	.border-red {
-		border: red 1px solid;
-	}
-</style>
 <link
-	rel="icon"
-	href="../../favicon.ico">
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
 <link
-	href="css/bootstrap.min.css"
+	href="css/bulma.css"
 	rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script
@@ -24,148 +18,198 @@
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
-$(document).ready(function () {
-	 $("#register_form").validate({
-		 focusCleanup: true,
-		 rules: {
-			 nickname: {
-				 minlength: 2,
-				 maxlength: 32
-			 },
-			 name: {
-				 minlength: 2,
-				 maxlength: 64
-			 },
-			 password: {
-				 minlength: 5,
-				 maxlength: 64
-			 },
-		 },
-		 messages: {
-			 nickname: {
-                required: "Especifica un apodo",
-                minlength: "El apodo debe tener 2 caracteres como mínimo",
-                maxlength: "Máximo 32 caracteres",
-			 },
-			 name: {
-				 minlength: "El nombre debe tener 2 caracteres como mínimo",
-				 maxlength: "Máximo 64 caracteres",
-			 },
-			 password: {
-				 minlength: "La contraseña debe tener al menos 5 caracteres",
-				 maxlength: "Máximo 64 caracteres",
-			 },
-		 },
-		 errorPlacement: function(error, element) {
-	            error.insertBefore(element);
-	            error.addClass("red");
-		 },
-		 highlight: function (element) {
-			 $(element).removeClass("border-red");
-	     },
-	     unhighlight: function (element) {
-	    	 $(element).removeClass("border-red");
-	    	 // TODO: RED STYLE ERRORS
-	     },
-	 });
-});
+	$(document).ready(function() {
+		$("#register_form").validate({
+			focusCleanup : true,
+			rules : {
+				nickname : {
+					minlength : 2,
+					maxlength : 32
+				},
+				name : {
+					minlength : 2,
+					maxlength : 64
+				},
+				password : {
+					minlength : 5,
+					maxlength : 64
+				},
+			},
+			messages : {
+				nickname : {
+					required : "Especifica un apodo",
+					minlength : "El apodo debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 32 caracteres",
+				},
+				name : {
+					minlength : "El nombre debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 64 caracteres",
+				},
+				password : {
+					minlength : "La contraseña debe tener al menos 5 caracteres",
+					maxlength : "Máximo 64 caracteres",
+				},
+			},
+			errorPlacement : function(error, element) {
+				error.insertAfter(element);
+				error.addClass("help is-danger");
+				element.addClass("is-danger")
+			},
+			highlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+			unhighlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+		});
+	});
 </script>
 </head>
-</script>
 <body>
-	<header class="container">
-		<h1>BIENVENIDO A "APP"</h1>
-	</header>
-	<article class="container">
-		<form
-			class="form"
-			action="#"
-			id="register_form"
-			th:action="@{/register}"
-			th:object="${user}"
-			enctype="multipart/form-data"
-			method="post">
-			<h2 class="form-heading">Registro</h2>
-			<label
-				for="nickname"
-				class="">Apodo</label>
-			<input
-				type="text"
-				th:field="*{nickname}"
-				id="nickname"
-				name="nickname"
-				class="form-control"
-				placeholder="Nickname"
-				required
-				autofocus>
-			<span
-				th:if="${#fields.hasErrors('nickname')}"
-				th:errors="*{nickname}"></span>
-			<label
-				for="name"
-				class="">Nombre</label>
-			<input
-				type="text"
-				th:field="*{name}"
-				id="name"
-				name="name"
-				class="form-control"
-				placeholder="Name"
-				required>
-			<span
-				th:if="${#fields.hasErrors('name')}"
-				th:errors="*{name}"></span>
-			<label
-				for="avatar"
-				class="">Avatar</label>
-			<input
-				type="file"
-				name="avatar_image"
-				id="avatar"
-				accept="image/*"
-				class="form-control">
-			<label
-				for="inputPassword"
-				class="">Contrase&ntilde;a</label>
-			<span
-				th:if="${#fields.hasErrors('password')}"
-				th:errors="*{password}"></span>
-			<input
-				type="password"
-				th:field="*{password}"
-				id="inputPassword"
-				name="password"
-				class="form-control"
-				placeholder="Password"
-				required>
-			<label
-				for="checkPassword"
-				class="">Repite contrase&ntilde;a</label>
-			<input
-				type="password"
-				name="checkPassword"
-				id="checkPassword"
-				class="form-control"
-				placeholder="Retype Password"
-				required>
-			<input
-				class="btn btn-lg btn-primary btn-block"
-				type="submit"
-				value="Registrarse"
-				onclick="return matchPasswords()">
-		</form>
-		<section class="container form">
-			<h3>Ya tienes una cuenta?</h3>
-			<form
-				th:action="@{/}"
-				method="get">
-				<input
-					class="btn btn-lg btn-primary btn-block"
-					type="submit"
-					value="Log in">
-			</form>
+	<header th:replace="fragments/login_header :: header"></header>
+	<article>
+		<section class="section">
+			<h2 class="subtitle is-4">Introduce tu informaci&oacute;n</h2>
+			<div class="container has-text-centered">
+				<form
+					action="#"
+					id="register_form"
+					th:action="@{/register}"
+					th:object="${user}"
+					enctype="multipart/form-data"
+					method="post">
+					<div
+						class="notification is-danger"
+						th:if="${#fields.hasErrors('nickname')}">
+						<p th:errors="*{nickname}"></p>
+						<span class="icon is-small is-right"><i
+							class="fas fa-exclamation-triangle"></i></span>
+					</div>
+					<div
+						class="notification is-danger"
+						th:if="${#fields.hasErrors('name')}">
+						<p th:errors="*{name}"></p>
+						<span class="icon is-small is-right"><i
+							class="fas fa-exclamation-triangle"></i></span>
+					</div>
+					<div
+						class="notification is-danger"
+						th:if="${#fields.hasErrors('password')}">
+						<p th:errors="*{password}"></p>
+						<span class="icon is-small is-right"><i
+							class="fas fa-exclamation-triangle"></i></span>
+					</div>
+					<div class="field">
+						<label
+							for="nickname"
+							class="label">Apodo</label>
+						<div class="control has-icons-left">
+							<input
+								type="text"
+								th:field="*{nickname}"
+								id="nickname"
+								name="nickname"
+								class="input"
+								placeholder="Nickname"
+								required
+								autofocus>
+							<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+						</div>
+					</div>
+					<div class="field">
+						<label
+							for="name"
+							class="label">Nombre</label>
+						<div class="control has-icons-left">
+							<input
+								type="text"
+								th:field="*{name}"
+								id="name"
+								name="name"
+								class="input"
+								placeholder="Name"
+								required>
+							<span class="icon is-small is-left"><i
+								class="fas fa-signature"></i></span>
+						</div>
+					</div>
+					<div class="field">
+						<label
+							for="avatar"
+							class="label">Avatar</label>
+						<div class="control has-icons-left">
+							<input
+								type="file"
+								name="avatar_image"
+								id="avatar"
+								accept="image/*"
+								class="input">
+							<span class="icon is-small is-left"><i
+								class="fas fa-file-image"></i></span>
+						</div>
+					</div>
+					<div class="field">
+						<label
+							for="inputPassword"
+							class="label">Contrase&ntilde;a</label>
+						<div class="control has-icons-left">
+							<input
+								type="password"
+								th:field="*{password}"
+								id="inputPassword"
+								name="password"
+								class="input"
+								placeholder="Password"
+								required>
+							<span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+						</div>
+					</div>
+					<div class="field">
+						<label
+							for="checkPassword"
+							class="label">Repite contrase&ntilde;a</label>
+						<div class="control has-icons-left">
+							<input
+								type="password"
+								name="checkPassword"
+								id="checkPassword"
+								class="input"
+								placeholder="Retype Password"
+								required>
+							<span class="icon is-small is-left"><i class="fas fa-lock"></i>
+								<i class="fas fa-lock"></i></span>
+						</div>
+					</div>
+					<div class="field">
+						<div class="control">
+							<input
+								class="button is-primary is-medium is-fullwidth"
+								type="submit"
+								value="Registrarse"
+								onclick="return matchPasswords()">
+						</div>
+					</div>
+				</form>
+			</div>
+		</section>
+		<section class="section">
+			<div class="container has-text-centered">
+				<h3 class="subtitle is-5">¿Ya tienes una cuenta?</h3>
+				<form
+					th:action="@{/}"
+					method="get">
+					<div class="field">
+						<div class="control">
+							<input
+								class="button is-medium is-info is-outlined is-fullwidth"
+								type="submit"
+								value="Logu&eacute;ate">
+						</div>
+					</div>
+				</form>
+			</div>
 		</section>
 	</article>
-	<footer class="container">oc pls dont steal</footer>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
