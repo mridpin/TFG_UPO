@@ -2,7 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<title></title>
+<title>Crear partida</title>
+<link
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
+<link
+	href="css/bulma.css"
+	rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script
@@ -25,8 +33,7 @@
 			if (tdname && tdscenario) {
 				var tdnametext = $(tdname).text().toLowerCase();
 				var tdscenariotext = $(tdscenario).text().toLowerCase();
-				var keep = (tdnametext.indexOf(filter) > -1)
-						|| (tdscenariotext.indexOf(filter) > -1);
+				var keep = (tdnametext.indexOf(filter) > -1) || (tdscenariotext.indexOf(filter) > -1);
 				if (keep) {
 					$(trs[i]).show();
 				} else {
@@ -40,121 +47,110 @@
 		$("#scenario").val(name);
 		$("#scenario_id").val(id);
 	}
-	
+
 	$.validator.addMethod("validUser", function(value, element) {
 		var res = true;
 		var players = [];
 		$.each($("td.nickname_cell"), function(index, val) {
 			players.push($(val).text());
 		});
-	    res = res && (players.indexOf(value) == -1);
-	    return res;
+		res = res && (players.indexOf(value) == -1);
+		return res;
 	});
-	
-	$(document).ready(function () {
-		 $("#game_form").validate({
-			 focusCleanup: true,
-			 rules: {
-				 name: {
-					 required: true,
-					 minlength: 2,
-					 maxlength: 64
-				 },
-				 scenario_id: {
-					 required: true,
-				 },
-				 scenario: {
-					 required: true,
-				 },
-				 player_nickname: {
-					 required: true,
-					 minlength: 2,
-					 maxlength: 32,					 
-				 }
-			 },
-			 messages: {
-				 name: {
-	                required: "Especifica un nombre para la partida",
-	                minlength: "El nombre debe tener 2 caracteres como mínimo",
-	                maxlength: "Máximo 64 caracteres",
-				 },
-				 scenario_id: {
-					 required: "Debes elegir un escenario de la lista de abajo"
-				 },
-				 scenario: {
-					 required: "Debes elegir un escenario de la lista de abajo"
-				 },
-				 player_nickname: {
-		                required: "Especifica un apodo de jugador",
-		                minlength: "El apodo debe tener 2 caracteres como mínimo",
-		                maxlength: "Máximo 32 caracteres",
-				 }
-			 },
-			 errorPlacement: function(error, element) {
-		            error.insertBefore(element);
-		            error.addClass("red");
-			 },
-			 highlight: function (element) {
-				 $(element).removeClass("border-red");
-		     },
-		     unhighlight: function (element) {
-		    	 $(element).removeClass("border-red");
-		    	 // TODO: RED STYLE ERRORS
-		     },
-		 });
-		 $("#country_form").validate({
-			 focusCleanup: true,
-			 rules: {
-				 player_nickname: {
-					 required: true,
-					 minlength: 2,
-					 maxlength: 32,	
-					 validUser: true,
-					 noPlayers: true,
-				 }
-			 },
-			 messages: {
-				 player_nickname: {
-		                required: "Especifica un apodo de jugador",
-		                minlength: "El apodo debe tener 2 caracteres como mínimo",
-		                maxlength: "Máximo 32 caracteres",
-		                validUser: "El usuario ya ha sido añadido a la partida"
-				 }
-			 },
-			 errorPlacement: function(error, element) {
-		            error.insertBefore(element);
-		            error.addClass("red");
-			 },
-			 highlight: function (element) {
-				 $(element).removeClass("border-red");
-		     },
-		     unhighlight: function (element) {
-		    	 $(element).removeClass("border-red");
-		    	 // TODO: RED STYLE ERRORS
-		     },
-		 });
+
+	$(document).ready(function() {
+		$("#game_formo").validate({
+			focusCleanup : true,
+			rules : {
+				name : {
+					required : true,
+					minlength : 2,
+					maxlength : 64
+				},
+				scenario_id : {
+					required : true,
+				},
+				scenario : {
+					required : true,
+				},
+				player_nickname : {
+					required : true,
+					minlength : 2,
+					maxlength : 32,
+				}
+			},
+			messages : {
+				name : {
+					required : "Especifica un nombre para la partida",
+					minlength : "El nombre debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 64 caracteres",
+				},
+				scenario_id : {
+					required : "Debes elegir un escenario de la lista de abajo"
+				},
+				scenario : {
+					required : "Debes elegir un escenario de la lista de abajo"
+				},
+				player_nickname : {
+					required : "Especifica un apodo de jugador",
+					minlength : "El apodo debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 32 caracteres",
+				}
+			},
+			errorPlacement : function(error, element) {
+				error.insertBefore(element);
+				error.addClass("red");
+			},
+			highlight : function(element) {
+				$(element).removeClass("border-red");
+			},
+			unhighlight : function(element) {
+				$(element).removeClass("border-red");
+				// TODO: RED STYLE ERRORS
+			},
+		});
+		$("#country_form").validate({
+			focusCleanup : true,
+			rules : {
+				player_nickname : {
+					required : true,
+					minlength : 2,
+					maxlength : 32,
+					validUser : true,
+					noPlayers : true,
+				}
+			},
+			messages : {
+				player_nickname : {
+					required : "Especifica un apodo de jugador",
+					minlength : "El apodo debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 32 caracteres",
+					validUser : "El usuario ya ha sido añadido a la partida"
+				}
+			},
+			errorPlacement : function(error, element) {
+				error.insertAfter(element);
+				error.addClass("help is-danger");
+				element.addClass("is-danger")
+			},
+			highlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+			unhighlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+		});
 	});
 </script>
-
 </head>
-<body>
-	<nav>
-		<form
-			action="#"
-			th:action="@{/landing}"
-			method="get">
-			<input
-				type="submit"
-				value="Volver a la p&aacute;gina principal">
-		</form>
-	</nav>
-	<article>
-		<h2 th:if="${session.scenario == null}">Crear partida</h2>
-		<h2 th:if="${session.scenario != null}">
-			Creando partida: <span th:text="${session.newGameName}"></span>
-		</h2>
-		<div th:if="${session.fail?.validate() == false}">
-			<h4>Se han detectado los siguientes errores:</h4>
+<body class="content">
+	<header th:replace="fragments/session_header :: header"></header>
+	<section
+		class="section"
+		th:if="${session.fail?.validate() == false}">
+		<div class="container box">
+			<h4 class="subtitle is-4 notification is-danger">Se han
+				detectado los siguientes errores:</h4>
 			<ul>
 				<li
 					class="valdiation_error"
@@ -170,81 +166,90 @@
 					th:text="${session?.fail?.scenarioError}"></li>
 			</ul>
 		</div>
-		<form
-			th:if="${session.scenario != null}"
-			action="#"
-			th:action="@{/removeScenario}"
-			method="post">
-			<input
-				type="submit"
-				value="Reiniciar creaci&oacute;n">
-		</form>
-		<section th:if="${session.scenario == null}">
-			<h3>Primero, elige un escenario</h3>
+	</section>
+	<section
+		class="section"
+		th:if="${session.scenario == null}">
+		<div class="container">
+			<h2
+				class="subtitle is-3"
+				th:if="${session.scenario == null}">Crear partida</h2>
+			<h3 class="subtitle is-4">Primero, elige un escenario</h3>
 			<form
 				class="form"
 				action="#"
 				id="game_form"
 				th:action="@{/addScenario}"
 				method="post">
-				<label
-					for="name"
-					class="">Nombre</label>
-				<input
-					type="text"
-					id="name"
-					name="name"
-					class="form-control"
-					placeholder="Nombre"
-					th:value="${session.newGameName != null ? session.newGameName : ''}"
-					th:readonly="${session.newGameName != null}"
-					required
-					autofocus>
-				<label
-					for="scenario"
-					class="">Escenario</label>
-				<input
-					type="text"
-					id="scenario"
-					name="scenario"
-					class="form-control"
-					placeholder="Selecciona uno abajo"
-					th:value="${session.scenario?.name}"
-					readonly="readonly"
-					required>
+				<div class="field">
+					<label
+						for="name"
+						class="label">Nombre de la partida</label>
+					<div class="control">
+						<input
+							type="text"
+							id="name"
+							name="name"
+							class="input"
+							placeholder="Nombre"
+							th:value="${session.newGameName != null ? session.newGameName : ''}"
+							th:readonly="${session.newGameName != null}"
+							required
+							autofocus>
+					</div>
+				</div>
+				<div class="field">
+					<label
+						for="scenario"
+						class="label">Escenario</label>
+					<div class="control">
+						<input
+							type="text"
+							id="scenario"
+							name="scenario"
+							class="input"
+							placeholder="Selecciona uno abajo"
+							th:value="${session.scenario?.name}"
+							readonly="readonly"
+							required>
+					</div>
+				</div>
 				<input
 					type="hidden"
 					name="scenario_id"
 					id="scenario_id"
 					th:value="${session.scenario?.id}">
-				<input
-					type="submit"
-					value="Confirmar Escenario">
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-medium is-primary is-outlined is-fullwidth"
+							type="submit"
+							value="Confirmar Escenario">
+					</div>
+				</div>
 			</form>
-		</section>
-		<section th:if="${session.scenario != null}">
-			<h3>¡Tu escenario se ha creado con &eacute;xito!</h3>
-			<p>Escenario seleccionado:</p>
-			<ul>
-				<li th:text="${'Nombre: ' + session.scenario.name}"></li>
-				<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
-				<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
-				<li>
-					<a
-						th:href="@{|/downloads/scenarios?id=${session.scenario.id}|}"
-						download>Descargar Escenario</a>
-				</li>
-			</ul>
-		</section>
-		<section th:if="${session.scenario == null}">
-			<h3>Escenarios</h3>
-			<input
-				type="text"
-				id="search_box"
-				placeholder="Buscar por nombre o etiquetas..."
-				onkeyup="searchScenario()">
+		</div>
+	</section>
+	<section
+		class="section"
+		th:if="${session.scenario == null}">
+		<div class="container">
+			<h3 class="subtitle is-4">Escenarios</h3>
+			<div class="field">
+				<div class="control has-icons-left">
+					<input
+						type="text"
+						id="search_box"
+						class="input"
+						placeholder="Buscar por nombre o etiquetas..."
+						onkeyup="searchScenario()">
+					<span class="icon is-small is-left"><i class="fas fa-search"></i></span>
+				</div>
+			</div>
 			<div style="height: 25%; overflow-y: scroll;">
-				<table id="scenario_table">
+				<table
+					class="table"
+					id="scenario_table">
 					<tr>
 						<th>Nombre</th>
 						<th>Pablabras clave</th>
@@ -262,152 +267,185 @@
 							th:text="${scenario.description}"
 							class="scenario_tags"></td>
 						<td th:text="${scenario.author.name}"></td>
-						<td><a
+						<td class="has-icon-left"><span class="icon is-small is-left"><i
+								class="fas fa-download"></i></span> <a
 							th:href="@{|/downloads/scenarios?id=${scenario.id}|}"
 							download>Descargar</a></td>
 						<td><button
+								class="button is-outlined is-primary"
 								th:onclick="@{|selectScenario(${scenario.id}, '${scenario.name}');|}">Seleccionar</button></td>
 					</tr>
 				</table>
-				<p>¿No te gusta ninguno?</p>
-				<form
-					style="display: inline;"
-					action="#"
-					th:action="@{/createScenario}">
-					<input
-						type="submit"
-						value="Crea tu propio escenario aqu&iacute;!">
-				</form>
 			</div>
-		</section>
-		<section th:if="${session.scenario != null}">
-			<h3>Se han detectado estos turnos:</h3>
-			<div>
-				<table border="2">
-					<tr>
-						<th>Turno</th>
-						<th>Nombre del subescenario</th>
-					</tr>
-					<tr th:each="turn, turnStat : ${session.turns}">
-						<td th:text="${turnStat?.index + 1}"></td>
-						<td th:text="${turn?.subscenario}"></td>
-					</tr>
-				</table>
-			</div>
-		</section>
-		<section th:if="${session.scenario != null}">
-			<h3>Ahora, invita a tus jugadores</h3>
-			<div th:if="${session.fail?.validate() == false}">
-				<h4>Se han detectado los siguientes errores con ese jugador:</h4>
-				<ul>
-					<li
-						class="valdiation_error"
-						th:if="${session?.fail?.addedGMError != null}"
-						th:text="${session?.fail?.addedGMError}"></li>
-					<li
-						class="valdiation_error"
-						th:if="${session?.fail?.playerDoesntExistError != null}"
-						th:text="${session?.fail?.playerDoesntExistError}"></li>
-					<li
-						class="valdiation_error"
-						th:if="${session?.fail?.duplicatePlayerError != null}"
-						th:text="${session?.fail?.duplicatePlayerError}"></li>
-					<li
-						class="valdiation_error"
-						th:if="${session?.fail?.duplicateCountryError != null}"
-						th:text="${session?.fail?.duplicateCountryError}"></li>
-					<li
-						class="valdiation_error"
-						th:if="${session?.fail?.countryFileError != null}">Errores en
-						el fichero:</li>
-					<li
-						style="list-style: none;"
-						class="valdiation_error_file"
-						th:if="${session?.fail?.countryFileError != null}">
-						<ul th:each="error : ${session?.fail?.countryFileError}">
-							<li th:text="${error}"></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-			<div>
-				<h4>Jugadores a&ntilde;adidos</h4>
-				<table border="2">
-					<tr>
-						<th>Jugador</th>
-						<th>Pa&iacute;s</th>
-						<th></th>
-					</tr>
-					<tr th:each="country, countryStat : ${session.countries}">
-						<td class="nickname_cell" th:text="${country?.player?.nickname}"></td>
-						<td class="country_cell" th:text="${country?.name}"></td>
-						<td>
-							<form
-								action="#"
-								th:action="@{/removePlayer}"
-								method="post">
-								<input
-									type="hidden"
-									name="countryIndex"
-									th:value="${countryStat.index}">
-								<input
-									type="submit"
-									value="Quitar jugador">
-							</form>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div>
-				<h4>A&ntilde;ade un nuevo jugador</h4>
-				<form
-					class="form"
-					action="#"
-					id="country_form"
-					th:action="@{/addCountry}"
-					method="post"
-					enctype="multipart/form-data">
-					<label
-						for="playerName"
-						class="">Apodo del jugador</label>
-					<input
-						type="text"
-						id="player_nickname"
-						name="player_nickname"
-						class="form-control"
-						placeholder="Apodo..."
-						th:value="${playerName}"
-						required
-						autofocus>
-					<label
-						for="countryData"
-						class="">Datos del pa&iacute;s</label>
-					<input
-						type="file"
-						id="country_data"
-						name="country_data"
-						class="form-control"
-						accept=".csv"
-						required>
-					<input
-						class="btn btn-lg btn-primary btn-block"
-						type="submit"
-						value="A&ntilde;adir Jugador">
-				</form>
-			</div>
-		</section>
-		<section
-			th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
+			<p class="subtitle is-5">¿No te gusta ninguno?</p>
 			<form
+				style="display: inline;"
 				action="#"
-				id="create_game_form"
-				th:action="@{/submitGame}"
-				method="post">
+				th:action="@{/createScenario}">
 				<input
+					class="button is-medium is-info is-outlined is-fullwidth"
 					type="submit"
-					value="Finalizar Creaci&oacute;n">
+					value="Crea tu propio escenario aqu&iacute;!">
 			</form>
-		</section>
-	</article>
+		</div>
+	</section>
+	<section th:if="${session.scenario != null}">
+		<h2 th:if="${session.scenario != null}">
+			Creando partida: <span th:text="${session.newGameName}"></span>
+		</h2>
+		<h3>¡Tu escenario se ha creado con &eacute;xito!</h3>
+		<p>Escenario seleccionado:</p>
+		<ul>
+			<li th:text="${'Nombre: ' + session.scenario.name}"></li>
+			<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
+			<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
+			<li>
+				<a
+					th:href="@{|/downloads/scenarios?id=${session.scenario.id}|}"
+					download>Descargar Escenario</a>
+			</li>
+		</ul>
+		<form
+			th:if="${session.scenario != null}"
+			action="#"
+			th:action="@{/removeScenario}"
+			method="post">
+			<input
+				type="submit"
+				value="Reiniciar creaci&oacute;n">
+		</form>
+	</section>
+	<section th:if="${session.scenario != null}">
+		<h3>Se han detectado estos turnos:</h3>
+		<div>
+			<table class="table is-striped">
+				<tr>
+					<th>Turno</th>
+					<th>Nombre del subescenario</th>
+				</tr>
+				<tr th:each="turn, turnStat : ${session.turns}">
+					<td th:text="${turnStat?.index + 1}"></td>
+					<td th:text="${turn?.subscenario}"></td>
+				</tr>
+			</table>
+		</div>
+	</section>
+	<section th:if="${session.scenario != null}">
+		<h3>Ahora, invita a tus jugadores</h3>
+		<div th:if="${session.fail?.validate() == false}">
+			<h4>Se han detectado los siguientes errores con ese jugador:</h4>
+			<ul>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.addedGMError != null}"
+					th:text="${session?.fail?.addedGMError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.playerDoesntExistError != null}"
+					th:text="${session?.fail?.playerDoesntExistError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.duplicatePlayerError != null}"
+					th:text="${session?.fail?.duplicatePlayerError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.duplicateCountryError != null}"
+					th:text="${session?.fail?.duplicateCountryError}"></li>
+				<li
+					class="valdiation_error"
+					th:if="${session?.fail?.countryFileError != null}">Errores en
+					el fichero:</li>
+				<li
+					style="list-style: none;"
+					class="valdiation_error_file"
+					th:if="${session?.fail?.countryFileError != null}">
+					<ul th:each="error : ${session?.fail?.countryFileError}">
+						<li th:text="${error}"></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<div>
+			<h4>Jugadores a&ntilde;adidos</h4>
+			<table border="2">
+				<tr>
+					<th>Jugador</th>
+					<th>Pa&iacute;s</th>
+					<th></th>
+				</tr>
+				<tr th:each="country, countryStat : ${session.countries}">
+					<td
+						class="nickname_cell"
+						th:text="${country?.player?.nickname}"></td>
+					<td
+						class="country_cell"
+						th:text="${country?.name}"></td>
+					<td>
+						<form
+							action="#"
+							th:action="@{/removePlayer}"
+							method="post">
+							<input
+								type="hidden"
+								name="countryIndex"
+								th:value="${countryStat.index}">
+							<input
+								type="submit"
+								value="Quitar jugador">
+						</form>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<h4>A&ntilde;ade un nuevo jugador</h4>
+			<form
+				class="form"
+				action="#"
+				id="country_form"
+				th:action="@{/addCountry}"
+				method="post"
+				enctype="multipart/form-data">
+				<label
+					for="playerName"
+					class="">Apodo del jugador</label>
+				<input
+					type="text"
+					id="player_nickname"
+					name="player_nickname"
+					class="form-control"
+					placeholder="Apodo..."
+					th:value="${playerName}"
+					required
+					autofocus>
+				<label
+					for="countryData"
+					class="">Datos del pa&iacute;s</label>
+				<input
+					type="file"
+					id="country_data"
+					name="country_data"
+					class="form-control"
+					accept=".csv"
+					required>
+				<input
+					class="btn btn-lg btn-primary btn-block"
+					type="submit"
+					value="A&ntilde;adir Jugador">
+			</form>
+		</div>
+	</section>
+	<section
+		th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
+		<form
+			action="#"
+			id="create_game_form"
+			th:action="@{/submitGame}"
+			method="post">
+			<input
+				type="submit"
+				value="Finalizar Creaci&oacute;n">
+		</form>
+	</section>
 </body>
 </html>

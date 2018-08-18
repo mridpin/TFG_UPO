@@ -1,0 +1,49 @@
+
+<header class="hero is-primary is-bold">
+	<div class="hero-body">
+		<div class="container">
+			<div class="level">
+				<div class="level-item">
+					<h3
+						class="subtitle is-4"
+						th:text="${session.user.name} + ': '"></h3>
+				</div>
+				<div class="level-item">
+					<a href="/landing" class="is-outlined"><img
+						style="border-radius: 30%;"
+						width="168px"
+						th:src="@{/} + ${session.user.avatar}"></a>
+				</div>
+				<div class="level-item">
+					<div class="">
+						<div class="field">
+							<form
+								action="#"
+								th:action="@{/profile}"
+								method="get">
+								<input
+									class="button is-medium is-fullwidth is-rounded is-info"
+									type="submit"
+									value="Edit">
+							</form>
+						</div>
+						<div class="field">
+							<form
+								action="#"
+								th:action="@{/logout}"
+								method="post">
+								<input
+									class="button is-medium is-fullwidth is-rounded is-warning is-outlined"
+									type="submit"
+									value="Logout">
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="level-item">
+					<a href="/landing" class="is-outlined navbar-item"><p class="title is-1">"NOMBRE DEL JUEGO"</p></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>

@@ -112,7 +112,7 @@ public class GameController {
 			}
 			boolean access = Objects.equals(user, master);
 			if (!access) {
-				return "game_player";
+				return "game_main";
 			} else {
 				return "game_main";
 			}
@@ -312,16 +312,19 @@ public class GameController {
 
 	@PostMapping("/closeGame")
 	public String closeGame(@RequestParam(name = "pass", required = true) String pass,
-			HttpSession session) {
+			HttpSession session, RedirectAttributes redirectAttributes) {
 		// TODO: Show error message if incorrect password
 		User user = (User) session.getAttribute("user");
-		if (Objects.equals(pass, user.getPassword())) {
-			Game game = (Game) session.getAttribute("game");
+		Game game = (Game) session.getAttribute("game");
+		if (Objects.equals(pass, user.getPassword())) {			
 			gServ.closeGame(game);
 			session.removeAttribute("game");
 			return "redirect:/landing";
+		} else {
+			redirectAttributes.addAttribute("game_id", game.getId());
+			session.setAttribute("wrongPass", "Contraseña no válida");
+			return "redirect:/openGame";
 		}
-		return "game_main";
 	}
 
 	@PostMapping("/nextTurn")

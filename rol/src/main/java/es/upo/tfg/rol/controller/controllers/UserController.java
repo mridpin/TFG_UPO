@@ -55,6 +55,7 @@ public class UserController {
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
 		session.removeAttribute("user");
+		session.invalidate();
 		return "index";
 	}
 

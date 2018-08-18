@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Partida en curso</title>
+<link
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
+<link
+	href="css/bulma.css"
+	rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script
@@ -19,57 +27,50 @@
 		var modal = $("div#" + id + "_modal");
 		$(modal).hide();
 	}
-	$(document)
-			.ready(
-					function() {
-						// Show total scores
-						var tables = $(".rolls_per_turn");
-						for (var t = 0; t < tables.length; t++) {
-							var attackerScores = $(tables[t]).find(
-									"td.attacker_score_cell");
-							var attackerTotal = 0.0;
-							for (var r = 0; r < attackerScores.length; r++) {
-								attackerTotal += parseFloat($(attackerScores[r])
-										.text());
-							}
-							var defenderScores = $(tables[t]).find(
-									"td.defender_score_cell");
-							var defenderTotal = 0.0;
-							for (var r = 0; r < defenderScores.length; r++) {
-								defenderTotal += parseFloat($(defenderScores[r])
-										.text());
-							}
-							$(tables[t]).find("th.attacker_score").text(
-									attackerTotal.toFixed(2));
-							$(tables[t]).find("th.defender_score").text(
-									defenderTotal.toFixed(2));
+	$(document).ready(function() {
+		// Alert for next turn
+		$("#next_turn_button").click(function() {
+			return confirm("ATENCIÓN! Se va a proceder a avanzar al siguiente turno.\n Esta acción es irreversible");
+		});
+		// Show total scores
+		var tables = $(".rolls_per_turn");
+		for (var t = 0; t < tables.length; t++) {
+			var attackerScores = $(tables[t]).find("td.attacker_score_cell");
+			var attackerTotal = 0.0;
+			for (var r = 0; r < attackerScores.length; r++) {
+				attackerTotal += parseFloat($(attackerScores[r]).text());
+			}
+			var defenderScores = $(tables[t]).find("td.defender_score_cell");
+			var defenderTotal = 0.0;
+			for (var r = 0; r < defenderScores.length; r++) {
+				defenderTotal += parseFloat($(defenderScores[r]).text());
+			}
+			$(tables[t]).find("th.attacker_score").text(attackerTotal.toFixed(2));
+			$(tables[t]).find("th.defender_score").text(defenderTotal.toFixed(2));
 
-							// Hide detail tables
-							$(".roll_detail").hide();
-						}
-					});
+			// Hide detail tables
+			$(".roll_detail").hide();
+		}
+	});
 </script>
 </head>
-<body>
-	<header></header>
-	<nav>
-		<form
-			action="#"
-			th:action="@{/landing}"
-			method="get">
-			<input
-				type="submit"
-				value="Volver a la p&aacute;gina principal">
-		</form>
-	</nav>
-	<article>
-		<h2>
-			<span th:text="${game.name}"></span> - <span
-				th:text="${game.master.nickname}"></span>
-		</h2>
-		<section>
+<body class="content">
+	<header th:replace="fragments/session_header :: header"></header>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-3">
+				<span th:text="${game.name}"></span> - <span
+					th:text="${game.master.nickname}"></span>
+			</h3>
+			<div
+				class="notification is-danger has-text-centered"
+				th:if="${session.wrongPass != null}">
+				<p th:text="${session.wrongPass}"></p>
+				<span class="icon is-small is-right"><i
+					class="fas fa-exclamation-triangle"></i></span>
+			</div>
 			<h3>Participantes</h3>
-			<table border="2">
+			<table class="table is-striped is-narrow">
 				<tr>
 					<th>Jugador</th>
 					<th>Pa&iacute;s</th>
@@ -79,13 +80,18 @@
 					<td th:text="${country.name}"></td>
 				</tr>
 			</table>
-		</section>
-		<section>
-			<h3>Enfrentamientos</h3>
-			<p>
-				<a
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3>Enfrentamientos: TODO: HIDE-COLLAPSE WARS AND TURNS BY
+				CLICKING</h3>
+			<p class="has-icons-left has-icons-right">
+				<span class="icon is-small is-left"><i
+					class="fas fa-download"></i></span> <a
 					th:href="@{|/downloads/scenarios?id=${session.game.scenario.id}|}"
-					download>Descargar Escenario</a>
+					download>Descargar Escenario</a> <span
+					class="icon is-small is-right"><i class="fas fa-download"></i></span>
 			<p>
 			<ul id="turn_list">
 				<li th:each="turn, turnStats : ${turns}">
@@ -93,12 +99,11 @@
 					<ul class="wars_per_turn">
 						<li th:each="war, warStats : ${wars[turnStats.index]}">
 							<h4 th:text="${war.name}"></h4>
-							<table
-								border="1"
-								class="rolls_per_turn">
+							<table class="rolls_per_turn table is-striped">
 								<tr>
 									<th th:text="${war.rolls[0].attacker.name}"></th>
 									<th th:text="${war.rolls[0].defender.name}"></th>
+									<th>Detalles</th>
 								</tr>
 								<th:block th:each="roll, rollStats : ${war.rolls}">
 									<tr class="score_rows">
@@ -109,6 +114,7 @@
 											class="defender_score_cell"
 											th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></td>
 										<td><button
+												class="button is-outlined is-info"
 												th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
 												onclick="openRoll(this.value)">Detalles</button></td>
 									</tr>
@@ -184,6 +190,7 @@
 								</tr>
 								<tr>
 									<td colspan="4"><button
+											class="button is-outlined is-info is-fullwidth"
 											th:value="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
 											onclick="closeRoll(this.value)">Cerrar</button></td>
 								</tr>
@@ -192,9 +199,54 @@
 					</th:block>
 				</th:block>
 			</th:block>
-		</section>
-		<section>
-			<h3>
+		</div>
+	</section>
+	<section
+		class="section"
+		th:if="${game.endDate == null and game.master==session.user}"
+		th:switch="${war!=null}">
+		<div class="container">
+			<div th:case="${true}">
+				<h3 class="subtitle is-4">Retomar enfrentamientos</h3>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/war}"
+					method="get">
+					<input
+						type="hidden"
+						name="war_id"
+						th:value="${war.id}">
+					<input
+						class="button is-primary is-medium is-fullwidth is-outlined"
+						type="submit"
+						value="Retomar Enfrentamiento en curso">
+				</form>
+			</div>
+			<div th:case=${false}>
+				<h3 class="subtitle is-4">Crear enfrentamientos</h3>
+				<form
+					class="form"
+					action="#"
+					th:action="@{/war}"
+					method="get">
+					<input
+						type="hidden"
+						name="war_id"
+						value="">
+					<input
+						class="button is-primary is-medium is-fullwidth is-outlined"
+						type="submit"
+						value="Comenzar Enfrentamiento">
+				</form>
+			</div>
+		</div>
+	</section>
+	<section
+		class="section"
+		th:if="${game.master==session.user}">
+		<div class="container">
+			<h3 class="subtitle is-4">
 				Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span>
 			</h3>
 			<p>
@@ -207,74 +259,48 @@
 				th:action="@{/nextTurn}"
 				method="post">
 				<input
-					class=""
+					class="button is-link is-medium is-fullwidth is-outlined"
+					id="next_turn_button"
 					type="submit"
 					value="Avanzar Turno"
 					th:disabled="${nextTurn==null}">
 			</form>
-		</section>
-		<section
-			th:if="${game.endDate == null}"
-			th:switch="${war!=null}">
-			<div th:case="${true}">
-				<h3>Retomar enfrentamientos</h3>
-				<form
-					class="form"
-					action="#"
-					th:action="@{/war}"
-					method="get">
-					<input
-						type="hidden"
-						name="war_id"
-						th:value="${war.id}">
-					<input
-						class="btn btn-lg btn-primary btn-block"
-						type="submit"
-						value="Retomar Enfrentamiento en curso">
-				</form>
-			</div>
-			<div th:case=${false}>
-				<h3>Crear enfrentamientos</h3>
-				<form
-					class="form"
-					action="#"
-					th:action="@{/war}"
-					method="get">
-					<input
-						type="hidden"
-						name="war_id"
-						value="">
-					<input
-						class="btn btn-lg btn-primary btn-block"
-						type="submit"
-						value="Comenzar Enfrentamiento">
-				</form>
-			</div>
-		</section>
-		<section th:if="${game.endDate == null}">
-			<h3>Cerrar partida</h3>
+		</div>
+	</section>
+	<section
+		class="section"
+		th:if="${game.endDate == null and game.master==session.user}">
+		<div class="container">
+			<h3 class="subtitle is-4">Cerrar partida</h3>
 			<form
 				class="form"
 				action="#"
 				th:action="@{/closeGame}"
 				method="post">
-				<label
-					for="password"
-					class="">Contrase&ntilde;a del Game Master:</label>
-				<input
-					type="password"
-					name="pass"
-					id="password"
-					class="form-control"
-					placeholder="Password..."
-					required>
-				<input
-					class="btn btn-lg btn-primary btn-block"
-					type="submit"
-					value="Autorizar"
-					onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
+				<div class="field">
+					<label
+						for="password"
+						class="label">Contrase&ntilde;a del Game Master:</label>
+					<div class="control">
+						<input
+							type="password"
+							name="pass"
+							id="password"
+							class="input"
+							placeholder="Password..."
+							required>
+					</div>
+				</div>
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-warning is-medium is-fullwidth"
+							type="submit"
+							value="Autorizar"
+							onclick="return confirm('!!! CUIDADO !!! \n ¿Est&aacute;s seguro de que quieres cerrar esta partida? \nEsta acci&oacute;n es final e irreversible: una vez cerrada una partida, no se puede volver a abrir')">
+					</div>
+				</div>
 			</form>
-		</section>
-	</article>
-</body>
+		</div>
+	</section>
 </html>
