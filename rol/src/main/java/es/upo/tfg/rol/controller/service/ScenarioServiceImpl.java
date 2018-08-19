@@ -249,6 +249,9 @@ public class ScenarioServiceImpl implements ScenarioService {
 				}
 				n++;
 			}
+			if (line == null && n==1) {
+				res.add("El fichero está vacío");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			res.add("Error de apertura de fichero");

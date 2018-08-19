@@ -19,14 +19,35 @@
 <script type="text/javascript">
 	function openRoll(id) {
 		var modal = $("div#" + id + "_modal");
-		$(modal).show();
+		$(modal).toggle();
 	}
 
-	//TODO: TEMPORAARY, MAAKE AA PROPER MODAL
 	function closeRoll(id) {
 		var modal = $("div#" + id + "_modal");
 		$(modal).hide();
 	}
+	function toggleTurn(id) {
+		var turnList = $("ul#" + id);
+		$(turnList).toggle();
+	}
+	function toggleWar(id) {
+		var warList = $("table#" + id);
+		$(warList).toggle();
+	}
+
+	function showAll() {
+		var toggles = $(".toggleable");
+		$.each(toggles, function(key, value) {
+			$(value).show();
+		});
+	}
+	function hideAll() {
+		var toggles = $(".toggleable");
+		$.each(toggles, function(key, value) {
+			$(value).hide();
+		});
+	}
+	// TODO: BUTTON TO TOGGLE SHOW ALL
 	$(document).ready(function() {
 		// Alert for next turn
 		$("#next_turn_button").click(function() {
@@ -68,7 +89,6 @@
 				<p th:text="${session.wrongPass}"></p>
 				<span class="icon is-small is-right"><i
 					class="fas fa-exclamation-triangle"></i></span>
-			</div>
 			<h3>Participantes</h3>
 			<table class="table is-striped is-narrow">
 				<tr>
@@ -84,22 +104,45 @@
 	</section>
 	<section class="section">
 		<div class="container">
-			<h3>Enfrentamientos: TODO: HIDE-COLLAPSE WARS AND TURNS BY
-				CLICKING</h3>
-			<p class="has-icons-left has-icons-right">
-				<span class="icon is-small is-left"><i
-					class="fas fa-download"></i></span> <a
-					th:href="@{|/downloads/scenarios?id=${session.game.scenario.id}|}"
-					download>Descargar Escenario</a> <span
-					class="icon is-small is-right"><i class="fas fa-download"></i></span>
-			<p>
+			<h3 class="subtitle is-4">Enfrentamientos</h3>
+			<div class="level">
+				<div class="level-item has-centered-text">
+					<a
+						class="button is-fullwidth is-info is-outlined has-icons-left has-icons-right"
+						th:href="@{|/downloads/scenarios?id=${session.game.scenario.id}|}"
+						download> <span class="icon is-small is-left"><i
+							class="fas fa-download"></i></span> Descargar Escenario <span
+						class="icon is-small is-right"><i class="fas fa-download"></i></span>
+					</a>
+				</div>
+				<div class="level-item has-centered-text">
+					<button class="button is-fullwidth is-info is-outlined" onclick="showAll();">Abrir
+						todos</button>
+				</div>
+				<div class="level-item has-centered-text">
+					<button class="button is-fullwidth is-info is-outlined" onclick="hideAll();">Colapsar
+						todos</button>
+				</div>
+			</div>
 			<ul id="turn_list">
 				<li th:each="turn, turnStats : ${turns}">
-					<span th:text="${turn.subscenario}"></span>
-					<ul class="wars_per_turn">
+					<a
+						th:name="${'turn' + turnStats.index}"
+						onclick="toggleTurn(this.name);"><span
+						class="subtitle is-4"
+						th:text="${turn.subscenario}"></span></a>
+					<ul
+						th:id="${'turn' + turnStats.index}"
+						class="wars_per_turn toggleable">
 						<li th:each="war, warStats : ${wars[turnStats.index]}">
-							<h4 th:text="${war.name}"></h4>
-							<table class="rolls_per_turn table is-striped">
+							<a
+								th:name="${'turn' + turnStats.index + '_war' + warStats.index}"
+								onclick="toggleWar(this.name);"><h4
+									class="subtitle is-5"
+									th:text="${war.name}"></h4></a>
+							<table
+								th:id="${'turn' + turnStats.index + '_war' + warStats.index}"
+								class="rolls_per_turn table is-bordered is-striped toggleable">
 								<tr>
 									<th th:text="${war.rolls[0].attacker.name}"></th>
 									<th th:text="${war.rolls[0].defender.name}"></th>
@@ -118,12 +161,95 @@
 												th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
 												onclick="openRoll(this.value)">Detalles</button></td>
 									</tr>
+									<tr>
+										<td colspan="3"><div
+												class="roll_detail toggleable"
+												th:id="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index + '_modal'}">
+												<table
+													style="display: table; width: 100%; table-layout: fixed;"
+													class="table is-bordered is-narrow"
+													th:id="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}">
+													<tr>
+														<th colspan="4">Puntuaci&oacute;n</th>
+													</tr>
+													<tr>
+														<th
+															style="display: table-cell"
+															colspan="2"
+															th:text="${roll.attacker.name}"></th>
+														<th
+															style="display: table-cell"
+															colspan="2"
+															th:text="${roll.defender.name}"></th>
+													</tr>
+													<tr>
+														<td
+															style="display: table-cell"
+															colspan="2">
+															<table
+																id="last_attacker_result_table"
+																class="is-bordered table is-narrow"
+																style="width: 100%;">
+																<tr
+																	th:each="inv, invStats : ${roll.attacker.involvements}">
+																	<td
+																		class="last_attacker_country_name"
+																		th:text="${inv.country.name}"></td>
+																	<td
+																		class="last_attacker_country_percent"
+																		th:text="${inv.involvementPercent}"></td>
+																</tr>
+															</table>
+													</td>
+													<td
+														style="display: table-cell"
+														colspan="2">
+														<table
+															id="last_defender_result_table"
+															border="1"
+															style="width: 100%;">
+															<tr
+																th:each="inv, invStats : ${roll.defender.involvements}">
+																<td
+																	class="last_defender_country_name"
+																	th:text="${inv.country.name}"></td>
+																<td
+																	class="last_defender_country_percent"
+																	th:text="${inv.involvementPercent}"></td>
+															</tr>
+														</table>
+													</td>
+													</tr>
+													<tr>
+														<th
+															style="display: table-cell"
+															colspan="2"
+															th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></th>
+														<th
+															style="display: table-cell"
+															colspan="2"
+															th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></th>
+													</tr>
+													<tr>
+														<td
+															style="display: table-cell"
+															colspan="4"><button
+																class="button is-info is-fullwidth"
+																th:value="${'turn' + turnStats.index + '_war' + warStats.index + '_roll' + rollStats.index}"
+																onclick="closeRoll(this.value)">Cerrar</button></td>
+													</tr>
+												</table>
+									</div>
+									</td>
+									</tr>
 								</th:block>
 								<tr class="total_score">
 									<th class="attacker_score">Total atacante</th>
 									<th class="defender_score">Total defensor</th>
+									<th>Total</th>
 								</tr>
 							</table>
+							<hr />
 						</li>
 					</ul>
 				</li>
@@ -131,71 +257,7 @@
 			<th:block th:each="turn, turnStats : ${turns}">
 				<th:block th:each="turnwar, turnwarStats : ${wars[turnStats.index]}">
 					<th:block th:each="roll, rollStats : ${turnwar.rolls}">
-						<div
-							class="roll_detail"
-							th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index + '_modal'}">
-							<table
-								th:id="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
-								border="1">
-								<tr>
-									<th colspan="4">Puntuaci&oacute;n</th>
-								</tr>
-								<tr>
-									<th
-										colspan="2"
-										th:text="${roll.attacker.name}"></th>
-									<th
-										colspan="2"
-										th:text="${roll.defender.name}"></th>
-								</tr>
-								<tr>
-									<td colspan="2">
-										<table
-											id="last_attacker_result_table"
-											border="1"
-											style="width: 100%;">
-											<tr th:each="inv, invStats : ${roll.attacker.involvements}">
-												<td
-													class="last_attacker_country_name"
-													th:text="${inv.country.name}"></td>
-												<td
-													class="last_attacker_country_percent"
-													th:text="${inv.involvementPercent}"></td>
-											</tr>
-										</table>
-									</td>
-									<td colspan="2">
-										<table
-											id="last_defender_result_table"
-											border="1"
-											style="width: 100%;">
-											<tr th:each="inv, invStats : ${roll.defender.involvements}">
-												<td
-													class="last_defender_country_name"
-													th:text="${inv.country.name}"></td>
-												<td
-													class="last_defender_country_percent"
-													th:text="${inv.involvementPercent}"></td>
-											</tr>
-										</table>
-									</td>
-								</tr>
-								<tr>
-									<th
-										colspan="2"
-										th:text="${#numbers.formatDecimal(roll.attackerScore, 2, 2)}"></th>
-									<th
-										colspan="2"
-										th:text="${#numbers.formatDecimal(roll.defenderScore, 2, 2)}"></th>
-								</tr>
-								<tr>
-									<td colspan="4"><button
-											class="button is-outlined is-info is-fullwidth"
-											th:value="${'turn' + turnStats.index + '_war' + turnwarStats.index + '_roll' + rollStats.index}"
-											onclick="closeRoll(this.value)">Cerrar</button></td>
-								</tr>
-							</table>
-						</div>
+
 					</th:block>
 				</th:block>
 			</th:block>
@@ -244,7 +306,7 @@
 	</section>
 	<section
 		class="section"
-		th:if="${game.master==session.user}">
+		th:if="${game.master==session.user and game.endDate == null}">
 		<div class="container">
 			<h3 class="subtitle is-4">
 				Turno activo: <span th:text="${session.game.activeTurn.subscenario}"></span>

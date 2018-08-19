@@ -85,20 +85,24 @@ public class ScenarioController {
 		User user = (User) session.getAttribute("user");
 		// Perform trivial validations
 		if (name.length() < 2 || name.length() > 256) {
-			model.addAttribute("fail", "fail");
+			model.addAttribute("scenarioFail", "fail");
 			model.addAttribute("failname", "El nombre debe tener entre 2 y 256 caracteres");
 		}
 		if (description.length() > 512) {
-			model.addAttribute("fail", "fail");
+			model.addAttribute("scenarioFail", "fail");
 			model.addAttribute("faildesc", "Las etiquetas deben tener como m&aacute;ximo 512 caracteres");
+		}
+		if (data == null) {
+			model.addAttribute("scenarioFail", "fail");
+			model.addAttribute("datafail", "No se ha subido un fichero");
 		}
 		// Perform logic validations
 		List<String> res = scServ.validateScenarioFile(data);
 		if (res.size() != 0) {
-			model.addAttribute("fail", "fail");
+			model.addAttribute("scenarioFail", "fail");
 			model.addAttribute("failfile", res);
 		}
-		if (model.asMap().get("fail") != null) {
+		if (model.asMap().get("scenarioFail") != null) {
 			model.addAttribute("name", name);
 			model.addAttribute("description", description);
 			return "scenario";
