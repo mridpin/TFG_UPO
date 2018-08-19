@@ -31,7 +31,7 @@
 					maxlength : 511
 				},
 				data : {
-					required: true,
+					required : true,
 				}
 			},
 			messages : {
@@ -43,7 +43,7 @@
 				description : {
 					maxlength : "M&aacute;ximo 511 caracteres",
 				},
-				data: {
+				data : {
 					required : "Las reglas son obligatorias",
 				}
 			},
@@ -68,7 +68,8 @@
 		class="section"
 		th:if="${failname != null or faildesc != null or failfile != null}">
 		<div class="container box is-danger">
-			<h3 class="notification is-danger">Se han encontrado los siguientes errores:</h3>
+			<h3 class="notification is-danger">Se han encontrado los
+				siguientes errores:</h3>
 			<ul>
 				<li
 					th:if="${failname}"
@@ -149,5 +150,6 @@
 			</form>
 		</div>
 	</section>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

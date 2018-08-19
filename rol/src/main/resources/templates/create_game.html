@@ -289,116 +289,140 @@
 			</form>
 		</div>
 	</section>
-	<section th:if="${session.scenario != null}">
-		<h2 th:if="${session.scenario != null}">
-			Creando partida: <span th:text="${session.newGameName}"></span>
-		</h2>
-		<h3>¡Tu escenario se ha creado con &eacute;xito!</h3>
-		<p>Escenario seleccionado:</p>
-		<ul>
-			<li th:text="${'Nombre: ' + session.scenario.name}"></li>
-			<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
-			<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
-			<li>
-				<a
-					th:href="@{|/downloads/scenarios?id=${session.scenario.id}|}"
-					download>Descargar Escenario</a>
-			</li>
-		</ul>
-		<form
-			th:if="${session.scenario != null}"
-			action="#"
-			th:action="@{/removeScenario}"
-			method="post">
-			<input
-				type="submit"
-				value="Reiniciar creaci&oacute;n">
-		</form>
-	</section>
-	<section th:if="${session.scenario != null}">
-		<h3>Se han detectado estos turnos:</h3>
-		<div>
-			<table class="table is-striped">
-				<tr>
-					<th>Turno</th>
-					<th>Nombre del subescenario</th>
-				</tr>
-				<tr th:each="turn, turnStat : ${session.turns}">
-					<td th:text="${turnStat?.index + 1}"></td>
-					<td th:text="${turn?.subscenario}"></td>
-				</tr>
-			</table>
+	<section
+		class="section"
+		th:if="${session.scenario != null}">
+		<div class="container">
+			<h2
+				class="subtitle is-3"
+				th:if="${session.scenario != null}">
+				Creando partida: <span th:text="${session.newGameName}"></span>
+			</h2>
+			<div class="notification">
+				<h3 class="subtitle is-5">¡Tu escenario se ha seleccionado con
+					&eacute;xito!</h3>
+				<p>Escenario seleccionado:</p>
+				<ul>
+					<li th:text="${'Nombre: ' + session.scenario.name}"></li>
+					<li th:text="${'Etiquetas: ' + session.scenario.description}"></li>
+					<li th:text="${'Autor: ' + session.scenario.author.name}"></li>
+					<li class="has-icons-left">
+						<span class="icon is-small is-left"><i
+							class="fas fa-download"></i></span> <a
+							th:href="@{|/downloads/scenarios?id=${session.scenario.id}|}"
+							download>Descargar Escenario</a>
+					</li>
+				</ul>
+			</div>
+			<form
+				th:if="${session.scenario != null}"
+				action="#"
+				th:action="@{/removeScenario}"
+				method="post">
+				<input
+					class="button is-link is-outlined is-medium is-fullwidth"
+					type="submit"
+					value="Reiniciar creaci&oacute;n">
+			</form>
 		</div>
 	</section>
-	<section th:if="${session.scenario != null}">
-		<h3>Ahora, invita a tus jugadores</h3>
-		<div th:if="${session.fail?.validate() == false}">
-			<h4>Se han detectado los siguientes errores con ese jugador:</h4>
-			<ul>
-				<li
-					class="valdiation_error"
-					th:if="${session?.fail?.addedGMError != null}"
-					th:text="${session?.fail?.addedGMError}"></li>
-				<li
-					class="valdiation_error"
-					th:if="${session?.fail?.playerDoesntExistError != null}"
-					th:text="${session?.fail?.playerDoesntExistError}"></li>
-				<li
-					class="valdiation_error"
-					th:if="${session?.fail?.duplicatePlayerError != null}"
-					th:text="${session?.fail?.duplicatePlayerError}"></li>
-				<li
-					class="valdiation_error"
-					th:if="${session?.fail?.duplicateCountryError != null}"
-					th:text="${session?.fail?.duplicateCountryError}"></li>
-				<li
-					class="valdiation_error"
-					th:if="${session?.fail?.countryFileError != null}">Errores en
-					el fichero:</li>
-				<li
-					style="list-style: none;"
-					class="valdiation_error_file"
-					th:if="${session?.fail?.countryFileError != null}">
-					<ul th:each="error : ${session?.fail?.countryFileError}">
-						<li th:text="${error}"></li>
-					</ul>
-				</li>
-			</ul>
+	<section
+		class="section"
+		th:if="${session.scenario != null}">
+		<div class="container">
+			<h3 class="subtitle is-4">Se han detectado estos turnos:</h3>
+			<div class="columns is-centered">
+				<div class="column is-narrow panel">
+					<table class="table is-striped">
+						<tr>
+							<th>Turno</th>
+							<th>Nombre del subescenario</th>
+						</tr>
+						<tr th:each="turn, turnStat : ${session.turns}">
+							<td th:text="${turnStat?.index + 1}"></td>
+							<td th:text="${turn?.subscenario}"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
 		</div>
-		<div>
-			<h4>Jugadores a&ntilde;adidos</h4>
-			<table border="2">
-				<tr>
-					<th>Jugador</th>
-					<th>Pa&iacute;s</th>
-					<th></th>
-				</tr>
-				<tr th:each="country, countryStat : ${session.countries}">
-					<td
-						class="nickname_cell"
-						th:text="${country?.player?.nickname}"></td>
-					<td
-						class="country_cell"
-						th:text="${country?.name}"></td>
-					<td>
-						<form
-							action="#"
-							th:action="@{/removePlayer}"
-							method="post">
-							<input
-								type="hidden"
-								name="countryIndex"
-								th:value="${countryStat.index}">
-							<input
-								type="submit"
-								value="Quitar jugador">
-						</form>
-					</td>
-				</tr>
-			</table>
+	</section>
+	<section
+		class="section"
+		th:if="${session.scenario != null}">
+		<div class="container">
+			<h3 class="subtitle is-4">Ahora, invita a tus jugadores</h3>
+			<div
+				class="box"
+				th:if="${session.fail?.validate() == false}">
+				<h4 class="subtitle is-5 notification is-danger">Se han
+					detectado los siguientes errores con ese jugador:</h4>
+				<ul>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.addedGMError != null}"
+						th:text="${session?.fail?.addedGMError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.playerDoesntExistError != null}"
+						th:text="${session?.fail?.playerDoesntExistError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.duplicatePlayerError != null}"
+						th:text="${session?.fail?.duplicatePlayerError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.duplicateCountryError != null}"
+						th:text="${session?.fail?.duplicateCountryError}"></li>
+					<li
+						class="valdiation_error"
+						th:if="${session?.fail?.countryFileError != null}">Errores en
+						el fichero:</li>
+					<li
+						style="list-style: none;"
+						class="valdiation_error_file"
+						th:if="${session?.fail?.countryFileError != null}">
+						<ul th:each="error : ${session?.fail?.countryFileError}">
+							<li th:text="${error}"></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div>
+				<h4 class="subtitle is-5">Jugadores a&ntilde;adidos</h4>
+				<table class="table is-striped">
+					<tr>
+						<th>Jugador</th>
+						<th>Pa&iacute;s</th>
+						<th></th>
+					</tr>
+					<tr th:each="country, countryStat : ${session.countries}">
+						<td
+							class="nickname_cell"
+							th:text="${country?.player?.nickname}"></td>
+						<td
+							class="country_cell"
+							th:text="${country?.name}"></td>
+						<td>
+							<form
+								action="#"
+								th:action="@{/removePlayer}"
+								method="post">
+								<input
+									type="hidden"
+									name="countryIndex"
+									th:value="${countryStat.index}">
+								<input
+									type="submit"
+									value="Quitar jugador">
+							</form>
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
-		<div>
-			<h4>A&ntilde;ade un nuevo jugador</h4>
+		<div class="container">
+			<h4 class="subtitle is-5">A&ntilde;ade un nuevo jugador</h4>
 			<form
 				class="form"
 				action="#"
@@ -406,46 +430,64 @@
 				th:action="@{/addCountry}"
 				method="post"
 				enctype="multipart/form-data">
-				<label
-					for="playerName"
-					class="">Apodo del jugador</label>
-				<input
-					type="text"
-					id="player_nickname"
-					name="player_nickname"
-					class="form-control"
-					placeholder="Apodo..."
-					th:value="${playerName}"
-					required
-					autofocus>
-				<label
-					for="countryData"
-					class="">Datos del pa&iacute;s</label>
-				<input
-					type="file"
-					id="country_data"
-					name="country_data"
-					class="form-control"
-					accept=".csv"
-					required>
-				<input
-					class="btn btn-lg btn-primary btn-block"
-					type="submit"
-					value="A&ntilde;adir Jugador">
+				<div class="field">
+					<label
+						for="playerName"
+						class="label">Apodo del jugador</label>
+					<div class="control">
+						<input
+							type="text"
+							id="player_nickname"
+							name="player_nickname"
+							class="input"
+							placeholder="Apodo..."
+							th:value="${playerName}"
+							required
+							autofocus>
+					</div>
+				</div>
+				<div class="field">
+					<label
+						for="countryData"
+						class="label">Datos del pa&iacute;s</label>
+					<div class="control">
+						<input
+							type="file"
+							id="country_data"
+							name="country_data"
+							class="input"
+							accept=".csv"
+							required>
+					</div>
+				</div>
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-link is-primary is-medium is-fullwidth"
+							type="submit"
+							value="A&ntilde;adir Jugador">
+					</div>
+				</div>
 			</form>
 		</div>
 	</section>
 	<section
+		class="section"
 		th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
-		<form
-			action="#"
-			id="create_game_form"
-			th:action="@{/submitGame}"
-			method="post">
-			<input
-				type="submit"
-				value="Finalizar Creaci&oacute;n">
-		</form>
+		<div class="container">
+		<h3 class="subtitle is-4">¿Ya est&aacute; todo el mundo?</h3>
+			<form
+				action="#"
+				id="create_game_form"
+				th:action="@{/submitGame}"
+				method="post">
+				<input
+				class="button is-primary is-medium is-fullwidth"
+					type="submit"
+					value="Finalizar Creaci&oacute;n">
+			</form>
+		</div>
 	</section>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

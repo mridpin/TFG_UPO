@@ -1,26 +1,42 @@
-<div class="wrapper row2">
-	<div
-		id="container"
-		class="clear">
-		<section
-			id="fof"
-			class="clear">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>Recurso no encontrado</title>
+<link
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
+<link
+	href="css/bulma.css"
+	rel="stylesheet">
+</head>
+<body class="content">
+	<header th:replace="fragments/login_header :: header"></header>
+	<section class="section">
+		<div class="container">
 			<div class="hgroup clear">
-				<h1>404</h1>
-				<h2>
-					Error ! <span>Page Not Found</span>
+				<h1 class="title is-1">404</h1>
+				<h2 class="subtitle is-3">
+					Error! <span>P&aacute;gina no encontrada</span>
 				</h2>
 			</div>
-			<p>For Some Reason The Page You Requested Could Not Be Found On
-				Our Server</p>
+			<p>El recurso que estabas buscando no ha sido encontrado en
+				nuestro servidor.</p>
+			<p>Prueba a cerrar la sesi&oacute;n y a intentarlo de nuevo. Si
+				el problema persiste, ponte en contacto con el administrador</p>
 			<form
 				action="#"
 				th:action="@{/landing}"
 				method="get">
 				<input
+					class="button is-fullwidth is-primary"
 					type="submit"
 					value="Volver a la p&aacute;gina principal">
 			</form>
-		</section>
-	</div>
-</div>
+		</div>
+	</section>
+	<footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html>

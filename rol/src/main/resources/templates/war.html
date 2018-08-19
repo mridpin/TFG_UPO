@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Partida en curso</title>
+<link
+	rel="stylesheet"
+	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
+	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+	crossorigin="anonymous">
+<link
+	href="css/bulma.css"
+	rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -23,8 +31,7 @@
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
-	width: 60%;
-	min-height: 100px
+	min-height: 150px
 }
 
 .coalition_lists li {
@@ -62,14 +69,12 @@
 
 	function validateAttackers() {
 		var res = [];
-		var attackerCountries = $("#coal1_box").find("span.country_names",
-				"li.ui-sortable-handle");
+		var attackerCountries = $("#coal1_box").find("span.country_names", "li.ui-sortable-handle");
 		if (attackerCountries.length === 0) {
 			res.push("La coalici&oacute;n atacante est&aacute; vac&iacute;a. ");
 		}
 		if (attackerCountries.length === countries.length) {
-			res
-					.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n atacante. ");
+			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n atacante. ");
 		}
 		// These validate for both attackers and defenders
 		var countrynames = [];
@@ -80,14 +85,10 @@
 		for ( var key in countrynames) {
 			var countryInvolvement = 0;
 			for (var inv = 0; inv < countrynames[key].length; inv++) {
-				countryInvolvement += parseFloat($(countrynames[key][inv])
-						.find("input[type=number]").val());
+				countryInvolvement += parseFloat($(countrynames[key][inv]).find("input[type=number]").val());
 			}
 			if (countryInvolvement > 1.0) {
-				res
-						.push("El pa&iacute;s "
-								+ key
-								+ " est&aacute; usando m&aacute;s del 100% de sus recursos. ");
+				res.push("El pa&iacute;s " + key + " est&aacute; usando m&aacute;s del 100% de sus recursos. ");
 			}
 		}
 		return res;
@@ -95,14 +96,12 @@
 
 	function validateDefenders() {
 		var res = [];
-		var defenderCountries = $("#coal2_box").find("span.country_names",
-				"li.ui-sortable-handle");
+		var defenderCountries = $("#coal2_box").find("span.country_names", "li.ui-sortable-handle");
 		if (defenderCountries.length === 0) {
 			res.push("La coalici&oacute;n defensora est&aacute; vac&iacute;a. ");
 		}
 		if (defenderCountries.length === countries.length) {
-			res
-					.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n defensora. ");
+			res.push("Todos los pa&iacute;ses no pueden estar en la coalici&oacute;n defensora. ");
 		}
 		return res;
 	}
@@ -162,21 +161,16 @@
 	}
 
 	function swapButton(li, originalName) {
-		var button = $(li).find(
-				"button." + originalName.replaceAll(" ", "") + "_split");
+		var button = $(li).find("button." + originalName.replaceAll(" ", "") + "_split");
 		var text = $(button).text();
 		if (text === "Dividir") {
 			$(button).text("Borrar");
-			$(button)
-					.attr(
-							"onclick",
-							"deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+			$(button).attr("onclick",
+					"deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
 		} else if (text === "Borrar") {
 			$(button).text("Dividir");
-			$(button)
-					.attr(
-							"onclick",
-							"splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+			$(button).attr("onclick",
+					"splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
 		}
 	}
 
@@ -193,14 +187,11 @@
 		var clone = $(item).clone().appendTo(list);
 		var name1 = name + " 1";
 		var name2 = name + " 2";
-		$(clone).find("span.country_names", "li.ui-sortable-handle")
-				.text(name2);
+		$(clone).find("span.country_names", "li.ui-sortable-handle").text(name2);
 		$(item).find("span.country_names", "li.ui-sortable-handle").text(name1);
 		// Balance the commitment
-		var newPercentInput = $(clone).find(
-				"input." + escapedName + "_percent_input");
-		var originalPercentInput = $(item).find(
-				"input." + escapedName + "_percent_input");
+		var newPercentInput = $(clone).find("input." + escapedName + "_percent_input");
+		var originalPercentInput = $(item).find("input." + escapedName + "_percent_input");
 		var originalPercent = $(originalPercentInput).val();
 		var newPercent = 1 - originalPercent;
 		$(originalPercentInput).val(newPercent.toFixed(2));
@@ -210,15 +201,11 @@
 		swapButton(clone, name);
 		// Rename the ids of the countries
 		$(item).attr("id", escapedName + "1_listitem");
-		$(item).find("input#" + escapedName + "_percent").attr("id",
-				escapedName + "1_percent");
-		$(item).find("input#" + escapedName + "_percent_input").attr("id",
-				escapedName + "1_percent_input");
+		$(item).find("input#" + escapedName + "_percent").attr("id", escapedName + "1_percent");
+		$(item).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "1_percent_input");
 		$(clone).attr("id", escapedName + "2_listitem");
-		$(clone).find("input#" + escapedName + "_percent").attr("id",
-				escapedName + "2_percent");
-		$(clone).find("input#" + escapedName + "_percent_input").attr("id",
-				escapedName + "2_percent_input");
+		$(clone).find("input#" + escapedName + "_percent").attr("id", escapedName + "2_percent");
+		$(clone).find("input#" + escapedName + "_percent_input").attr("id", escapedName + "2_percent_input");
 		// Limit the max commitment UI elements
 		$("#" + escapedName + "2_percent").attr("max", newPercent);
 		$("#" + escapedName + "2_percent_input").attr("max", newPercent);
@@ -245,16 +232,14 @@
 		// Remove the list items and rename the ids
 		var item = partitions[0];
 		$(partitions[1]).remove();
-		$(item).find("span.country_names", "li.ui-sortable-handle").text(
-				countryName);
+		$(item).find("span.country_names", "li.ui-sortable-handle").text(countryName);
 		$(item).find("input." + escapedName + "_percent_input").attr("max", 1);
 		$(item).find("input." + escapedName + "_percent").attr("max", 1);
 		$(item).find("input." + escapedName + "_percent_input").val(1);
 		$(item).find("input." + escapedName + "_percent").val(1);
 		$(item).attr("id", escapedName + "_listitem");
 		$(item).find("input[type=range]").attr("id", escapedName + "_percent");
-		$(item).find("input[type=number]").attr("id",
-				escapedName + "_percent_input");
+		$(item).find("input[type=number]").attr("id", escapedName + "_percent_input");
 		swapButton(item, countryName);
 	}
 
@@ -384,8 +369,7 @@
 		$("#coalition_navies").find("tr:gt(0)").remove();
 		for ( var key in countries) {
 			var row = $("<tr>")
-			if (Math
-					.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
+			if (Math.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
 				var intervention = countries[key][turn][rules[NAVAL]];
 				var navalPowerNavy = 0;
 				for ( var navy in intervention) {
@@ -445,8 +429,7 @@
 			$(countryHeader).append(key);
 			$(firstRow).append(countryHeader);
 			// If the country is a naval power, add a row for it
-			if (Math
-					.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
+			if (Math.round(countries[key][turn][rules[NAVAL]][rules[NAVAL_POWER]]) === 1.0) {
 				var intervention = countries[key][turn][rules[NAVAL]];
 				var navalPowerNavy = 0;
 				for ( var navy in intervention) {
@@ -463,15 +446,13 @@
 					var cpercent = 0.0;
 					cpercent += countryNavies[c] / navalPowerNavy;
 					var blockadeCheckbox = $("<input>");
-					$(blockadeCheckbox).attr(
-							{
-								type : "checkbox",
-								// form : "war_form",
-								name : "block_" + c.replaceAll(" ", ""),
-								value : key.replaceAll(" ", "") + "_blocks_"
-										+ c.replaceAll(" ", ""),
-								onchange : "updateCountryPoints();",
-							});
+					$(blockadeCheckbox).attr({
+						type : "checkbox",
+						// form : "war_form",
+						name : "block_" + c.replaceAll(" ", ""),
+						value : key.replaceAll(" ", "") + "_blocks_" + c.replaceAll(" ", ""),
+						onchange : "updateCountryPoints();",
+					});
 					var ccell = $("<td>");
 					$(ccell).append((cpercent * 100).toFixed(2) + ": ");
 					$(ccell).append(blockadeCheckbox);
@@ -487,50 +468,29 @@
 		var turn = getSelectedTurn();
 		$(table).find("tr").remove();
 		// Iterate the types of attributes
-		$
-				.each(
-						attributeValuesTemplate[turn],
-						function(type, attributes) {
-							var header = $("<tr>");
-							$(header).append($("<th>").append(type));
-							$(header).append($("<th>").append("Atacante"));
-							$(header).append($("<th>").append("Defensor"));
-							$(table).append(header);
-							// Iterate the attributes
-							$
-									.each(
-											attributes,
-											function(name, value) {
-												var row = $("<tr>");
-												$(row)
-														.append(
-																$("<td>")
-																		.append(
-																				name
-																						+ " &#10005; "
-																						+ attributeValuesTemplate[turn][type][name]
-																						+ " pts."));
-												var at = (attackerPoints[type] == null)
-														|| isEmpty(attackerPoints[type]);
-												$(row)
-														.append(
-																$("<td>")
-																		.append(
-																				(attackerPoints[type] == null)
-																						|| isEmpty(attackerPoints[type]) ? 0
-																						: attackerPoints[type][name]
-																								.toFixed(2)));
-												$(row)
-														.append(
-																$("<td>")
-																		.append(
-																				(defenderPoints[type] == null)
-																						|| isEmpty(defenderPoints[type]) ? 0
-																						: defenderPoints[type][name]
-																								.toFixed(2)));
-												$(table).append(row);
-											});
-						});
+		$.each(attributeValuesTemplate[turn], function(type, attributes) {
+			var header = $("<tr>");
+			$(header).append($("<th>").append(type));
+			$(header).append($("<th>").append("Atacante"));
+			$(header).append($("<th>").append("Defensor"));
+			$(table).append(header);
+			// Iterate the attributes
+			$.each(attributes, function(name, value) {
+				var row = $("<tr>");
+				$(row).append(
+						$("<td>").append(name + " &#10005; " + attributeValuesTemplate[turn][type][name] + " pts."));
+				var at = (attackerPoints[type] == null) || isEmpty(attackerPoints[type]);
+				$(row).append(
+						$("<td>").append(
+								(attackerPoints[type] == null) || isEmpty(attackerPoints[type]) ? 0
+										: attackerPoints[type][name].toFixed(2)));
+				$(row).append(
+						$("<td>").append(
+								(defenderPoints[type] == null) || isEmpty(defenderPoints[type]) ? 0
+										: defenderPoints[type][name].toFixed(2)));
+				$(table).append(row);
+			});
+		});
 		// Add the sum row:
 		var sumrow = $("<tr>");
 		$(sumrow).append($("<th>").append("Puntos totales"));
@@ -547,10 +507,8 @@
 	function updateCoalitionNavies() {
 		var attackerNavy = 0.0;
 		var defenderNavy = 0.0;
-		var attackerCountries = $("#coal1_box").find("span.country_names",
-				"li.ui-sortable-handle");
-		var defenderCountries = $("#coal2_box").find("span.country_names",
-				"li.ui-sortable-handle");
+		var attackerCountries = $("#coal1_box").find("span.country_names", "li.ui-sortable-handle");
+		var defenderCountries = $("#coal2_box").find("span.country_names", "li.ui-sortable-handle");
 		var turn = getSelectedTurn();
 		for (var key = 0; key < attackerCountries.length; key++) {
 			var longname = $(attackerCountries[key]).text();
@@ -568,9 +526,7 @@
 					navies += intervention[navy];
 				}
 			}
-			var commitment = $(
-					"#" + longname.replaceAll(" ", "") + "_percent_input")
-					.val();
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input").val();
 			attackerNavy += navies * commitment;
 		}
 		for (var key = 0; key < defenderCountries.length; key++) {
@@ -589,9 +545,7 @@
 					navies += intervention[navy];
 				}
 			}
-			var commitment = $(
-					"#" + longname.replaceAll(" ", "") + "_percent_input")
-					.val();
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input").val();
 			defenderNavy += navies * commitment;
 		}
 		drawCoalitionNavies(turn, attackerNavy, defenderNavy);
@@ -618,9 +572,7 @@
 					navies += intervention[navy];
 				}
 			}
-			var commitment = $(
-					"#" + longname.replaceAll(" ", "") + "_percent_input")
-					.val();
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input").val();
 			// This is so the "parent" country appears in full force when it's
 			// partitioned
 			if (commitment == null) {
@@ -633,10 +585,8 @@
 	}
 
 	function updateCountryPoints() {
-		var attackerCountries = $("#coal1_box").find("span.country_names",
-				"li.ui-sortable-handle");
-		var defenderCountries = $("#coal2_box").find("span.country_names",
-				"li.ui-sortable-handle");
+		var attackerCountries = $("#coal1_box").find("span.country_names", "li.ui-sortable-handle");
+		var defenderCountries = $("#coal2_box").find("span.country_names", "li.ui-sortable-handle");
 		var turn = getSelectedTurn();
 		// Add up the power of coalitions
 		var defenders = [];
@@ -657,13 +607,9 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $(
-					"#" + longname.replaceAll(" ", "") + "_percent_input")
-					.val();
-			var blockaded = isBlockaded(
-					"block_" + longname.replaceAll(" ", ""), "block_defender");
-			var intervention = calculateCommitment(countries[name][turn],
-					commitment, blockaded, "defense");
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input").val();
+			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""), "block_defender");
+			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded, "defense");
 			defenders.push(intervention);
 		}
 		for (var key = 0; key < attackerCountries.length; key++) {
@@ -674,13 +620,9 @@
 			if (nameSplit.length > 1 && !isNaN(nameSplit.pop())) {
 				name = nameSplit.join(" ");
 			}
-			var commitment = $(
-					"#" + longname.replaceAll(" ", "") + "_percent_input")
-					.val();
-			var blockaded = isBlockaded(
-					"block_" + longname.replaceAll(" ", ""), "block_attacker");
-			var intervention = calculateCommitment(countries[name][turn],
-					commitment, blockaded, "attack");
+			var commitment = $("#" + longname.replaceAll(" ", "") + "_percent_input").val();
+			var blockaded = isBlockaded("block_" + longname.replaceAll(" ", ""), "block_attacker");
+			var intervention = calculateCommitment(countries[name][turn], commitment, blockaded, "attack");
 			attackers.push(intervention);
 		}
 		var attackerStats = sumCoalition(attackers);
@@ -694,66 +636,50 @@
 		// Iterate the total and create an object with attacker and defender
 		// points
 		var turn = getSelectedTurn();
-		$
-				.each(
-						attributeValuesTemplate[turn],
-						function(type, types) {
-							attackerPoints[type] = {};
-							defenderPoints[type] = {};
-							$
-									.each(
-											types,
-											function(name, attribute) {
-												if (!isEmpty(totalStats[type])) {
-													var total = totalStats[type][name];
-													var points = attributeValuesTemplate[turn][type][name];
-													if (!isEmpty(attackerStats)) {
-														var at = attackerStats[type][name];
-														attackerPoints[type][name] = (total === 0) ? attackerStats[type][name]
-																: (attackerStats[type][name] / total);
-														attackerPoints[type][name] *= points;
-														// Apply modifiers:
-														// 1. Penalize infantry
-														// for attack
-														if (rules[INFANTRY]
-																.includes(name)) {
-															attackerPoints[type][name] *= rules[INFANTRY_ATTACK_PENALTY];
-														}
-														// Penalize for inland
-														// battles
-														if (type === rules[NAVAL]
-																&& $(
-																		"#inland_battle")
-																		.prop(
-																				"checked")) {
-															attackerPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
-														}
-													}
-													if (!isEmpty(defenderStats)) {
-														defenderPoints[type][name] = (total === 0) ? defenderStats[type][name]
-																: (defenderStats[type][name] / total);
-														defenderPoints[type][name] *= points;
-														var def = defenderStats[type][name];
-														// Apply modifiers
-														// 1. Bonus to infantry
-														// for defense
-														if (rules[INFANTRY]
-																.includes(name)) {
-															defenderPoints[type][name] *= rules[INFANTRY_DEFENSE_BONUS];
-														}
-														// 2. Penalize navies
-														// for inland battles
-														if (type === rules[NAVAL]
-																&& $(
-																		"#inland_battle")
-																		.prop(
-																				"checked")) {
-															defenderPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
-														}
-													}
-												}
-											});
-						});
+		$.each(attributeValuesTemplate[turn], function(type, types) {
+			attackerPoints[type] = {};
+			defenderPoints[type] = {};
+			$.each(types, function(name, attribute) {
+				if (!isEmpty(totalStats[type])) {
+					var total = totalStats[type][name];
+					var points = attributeValuesTemplate[turn][type][name];
+					if (!isEmpty(attackerStats)) {
+						var at = attackerStats[type][name];
+						attackerPoints[type][name] = (total === 0) ? attackerStats[type][name]
+								: (attackerStats[type][name] / total);
+						attackerPoints[type][name] *= points;
+						// Apply modifiers:
+						// 1. Penalize infantry
+						// for attack
+						if (rules[INFANTRY].includes(name)) {
+							attackerPoints[type][name] *= rules[INFANTRY_ATTACK_PENALTY];
+						}
+						// Penalize for inland
+						// battles
+						if (type === rules[NAVAL] && $("#inland_battle").prop("checked")) {
+							attackerPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
+						}
+					}
+					if (!isEmpty(defenderStats)) {
+						defenderPoints[type][name] = (total === 0) ? defenderStats[type][name]
+								: (defenderStats[type][name] / total);
+						defenderPoints[type][name] *= points;
+						var def = defenderStats[type][name];
+						// Apply modifiers
+						// 1. Bonus to infantry
+						// for defense
+						if (rules[INFANTRY].includes(name)) {
+							defenderPoints[type][name] *= rules[INFANTRY_DEFENSE_BONUS];
+						}
+						// 2. Penalize navies
+						// for inland battles
+						if (type === rules[NAVAL] && $("#inland_battle").prop("checked")) {
+							defenderPoints[type][name] *= rules[INLAND_BATTLE_PENALTY];
+						}
+					}
+				}
+			});
+		});
 		drawCountryPoints(attackerPoints, defenderPoints);
 	}
 
@@ -767,198 +693,132 @@
 		var attackersList = $("ul#attacker_list");
 		var defenderList = $("ul#defender_list");
 		for (var i = 0; i < lastAttackersTDs.length; i++) {
-			var countryLi = $("#"
-					+ $(lastAttackersTDs[i]).text().replaceAll(" ", "")
-					+ "_listitem");
+			var countryLi = $("#" + $(lastAttackersTDs[i]).text().replaceAll(" ", "") + "_listitem");
 			$(attackersList).append(countryLi);
 		}
 		for (var i = 0; i < lastDefendersTDs.length; i++) {
-			var countryLi = $("#"
-					+ $(lastDefendersTDs[i]).text().replaceAll(" ", "")
-					+ "_listitem");
+			var countryLi = $("#" + $(lastDefendersTDs[i]).text().replaceAll(" ", "") + "_listitem");
 			$(defenderList).append(countryLi);
 		}
 	}
 
-	$(document)
-			.ready(
-					function() {
-						// Load the previous coalitions if they exist
-						loadPreviousCoalitions();
-						// Sortable list to drag countries to coalitions
-						$("ul#country_list, ul#attacker_list, ul#defender_list")
-								.sortable({
-									connectWith : ".coalition_lists",
-									dropOnEmpty : true,
-									placeholder : "ui-state-highlight",
-									update : function() {
-										updateCoalitionNavies();
-										updateCountryNavies();
-										updateCountryPoints();
-										$(this).clone()
-									},
-								});
+	$(document).ready(function() {
+		// Load the previous coalitions if they exist
+		loadPreviousCoalitions();
+		// Sortable list to drag countries to coalitions
+		$("ul#country_list, ul#attacker_list, ul#defender_list").sortable({
+			connectWith : ".coalition_lists",
+			dropOnEmpty : true,
+			placeholder : "ui-state-highlight",
+			update : function() {
+				updateCoalitionNavies();
+				updateCountryNavies();
+				updateCountryPoints();
+				$(this).clone()
+			},
+		});
 
-						$("ul.coalition_lists").disableSelection();
+		$("ul.coalition_lists").disableSelection();
 
-						$("#war_form")
-								.submit(
-										function() {
-											// Submit the scores
-											$("#attacker_score").val(
-													$("#total_attack_score")
-															.text());
-											$("#defender_score").val(
-													$("#total_defender_score")
-															.text());
-											// Submit the coalitions as a string list such as
-											// country,percent; to be parsed by the server
-											var attacker = "";
-											$
-													.each(
-															$("#coal1_box")
-																	.find("li"),
-															function(key, val) {
-																attacker += $(
-																		val)
-																		.attr(
-																				"name")
-																		+ ","
-																		+ $(val)
-																				.find(
-																						"input[type=number]")
-																				.val()
-																		+ ";";
-															});
-											$("#attacker_countries").val(
-													attacker);
-											var defender = "";
-											$
-													.each(
-															$("#coal2_box")
-																	.find("li"),
-															function(key, val) {
-																defender += $(
-																		val)
-																		.attr(
-																				"name")
-																		+ ","
-																		+ $(val)
-																				.find(
-																						"input[type=number]")
-																				.val()
-																		+ ";";
-															});
-											$("#defender_countries").val(
-													defender);
-											return true;
-										});
-						// Ajax call to get all rules
+		$("#war_form").submit(function() {
+			// Submit the scores
+			$("#attacker_score").val($("#total_attack_score").text());
+			$("#defender_score").val($("#total_defender_score").text());
+			// Submit the coalitions as a string list such as
+			// country,percent; to be parsed by the server
+			var attacker = "";
+			$.each($("#coal1_box").find("li"), function(key, val) {
+				attacker += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+			});
+			$("#attacker_countries").val(attacker);
+			var defender = "";
+			$.each($("#coal2_box").find("li"), function(key, val) {
+				defender += $(val).attr("name") + "," + $(val).find("input[type=number]").val() + ";";
+			});
+			$("#defender_countries").val(defender);
+			return true;
+		});
+		// Ajax call to get all rules
+		$.ajax({
+			type : "POST",
+			url : "/mapRules",
+			success : function(response) {
+				rules = response;
+				// Ajax call to get the points template
+				$.ajax({
+					type : "POST",
+					url : "/mapAttributes",
+					success : function(response) {
+						attributeValuesTemplate = response;
+						// Ajax call to get all country data to display
+						// in tables dynamically
 						$.ajax({
 							type : "POST",
-							url : "/mapRules",
+							url : "/mapCountries",
 							success : function(response) {
-								rules = response;
-								// Ajax call to get the points template
-								$.ajax({
-									type : "POST",
-									url : "/mapAttributes",
-									success : function(response) {
-										attributeValuesTemplate = response;
-										// Ajax call to get all country data to display
-										// in tables dynamically
-										$.ajax({
-											type : "POST",
-											url : "/mapCountries",
-											success : function(response) {
-												countries = response;
-												updateCoalitionNavies();
-												updateCountryNavies();
-												updateCountryPoints();
-											}
-										});
-									}
-								});
+								countries = response;
+								updateCoalitionNavies();
+								updateCountryNavies();
+								updateCountryPoints();
 							}
 						});
-						$("#error_section").hide();
-						$("#war_form")
-								.validate(
-										{
-											focusCleanup : true,
-											rules : {
-												name : {
-													required : true,
-													minlength : 2,
-													maxlength : 256
-												},
-												attacker_name : {
-													maxlength : 256
-												},
-												defender_name : {
-													maxlength : 256
-												}
-											},
-											messages : {
-												name : {
-													required : "Especifica un nombre para el enfrentamiento",
-													minlength : "El nombre debe tener 2 caracteres como mínimo",
-													maxlength : "Máximo 256 caracteres",
-												},
-												attacker_name : {
-													maxlength : "Máximo 256 caracteres",
-												},
-												defender_name : {
-													maxlength : "Máximo 256 caracteres",
-												}
-											},
-											errorPlacement : function(error,
-													element) {
-												error.insertBefore(element);
-												error.addClass("red");
-											},
-											highlight : function(element) {
-												$(element).removeClass(
-														"border-red");
-											},
-											unhighlight : function(element) {
-												$(element).removeClass(
-														"border-red");
-												// TODO: RED STYLE ERRORS
-											},
-										});
-					});
+					}
+				});
+			}
+		});
+		$("#error_section").hide();
+		$("#war_form").validate({
+			focusCleanup : true,
+			rules : {
+				name : {
+					required : true,
+					minlength : 2,
+					maxlength : 256
+				},
+				attacker_name : {
+					maxlength : 256
+				},
+				defender_name : {
+					maxlength : 256
+				}
+			},
+			messages : {
+				name : {
+					required : "Especifica un nombre para el enfrentamiento",
+					minlength : "El nombre debe tener 2 caracteres como mínimo",
+					maxlength : "Máximo 256 caracteres",
+				},
+				attacker_name : {
+					maxlength : "Máximo 256 caracteres",
+				},
+				defender_name : {
+					maxlength : "Máximo 256 caracteres",
+				}
+			},
+			errorPlacement : function(error, element) {
+				error.insertAfter(element);
+				error.addClass("help is-danger");
+				element.addClass("is-danger")
+			},
+			highlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+			unhighlight : function(element) {
+				$(element).removeClass("is-danger");
+			},
+		});
+	});
 </script>
 </head>
-<body>
-	<nav>
-		<form
-			action="#"
-			th:action="@{/openGame}"
-			method="get">
-			<input
-				type="hidden"
-				name="game_id"
-				th:value="${session.game.id}">
-			<input
-				type="submit"
-				value="Volver a la p&aacute;gina del enfrentamiento">
-		</form>
-	</nav>
-	<form
-		action="#"
-		th:action="@{/landing}"
-		method="get">
-		<input
-			type="submit"
-			value="Volver a la p&aacute;gina principal">
-	</form>
-	<article>
-		<th:block th:if="${rolls!=null and !rolls.empty}">
-			<section
-				th:each="roll, rollStats : ${rolls}"
-				th:if="${rollStats.index == rollStats.size-1}"
-				id="last_roll_result">
+<body class="content">
+	<header th:replace="fragments/session_header :: header"></header>
+	<th:block th:if="${rolls!=null and !rolls.empty}">
+		<section
+			class="section"
+			th:each="roll, rollStats : ${rolls}"
+			th:if="${rollStats.index == rollStats.size-1}"
+			id="last_roll_result">
+			<div class="container">
 				<h3>Resultado de la &uacute;ltima tirada</h3>
 				<table
 					id="last_result"
@@ -1015,18 +875,17 @@
 							th:text="${#numbers.formatDecimal(roll.defenderScore, 0, 2)}"></th>
 					</tr>
 				</table>
-			</section>
-		</th:block>
-		<h2>Comenzar una tirada</h2>
-		<section id="error_section">
-			<h3>Se han detectado los siguientes errores:</h3>
-			<ul id="error_list">
-			</ul>
+			</div>
 		</section>
-		<section
-			th:if="${session.fail != null}"
-			id="server_error_section">
-			<h3>Se han detectado los siguientes errores:</h3>
+	</th:block>
+
+	<section
+		class="section"
+		th:if="${session.fail != null}"
+		id="server_error_section">
+		<div class="container">
+			<h3 class="subtitle is-4 notification is-danger">Se han
+				detectado los siguientes errores:</h3>
 			<ul id="server_error_list">
 				<li
 					th:if="${session.fail.warNameError != null}"
@@ -1053,28 +912,39 @@
 					th:if="${session.fail.genericRollError != null}"
 					th:text="${session.fail.genericRollError}"></li>
 			</ul>
-		</section>
-		<section>
-			<h3>Nombre</h3>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h2 class="subtitle is-3">Comenzar una tirada</h2>
+			<h3 class="subtitle is-4">Nombre</h3>
 			<form
 				id="war_form"
 				name="war_form"
 				action="#"
 				th:action="@{/createRoll}"
 				method="post">
-				<label>Nombre:</label>
-				<div th:switch="${session.war.id==null}">
-					<input
-						th:case="${true}"
-						type="text"
-						name="name"
-						th:value="${name}">
-					<input
-						th:case="${false}"
-						type="text"
-						name="name"
-						th:value="${session.war.name}"
-						readonly="readonly">
+				<div class="field">
+					<label
+						class="label"
+						for="name">Nombre del enfrentamiento:</label>
+					<div class="control">
+						<div th:switch="${session.war.id==null}">
+							<input
+								th:case="${true}"
+								type="text"
+								name="name"
+								class="input"
+								th:value="${name}">
+							<input
+								th:case="${false}"
+								type="text"
+								name="name"
+								class="input"
+								th:value="${session.war.name}"
+								readonly="readonly">
+						</div>
+					</div>
 				</div>
 				<input
 					type="hidden"
@@ -1097,16 +967,20 @@
 					id="defender_countries"
 					value="">
 			</form>
-		</section>
-		<section>
-			<h3>Subescenario</h3>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-4">
+				Subescenario: <span th:text="${session.game.activeTurn.subscenario}"></span>
+			</h3>
 			<ul id="subscenario_list">
 				<li th:each="turn, turnStat : ${turns}">
 					<label th:text="${turn.subscenario}"></label>
 					<input
 						type="radio"
 						th:name="subscenario"
-						th:class="subscenario_radio"
+						th:class="subscenario_radio + ' radio'"
 						th:id="${turn.subscenario}"
 						th:value="${turn.subscenario}"
 						th:checked="${session.game.activeTurn==turn}"
@@ -1114,42 +988,62 @@
 						th:disabled="${session.game.activeTurn!=turn}">
 				</li>
 			</ul>
-		</section>
-		<section id="coalition_section">
-			<h3>Coaliciones</h3>
-			<div>
-				<h4>Coalici&oacute;n Atacante</h4>
-				<div
-					id="coal1_box"
-					style="border: solid 2px;">
-					<ul
-						id="attacker_list"
-						class="coalition_lists"></ul>
+		</div>
+	</section>
+	<section
+		class="section"
+		id="coalition_section">
+		<div class="container">
+			<h3 class="subtitle is-4">Coaliciones</h3>
+			<div class="columns is-centered">
+				<div class="column">
+					<h4 class="subtitle is-5">Coalici&oacute;n Atacante</h4>
+					<div class="field">
+						<label
+							class="label"
+							for="attacker_name">Nombre coalici&oacute;n atacante</label>
+						<div class="control">
+							<input
+								type="text"
+								name="attacker_name"
+								class="input"
+								th:value="${lastRoll?.attacker?.name} != null ? ${lastRoll?.attacker?.name} : ${attackerString}"
+								th:readonly="${lastRoll!=null}"
+								form="war_form">
+						</div>
+					</div>
+					<div
+						id="coal1_box"
+						style="border: solid 2px;">
+						<ul
+							id="attacker_list"
+							class="coalition_lists"></ul>
+					</div>
 				</div>
-				<label>Nombre coalici&oacute;n atacante</label>
-				<input
-					type="text"
-					name="attacker_name"
-					th:value="${lastRoll?.attacker?.name} != null ? ${lastRoll?.attacker?.name} : ${attackerString}"
-					th:readonly="${lastRoll!=null}"
-					form="war_form">
-				<h4>Coalici&oacute;n Defensora</h4>
-				<div
-					id="coal2_box"
-					style="border: solid 2px;">
-					<ul
-						id="defender_list"
-						class="coalition_lists"></ul>
+				<div class="column">
+					<h4 class="subtitle is-5">Coalici&oacute;n Defensora</h4>
+					<div class="field">
+						<label
+							class="label"
+							for="defender_name">Nombre coalici&oacute;n defensora</label>
+						<input
+							type="text"
+							name="defender_name"
+							class="input"
+							th:value="${lastRoll?.defender?.name} != null ? ${lastRoll?.defender?.name} : ${defenderString}"
+							th:readonly="${lastRoll!=null}"
+							form="war_form">
+					</div>
+					<div
+						id="coal2_box"
+						style="border: solid 2px;">
+						<ul
+							id="defender_list"
+							class="coalition_lists"></ul>
+					</div>
 				</div>
-				<label>Nombre coalici&oacute;n defensora</label>
-				<input
-					type="text"
-					name="defender_name"
-					th:value="${lastRoll?.defender?.name} != null ? ${lastRoll?.defender?.name} : ${defenderString}"
-					th:readonly="${lastRoll!=null}"
-					form="war_form">
 			</div>
-			<h4>Pa&iacute;ses</h4>
+			<h4 class="subtitle is-5">Pa&iacute;ses</h4>
 			<div style="border: solid 2px;">
 				<ul
 					id="country_list"
@@ -1184,45 +1078,54 @@
 							value=1
 							oninput="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);"
 							onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints();return updateSliderInput(this, this.value, this.id);">
-						<!--						TODO: JQUERY validate this to max 1  -->
 						<button
 							type="button"
 							th:name="${country.name + '_split'}"
-							th:class="${#strings.replace(country.name, ' ', '') + '_split'}"
+							th:class="${#strings.replace(country.name, ' ', '') + '_split'} + ' button is-small is-outlined is-info'"
 							th:id="${country.name + '_split'}"
 							th:value="${country.name}"
 							onclick="splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()">Dividir</button>
 					</li>
 				</ul>
 			</div>
-			<div>
-				<form
-					action="#"
-					th:action="@{/endWar}"
-					method="get">
-					<input
-						type="submit"
-						value="Terminar Enfrentamiento">
-				</form>
+		</div>
+		<div class="container">
+			<div class="field">
+				<div class="control">
+					<form
+						action="#"
+						th:action="@{/endWar}"
+						method="get">
+						<input
+							class="button is-link is-outlined is-fullwidth"
+							type="submit"
+							value="Terminar Enfrentamiento">
+					</form>
+				</div>
 			</div>
-		</section>
-		<section>
-			<h3>Armadas</h3>
-			<div>
-				<label for="inland_battle">Batalla Interior</label>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-4">Armadas</h3>
+			<div class="field has-text-centered">
+				<label
+					class="label"
+					for="inland_battle">Batalla Interior</label>
 				<input
 					type="checkbox"
 					id="inland_battle"
 					name="inland_battle"
 					value="inland_battle"
+					class="checkbox is-large"
 					form="war_form"
 					onchange="updateCoalitionNavies();updateCountryNavies();updateCountryPoints()">
 			</div>
-			<div>
-				<h4>Potencias navales vs. Coaliciones</h4>
+			<div class="is-medium">
+				<h4 class="subtitle is-5">Potencias navales vs. Coaliciones</h4>
 				<table
 					id="coalition_navies"
-					border="2">
+					class="table is-bordered">
 					<tr>
 						<th>Potencias navales</th>
 						<th>Porcentaje coalici&oacute;n atacante</th>
@@ -1230,33 +1133,50 @@
 					</tr>
 				</table>
 			</div>
-			<div>
-				<h4>Potencias navales vs. Pa&iacute;ses</h4>
+			<hr />
+			<div class="is-medium">
+				<h4 class="subtitle is-5">Potencias navales vs. Pa&iacute;ses</h4>
 				<table
 					id="country_navies"
-					border="2">
+					class="table is-bordered">
 					<tr>
 					</tr>
 				</table>
 			</div>
-		</section>
-		<section>
-			<h3>Puntos disponibles para la tirada actual</h3>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<h3 class="subtitle is-4">Puntos disponibles para la tirada
+				actual</h3>
 			<table
 				id="stat_table"
-				border="2">
+				class="table is-striped is-bordered is-narrow">
 			</table>
 			<input
 				type="submit"
 				value="Tirar dado"
+				class="button is-fullwidth is-primary"
 				form="war_form"
 				onclick="return validateDieRoll();">
-		</section>
-		<section th:if="${session.war.id != null}">
-			<h3>Puntos acumulados</h3>
-			<table
-				border="2"
-				class="previous_rolls">
+		</div>
+	</section>
+	<section
+		class="section"
+		id="error_section">
+		<div class="container">
+			<h3 class="subtitle is-4 notification is-danger">Se han
+				detectado los siguientes errores:</h3>
+			<ul id="error_list">
+			</ul>
+		</div>
+	</section>
+	<section
+		class="section"
+		th:if="${session.war.id != null}">
+		<div class="container">
+			<h3 class="subtitle is-4">Puntos acumulados</h3>
+			<table class="class previous_rolls">
 				<tr>
 					<th>Puntos por tirada</th>
 					<th>Atacante</th>
@@ -1277,7 +1197,8 @@
 					<th id="defender_total_score"></th>
 				</tr>
 			</table>
-		</section>
-	</article>
+		</div>
+	</section>
+	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
