@@ -92,7 +92,7 @@ public class WarController {
 		wServ.endWar(war);
 		// TODO: Calculate and show the winning coalition
 		redirectAttributes.addAttribute("game_id", game.getId());
-		session.removeAttribute(Rules.FAIL);
+		session.removeAttribute(Rules.ROLL_FAIL);
 		return "redirect:/openGame";
 	}
 
@@ -172,22 +172,28 @@ public class WarController {
 			fails.setDefenderZeroCountError(
 					"La coalición defensora no tiene ningún país");
 		}
+		// Validate the turn
+		List<Turn> turns = tServ.findByGame(game);
+		Turn turn = tServ.findTurnFromGame(turns, subscenario);
+		if (turn == null) {
+			fails.setTurnError("Turno no encontrado para esa partida");
+		}
 		if (!fails.validate()) {
-			session.setAttribute(Rules.FAIL, fails);
+			session.setAttribute(Rules.ROLL_FAIL, fails);
 			redirectAttributes.addAttribute("war_id",
 					(war.getId() == null) ? "" : war.getId());
 			return "redirect:/war";
 		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
 				attackerCountries, defenderCountries, defenderName, attackerName,
-				subscenario);
+				turn);
 		// TODO: Calculate and show the winning coalition
 		if (roll == null) {
 			fails.setGenericRollError(
 					"Se ha producido un error al crear la tirada. Prueba a cerrar sesión y ha intentarlo otra vez. Si el error persiste es posible que la información de tu partida esté corrupta");
 			return "redirect:/landing";
 		} else {
-			session.removeAttribute(Rules.FAIL);
+			session.removeAttribute(Rules.ROLL_FAIL);
 			int nRolls = rServ.findByWar(war).size();
 			redirectAttributes.addAttribute("war_id", war.getId());
 			if (nRolls < Rules.MAX_ROLLS_PER_WAR) {

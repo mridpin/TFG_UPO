@@ -64,4 +64,19 @@ public class TurnServiceImpl implements TurnService {
 		return result;
 	}
 
+	@Override
+	public List<Turn> findByGame(Game game) {
+		return turnRep.findByGame(game);
+	}
+	
+	@Override
+	public Turn findTurnFromGame(List<Turn> turns, String subscenario) {
+		for (Turn turn : turns) {
+			if (turn.getSubscenario().equals(subscenario)) {
+				return turn;
+			}
+		}
+		return null;
+	}
+	
 }

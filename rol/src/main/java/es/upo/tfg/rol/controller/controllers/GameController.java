@@ -132,6 +132,9 @@ public class GameController {
 		List<Game> closedGames = gServ.findClosedGames(user);
 		model.addAttribute("openGames", playedGames);
 		model.addAttribute("closedGames", closedGames);
+		session.removeAttribute(Rules.GAME_FAIL);
+		session.removeAttribute(Rules.COUNTRY_FAIL);
+		session.removeAttribute(Rules.ROLL_FAIL);
 		return "landing";
 	}
 
@@ -141,12 +144,15 @@ public class GameController {
 		session.removeAttribute("turns");
 		session.removeAttribute("countries");
 		session.removeAttribute("newGameName");
+		session.removeAttribute("playerName");
+		session.removeAttribute(Rules.GAME_FAIL);
+		session.removeAttribute(Rules.COUNTRY_FAIL);
 		return "redirect:/create_game";
 	}
 
 	@PostMapping("/addScenario")
 	public String addScenario(
-			@RequestParam(name = "scenario_id", required = true) Long id,
+			@RequestParam(name = "scenario_id", required = true) String idString,
 			@RequestParam(name = "name", required = true) String name,
 			HttpSession session) {
 		// Perform validation
@@ -154,9 +160,16 @@ public class GameController {
 		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
 			validator.setGameNameError("El nombre debe tener entre 2 y 255 caracteres");
 		}
-		if (id == null) {
+		if (idString == null || "".equals(idString)) {
 			validator.setScenarioError("No se ha seleccionado ningún escenario");
 		}
+		Long id = -1L;
+		try {
+			id = Long.parseLong(idString);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			validator.setScenarioError("No se ha encontrado el escenario que buscabas");
+		}		
 		if (validator.validate()) {
 			Scenario scenario = scServ.findById(id);
 			if (scenario == null) {
@@ -171,11 +184,11 @@ public class GameController {
 				Game game = (Game) session.getAttribute("game");
 				List<Turn> turns = tServ.generateTurns(scenario, game);
 				session.setAttribute("turns", turns);
-				session.removeAttribute(Rules.FAIL);
+				session.removeAttribute(Rules.GAME_FAIL);
 				return "redirect:/create_game";
 			}
 		} else {
-			session.setAttribute(Rules.FAIL, validator);
+			session.setAttribute(Rules.GAME_FAIL, validator);
 			return "redirect:/create_game";
 		}
 	}
@@ -191,7 +204,7 @@ public class GameController {
 		files.remove(index);
 		session.setAttribute("countries", countries);
 		session.setAttribute("files", files);
-		session.removeAttribute(Rules.FAIL);
+		//session.removeAttribute(Rules.COUNTRY_FAIL);
 		return "redirect:/create_game";
 	}
 
@@ -268,10 +281,12 @@ public class GameController {
 					"El apodo introducido no corresponde a ningún jugador");
 		}
 		if (!validator.validate()) {
-			session.setAttribute(Rules.FAIL, validator);
+			session.setAttribute("playerName", nickname);			
+			session.setAttribute(Rules.COUNTRY_FAIL, validator);
 			return "redirect:/create_game";
 		}
-		session.removeAttribute(Rules.FAIL);
+		session.removeAttribute("playerName");
+		session.removeAttribute(Rules.COUNTRY_FAIL);
 		return "redirect:/create_game";
 	}
 
@@ -299,12 +314,14 @@ public class GameController {
 			if (game == null) {
 				// TODO: HANDLE ERROR
 			} else {
-				session.removeAttribute(Rules.FAIL);
+				session.removeAttribute(Rules.GAME_FAIL);
+				session.removeAttribute(Rules.COUNTRY_FAIL);
 				session.setAttribute("game", game);
 				redirect.addAttribute("game_id", game.getId());
 			}
 		} else {
-			session.setAttribute(Rules.FAIL, validator);
+			session.setAttribute(Rules.GAME_FAIL, validator);
+			session.setAttribute(Rules.COUNTRY_FAIL, validator);
 			return "redirect:/create_game";
 		}
 		return "redirect:/landing";

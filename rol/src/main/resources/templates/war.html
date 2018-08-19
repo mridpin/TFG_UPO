@@ -771,7 +771,7 @@
 			}
 		});
 		$("#error_section").hide();
-		$("#war_form").validate({
+		$("#war_formo").validate({
 			focusCleanup : true,
 			rules : {
 				name : {
@@ -826,15 +826,18 @@
 				<h3>Resultado de la &uacute;ltima tirada</h3>
 				<table
 					id="last_result"
-					border="1">
+					class="table is-narrow is-bordered is-striped"
+					style="display: table; width: 100%; table-layout: fixed;">
 					<tr>
 						<th colspan="4">Puntuaci&oacute;n</th>
 					</tr>
 					<tr>
 						<th
+						style="display: table-cell"
 							colspan="2"
 							th:text="${roll.attacker.name}"></th>
 						<th
+						style="display: table-cell"
 							colspan="2"
 							th:text="${roll.defender.name}"></th>
 					</tr>
@@ -842,8 +845,8 @@
 						<td colspan="2">
 							<table
 								id="last_attacker_result_table"
-								border="1"
-								style="width: 100%;">
+								class="table is-narrow is-bordered is-striped"
+								style="display: table; width: 100%; table-layout: fixed;width: 100%;">
 								<tr th:each="inv, invStats : ${roll.attacker.involvements}">
 									<td
 										class="last_attacker_country_name"
@@ -857,8 +860,8 @@
 						<td colspan="2">
 							<table
 								id="last_defender_result_table"
-								border="1"
-								style="width: 100%;">
+								class="table is-narrow is-bordered is-striped"
+								style="display: table; width: 100%; table-layout: fixed;width: 100%;">
 								<tr th:each="inv, invStats : ${roll.defender.involvements}">
 									<td
 										class="last_defender_country_name"
@@ -912,6 +915,9 @@
 				<li
 					th:if="${session.fail.countryNotRecognized != null}"
 					th:text="${session.fail.countryNotRecognized}"></li>
+									<li
+					th:if="${session.fail.turnError != null}"
+					th:text="${session.fail.turnError}"></li>
 				<li
 					th:if="${session.fail.genericRollError != null}"
 					th:text="${session.fail.genericRollError}"></li>
@@ -1162,8 +1168,8 @@
 				type="submit"
 				value="Tirar dado"
 				class="button is-fullwidth is-primary"
-				form="war_form"
-				onclick="return validateDieRoll();">
+				form="war_form">
+<!-- 				onclick="return validateDieRoll();"> -->
 		</div>
 	</section>
 	<section

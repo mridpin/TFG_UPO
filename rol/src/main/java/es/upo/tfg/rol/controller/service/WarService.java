@@ -13,10 +13,6 @@ public interface WarService {
 
 	void endWar(War war);
 
-	Roll roll(Game game, War war, String name, Double attackerScore, Double defenderScore,
-			String attackerCountries, String defenderCountries, String defenderName,
-			String attackerName, String subscenario);
-
 	List<War> findByGame(Game game);
 
 	War findById(String warId);
@@ -24,5 +20,9 @@ public interface WarService {
 	War findOpenWar(Game game);
 
 	List<War> findByTurn(Turn t);
+
+	Roll roll(Game game, War war, String name, Double attackerScore, Double defenderScore,
+			String attackerCountries, String defenderCountries, String defenderName,
+			String attackerName, Turn turn);
 	
 }

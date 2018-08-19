@@ -236,8 +236,22 @@ public class CountryServiceImpl implements CountryService {
 						&& !attribute.equals(Rules.COUNTRY_TYPE.toLowerCase())
 						&& !attribute.equals(Rules.COUNTRY_SUBSCENARIO.toLowerCase())) {
 					value = dataline[1];
-					Double.parseDouble(dataline[1]);
+					if (attribute.equals(Rules.NAVAL_POWER.toLowerCase())
+							|| attribute.equals(Rules.DEVELOPED_INFRAESTRUCTURE.toLowerCase())) {
+						if (!Rules.TRUE.contains(value.toLowerCase()) && !Rules.FALSE.contains(value.toLowerCase())) {
+							res.add("No se reconoce el valor " + value + " del atributo "
+									+ attribute + " en la línea " + (n + 1));
+						}
+					} else {
+						Double.parseDouble(dataline[1]);
+					}
 				}
+			}
+			if (n < scenarioFile.size()) {
+				res.add("El fichero del país no coincide en longitud con el del escenacio a partir de la línea " + (n+1) + ".");
+			}
+			if (line == null && n == 0) {
+				res.add("El fichero estaba vacío");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

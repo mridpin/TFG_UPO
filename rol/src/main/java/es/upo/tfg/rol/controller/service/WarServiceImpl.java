@@ -70,14 +70,7 @@ public class WarServiceImpl implements WarService {
 	@Override
 	public Roll roll(Game game, War war, String name, Double attackerScore,
 			Double defenderScore, String attackerCountries, String defenderCountries,
-			String defenderName, String attackerName, String subscenario) {
-		// Get the list of turns from the game, then find the correct one from the
-		// subscenario
-		List<Turn> turns = turnRep.findByGame(game);
-		Turn turn = this.findTurnFromGame(turns, subscenario);
-		if (turn == null) {
-			return null;
-		}
+			String defenderName, String attackerName, Turn turn) {
 		// Assign turn to war
 		war.setTurn(turn);
 		// If this is the first roll of the war, save it
@@ -232,21 +225,6 @@ public class WarServiceImpl implements WarService {
 		for (Country c : countries) {
 			if (c.getName().equals(name)) {
 				return c;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Finds a turn from a game by name
-	 * @param turns of the game
-	 * @param subscenario name of the turn to look for
-	 * @return the Turn if it exists, null if it doesn't
-	 */
-	private Turn findTurnFromGame(List<Turn> turns, String subscenario) {
-		for (Turn turn : turns) {
-			if (turn.getSubscenario().equals(subscenario)) {
-				return turn;
 			}
 		}
 		return null;

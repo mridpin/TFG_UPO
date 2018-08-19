@@ -1,6 +1,9 @@
 package es.upo.tfg.rol;
 
+
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Rules {
@@ -68,9 +71,18 @@ public class Rules {
 	
 	// Validation rules
 	public final static String FAIL = "fail";
+	public final static String GAME_FAIL = "gamefail";
 	public final static Integer MIN_NAME_LENGTH = 2;
 	public final static Integer MAX_NAME_LENGTH = 255;
 	public final static Integer MAX_TEXT_LENGTH = 511;
+	public static final String COUNTRY_FAIL = "countryfail";
+	public static final String ROLL_FAIL = "fail";
+	public static final List TRUE = Arrays.asList(new String[] {
+			"true", "sí", "yes", "si", "verdadero", "1", "1.0", "1.00"
+	});
+	public static final List FALSE = Arrays.asList(new String[] {
+			"false", "no", "0", "0.0", "0.00"
+	});
 	
 	public Rules() {
 		// TODO Auto-generated constructor stub

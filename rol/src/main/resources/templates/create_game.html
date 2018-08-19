@@ -59,7 +59,7 @@
 	});
 
 	$(document).ready(function() {
-		$("#game_formo").validate({
+		$("#game_form").validate({
 			focusCleanup : true,
 			rules : {
 				name : {
@@ -98,15 +98,15 @@
 				}
 			},
 			errorPlacement : function(error, element) {
-				error.insertBefore(element);
-				error.addClass("red");
+				error.insertAfter(element);
+				error.addClass("help is-danger");
+				element.addClass("is-danger")
 			},
 			highlight : function(element) {
-				$(element).removeClass("border-red");
+				$(element).removeClass("is-danger");
 			},
 			unhighlight : function(element) {
-				$(element).removeClass("border-red");
-				// TODO: RED STYLE ERRORS
+				$(element).removeClass("is-danger");
 			},
 		});
 		$("#country_form").validate({
@@ -147,23 +147,23 @@
 	<header th:replace="fragments/session_header :: header"></header>
 	<section
 		class="section"
-		th:if="${session.fail?.validate() == false}">
+		th:if="${session.gamefail?.validate() == false}">
 		<div class="container box">
 			<h4 class="subtitle is-4 notification is-danger">Se han
 				detectado los siguientes errores:</h4>
 			<ul>
 				<li
 					class="valdiation_error"
-					th:if="${session?.fail?.gameNameError != null}"
-					th:text="${session?.fail?.gameNameError}"></li>
+					th:if="${session?.gamefail?.gameNameError != null}"
+					th:text="${session?.gamefail?.gameNameError}"></li>
 				<li
 					class="valdiation_error"
-					th:if="${session?.fail?.playerCountError != null}"
-					th:text="${session?.fail?.playerCountError}"></li>
+					th:if="${session?.gamefail?.playerCountError != null}"
+					th:text="${session?.gamefail?.playerCountError}"></li>
 				<li
 					class="valdiation_error"
-					th:if="${session?.fail?.scenarioError != null}"
-					th:text="${session?.fail?.scenarioError}"></li>
+					th:if="${session?.gamefail?.scenarioError != null}"
+					th:text="${session?.gamefail?.scenarioError}"></li>
 			</ul>
 		</div>
 	</section>
@@ -354,35 +354,35 @@
 			<h3 class="subtitle is-4">Ahora, invita a tus jugadores</h3>
 			<div
 				class="box"
-				th:if="${session.fail?.validate() == false}">
+				th:if="${session.countryfail?.validate() == false}">
 				<h4 class="subtitle is-5 notification is-danger">Se han
 					detectado los siguientes errores con ese jugador:</h4>
 				<ul>
 					<li
 						class="valdiation_error"
-						th:if="${session?.fail?.addedGMError != null}"
-						th:text="${session?.fail?.addedGMError}"></li>
+						th:if="${session?.countryfail?.addedGMError != null}"
+						th:text="${session?.countryfail?.addedGMError}"></li>
 					<li
 						class="valdiation_error"
-						th:if="${session?.fail?.playerDoesntExistError != null}"
-						th:text="${session?.fail?.playerDoesntExistError}"></li>
+						th:if="${session?.countryfail?.playerDoesntExistError != null}"
+						th:text="${session?.countryfail?.playerDoesntExistError}"></li>
 					<li
 						class="valdiation_error"
-						th:if="${session?.fail?.duplicatePlayerError != null}"
-						th:text="${session?.fail?.duplicatePlayerError}"></li>
+						th:if="${session?.countryfail?.duplicatePlayerError != null}"
+						th:text="${session?.countryfail?.duplicatePlayerError}"></li>
 					<li
 						class="valdiation_error"
-						th:if="${session?.fail?.duplicateCountryError != null}"
-						th:text="${session?.fail?.duplicateCountryError}"></li>
+						th:if="${session?.countryfail?.duplicateCountryError != null}"
+						th:text="${session?.countryfail?.duplicateCountryError}"></li>
 					<li
 						class="valdiation_error"
-						th:if="${session?.fail?.countryFileError != null}">Errores en
-						el fichero:</li>
+						th:if="${session?.countryfail?.countryFileError != null}">Errores
+						en el fichero:</li>
 					<li
 						style="list-style: none;"
 						class="valdiation_error_file"
-						th:if="${session?.fail?.countryFileError != null}">
-						<ul th:each="error : ${session?.fail?.countryFileError}">
+						th:if="${session?.countryfail?.countryFileError != null}">
+						<ul th:each="error : ${session?.countryfail?.countryFileError}">
 							<li th:text="${error}"></li>
 						</ul>
 					</li>
@@ -413,6 +413,7 @@
 									name="countryIndex"
 									th:value="${countryStat.index}">
 								<input
+									class="button is-outlined is-info"
 									type="submit"
 									value="Quitar jugador">
 							</form>
@@ -432,7 +433,7 @@
 				enctype="multipart/form-data">
 				<div class="field">
 					<label
-						for="playerName"
+						for="player_nickname"
 						class="label">Apodo del jugador</label>
 					<div class="control">
 						<input
@@ -441,7 +442,7 @@
 							name="player_nickname"
 							class="input"
 							placeholder="Apodo..."
-							th:value="${playerName}"
+							th:value="${session.playerName}"
 							required
 							autofocus>
 					</div>
@@ -475,14 +476,14 @@
 		class="section"
 		th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
 		<div class="container">
-		<h3 class="subtitle is-4">¿Ya est&aacute; todo el mundo?</h3>
+			<h3 class="subtitle is-4">¿Ya est&aacute; todo el mundo?</h3>
 			<form
 				action="#"
 				id="create_game_form"
 				th:action="@{/submitGame}"
 				method="post">
 				<input
-				class="button is-primary is-medium is-fullwidth"
+					class="button is-primary is-medium is-fullwidth"
 					type="submit"
 					value="Finalizar Creaci&oacute;n">
 			</form>

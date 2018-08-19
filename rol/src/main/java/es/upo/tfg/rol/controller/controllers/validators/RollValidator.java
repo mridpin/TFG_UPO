@@ -14,6 +14,7 @@ public class RollValidator implements Validator {
 	private String defenderZeroCountError;
 	private String countryInv;
 	private String countryNotRecognized;
+	private String turnError;
 	private String genericRollError;
 
 	public RollValidator() {
@@ -75,7 +76,15 @@ public class RollValidator implements Validator {
 	public void setGenericRollError(String genericRollError) {
 		this.genericRollError = genericRollError;
 	}
-	
+		
+	public String getTurnError() {
+		return turnError;
+	}
+
+	public void setTurnError(String turnError) {
+		this.turnError = turnError;
+	}
+
 	public String getCountryNotRecognized() {
 		return countryNotRecognized;
 	}
@@ -95,7 +104,9 @@ public class RollValidator implements Validator {
 		res = res && getCountryInv() == null;
 		res = res && getGenericRollError() == null;
 		res = res && getCountryNotRecognized() == null;
+		res = res && getTurnError() == null;
 		return res;
 	}
+
 
 }

@@ -22,4 +22,16 @@ public interface TurnService {
 	 */
 	List<Turn> generateTurns(Scenario scenario, Game game);
 
+	List<Turn> findByGame(Game game);
+
+	/**
+	 * Finds a turn from a game by name
+	 * 
+	 * @param turns
+	 *            of the game
+	 * @param subscenario
+	 *            name of the turn to look for
+	 * @return the Turn if it exists, null if it doesn't
+	 */
+	Turn findTurnFromGame(List<Turn> turns, String subscenario);
 }

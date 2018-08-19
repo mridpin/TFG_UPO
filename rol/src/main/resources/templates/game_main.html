@@ -189,7 +189,7 @@
 															<table
 																id="last_attacker_result_table"
 																class="is-bordered table is-narrow"
-																style="width: 100%;">
+																style="display: table; width: 100%; table-layout: fixed;width: 100%;">
 																<tr
 																	th:each="inv, invStats : ${roll.attacker.involvements}">
 																	<td
@@ -207,7 +207,7 @@
 														<table
 															id="last_defender_result_table"
 															border="1"
-															style="width: 100%;">
+															style="display: table; width: 100%; table-layout: fixed;width: 100%;">
 															<tr
 																th:each="inv, invStats : ${roll.defender.involvements}">
 																<td
