@@ -48,7 +48,7 @@ public class WarServiceImpl implements WarService {
 	private InvolvementRepository invRep;
 	@Autowired
 	private CoalitionRepository coalRep;
-	
+
 	@Autowired
 	private CountryService countryServ;
 
@@ -166,6 +166,7 @@ public class WarServiceImpl implements WarService {
 
 	/**
 	 * Applies damage to the attributes of the attackers and defenders of the roll
+	 * 
 	 * @param roll
 	 */
 	private void applyCostOfWar(Roll roll) {
@@ -183,42 +184,206 @@ public class WarServiceImpl implements WarService {
 			Coalition defender = roll.getDefender();
 			winners = invRep.findByCoalition(defender);
 		}
+		//
+		Map<String, List<Involvement>> involvements = this.arrangeInvolvements(winners,
+				losers);
 		for (Involvement i : winners) {
-			this.damageCountry(Rules.COST_OF_WAR_WINNER, i);
+			i.setWonTheRoll(true);
+			// this.damageCountry(Rules.COST_OF_WAR_WINNER, i);
 		}
 		for (Involvement i : losers) {
-			this.damageCountry(Rules.COST_OF_WAR_LOSER, i);
+			i.setWonTheRoll(false);
+			// this.damageCountry(Rules.COST_OF_WAR_LOSER, i);
+		}
+		for (String countryName : involvements.keySet()) {
+			this.damageCountry(involvements.get(countryName));
 		}
 	}
 
 	/**
-	 * Applies damage to a country according to its participation in a roll
-	 * @param costOfWar the damage to apply to winners and losers, according to the Rules
-	 * @param i involvement of the country. countains the country and its participation percent
+	 * Organizes the winners and losers into a map of lists, where every map entry
+	 * is a country of the game that participated in a roll, and every list element
+	 * one of its involvements
+	 * 
+	 * @param winners
+	 *            countries in roll
+	 * @param losers
+	 *            countries in roll
+	 * @return map of lists of involvements
 	 */
-	private void damageCountry(Double costOfWar, Involvement i) {
-		Country c = i.getCountry();
+	private Map<String, List<Involvement>> arrangeInvolvements(List<Involvement> winners,
+			List<Involvement> losers) {
+		Map<String, List<Involvement>> involvements = new HashMap<>();
+		for (Involvement i : winners) {
+			String name = i.getCountry().getName();
+			if (!involvements.containsKey(name)) {
+				List<Involvement> involvementsForCountry = new ArrayList<>();
+				involvementsForCountry.add(i);
+				involvements.put(name, involvementsForCountry);
+			} else {
+				involvements.get(name).add(i);
+			}
+		}
+		for (Involvement i : losers) {
+			String name = i.getCountry().getName();
+			if (!involvements.containsKey(name)) {
+				List<Involvement> involvementsForCountry = new ArrayList<>();
+				involvementsForCountry.add(i);
+				involvements.put(name, involvementsForCountry);
+			} else {
+				involvements.get(name).add(i);
+			}
+		}
+		return involvements;
+	}
+
+	/**
+	 * Applies damage to a country according to its involvements in a roll
+	 *
+	 * @param i
+	 *            involvements of the country for the roll. contains the country and
+	 *            its participation percent
+	 */
+	private void damageCountry(List<Involvement> involvements) {
 		// Map the country
-		Map<String, Map<String, Map<String, Double>>> attributes = countryServ.mapCountry(c);
-		// Apply the damage
-		for (String subscenario : attributes.keySet()) {
-			Map<String, Map<String, Double>> subscenarioAttributes = attributes.get(subscenario);			
+		int n = 0;
+		Double leftoverInvolvement = 1.0;
+		Country c = involvements.get(0).getCountry();
+		Map<String, Map<String, Map<String, Double>>> currentAttributes = countryServ
+				.mapCountry(c);
+		// Map<String, Map<String, Map<String, Double>>> newAttributes = countryServ
+		// .mapCountry(c);
+		List<Map<String, Map<String, Map<String, Double>>>> countryAttributes = new ArrayList<>();
+
+		for (Involvement i : involvements) {
+			// Copy the starting resources to calculate what each partition consumes
+			Map<String, Map<String, Map<String, Double>>> newAttributes = new HashMap<>();
+			newAttributes = this.copyMap(currentAttributes);
+			Double costOfWar = (i.isWonTheRoll()) ? Rules.COST_OF_WAR_WINNER
+					: Rules.COST_OF_WAR_LOSER;
+			Double involvement = i.getInvolvementPercent();
+			leftoverInvolvement -= involvement;
+			// Save the results into the new map
+			for (String subscenario : currentAttributes.keySet()) {
+				Map<String, Map<String, Double>> subscenarioAttributes = currentAttributes
+						.get(subscenario);
+				for (String type : subscenarioAttributes.keySet()) {
+					Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
+					for (String key : typeAttributes.keySet()) {
+						if (n == 0) {
+							Double originalValue = typeAttributes.get(key);
+							// These are the remaining resources for the this involvement
+							// partition
+							Double d = originalValue * involvement * (1 - costOfWar);
+							newAttributes.get(subscenario).get(type).put(key, d);
+							// Double remainingRes = (1 - involvement) * originalValue;
+							// Double newValue = d + remainingRes;
+							// newAttributes.get(subscenario).get(type).put(key,
+							// newValue);
+						}
+						// } else {
+						// // For the second and later involvements, add the calculation
+						// // to the current value to get the total value.
+						// Double originalValue = typeAttributes.get(key);
+						// Double involvement = i.getInvolvementPercent();
+						// Double currValue = newAttributes.get(subscenario).get(type)
+						// .get(key);
+						// Double d = originalValue * involvement * (1 - costOfWar);
+						// // These are the untouched resources (can be 0 if involvement
+						// // was 1 (ie all resources were commited to a war))
+						// Double remainingRes = (1 - involvement) * originalValue;
+						// Double newValue = d + remainingRes + currValue;
+						// newAttributes.get(subscenario).get(type).put(key, newValue);
+						// }
+					}
+				}
+			}
+			countryAttributes.add(newAttributes);
+		}
+		// Merge all the maps
+		Map<String, Map<String, Map<String, Double>>> remainingAttributes = this
+				.mergeCountryPartitions(countryAttributes, leftoverInvolvement,
+						currentAttributes);
+		countryServ.demapCountry(remainingAttributes, c);
+	}
+
+	/**
+	 * Sums all the partitions of a country that participated in a war, plus all its
+	 * unused resources for that war
+	 * 
+	 * @param countryAttributes list of maps that represent country partitions
+	 * @param leftoverInvolvement percent of unused resources
+	 * @param currentAttributes original attributes at the start of the roll
+	 * @return map which is a sum of the remaining resources from each partition
+	 */
+	private Map<String, Map<String, Map<String, Double>>> mergeCountryPartitions(
+			List<Map<String, Map<String, Map<String, Double>>>> countryAttributes,
+			Double leftoverInvolvement,
+			Map<String, Map<String, Map<String, Double>>> currentAttributes) {
+		Map<String, Map<String, Map<String, Double>>> result = new HashMap<>();
+		// Copy the item 0 then start adding from item 1
+		result = copyMap(countryAttributes.get(0));
+		for (String subscenario : result.keySet()) {
+			Map<String, Map<String, Double>> subscenarioAttributes = result
+					.get(subscenario);
 			for (String type : subscenarioAttributes.keySet()) {
 				Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
 				for (String key : typeAttributes.keySet()) {
-					// TODO: ACUMULAR EL COST OF WAR
-					Double d = typeAttributes.get(key) * i.getInvolvementPercent() * (1 - costOfWar);
-					typeAttributes.put(key, d);
+					// For each attr, sum all the partitions: Take the current value, add
+					// the other partitions' values, then add
+					// the unused resources
+					Double originalValue = typeAttributes.get(key);
+					Double currentValue = originalValue;
+					for (int i = 1; i < countryAttributes.size(); i++) {
+						Double valueToAdd = countryAttributes.get(i).get(subscenario)
+								.get(type).get(key);
+						currentValue += valueToAdd;
+					}
+					// Get the attribute before the damage application and use it to
+					// calculate the remaining untouched resources (it can be 0 if
+					// involvement percent was 1)
+					Double valuesBeforeDamage = currentAttributes.get(subscenario)
+							.get(type).get(key);
+					Double newValue = currentValue
+							+ valuesBeforeDamage * leftoverInvolvement;
+					typeAttributes.put(key, newValue);
+					// TODO: RETOMAR AQUI: SUMAR LOS MAPAS
+					// Double currentValue = typeAttributes.get(key);
+					// Double valueToAdd =
+					// countryAttributes.get(i).get(subscenario).get(type).get(key);
+					// currentValue += valueToAdd;
 				}
 			}
 		}
-		countryServ.demapCountry(attributes, c);
+
+		// for (int i = 1; i<countryAttributes.size(); i++) {
+		// Map<String, Map<String, Map<String, Double>>> attributes =
+		// countryAttributes.get(i);
+		// for (String subscenario : attributes.keySet()) {
+		// Map<String, Map<String, Double>> subscenarioAttributes = attributes
+		// .get(subscenario);
+		// for (String type : subscenarioAttributes.keySet()) {
+		// Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
+		// for (String key : typeAttributes.keySet()) {
+		// // TODO: RETOMAR AQUI: SUMAR LOS MAPAS
+		//// Double currentValue = typeAttributes.get(key);
+		//// Double valueToAdd =
+		// countryAttributes.get(i).get(subscenario).get(type).get(key);
+		//// currentValue += valueToAdd;
+		// }
+		// }
+		// }
+
+		return result;
 	}
-	
+
 	/**
 	 * Finds a country in a list of countries from a game by name.
-	 * @param name of the country
-	 * @param countries that participated in a game
+	 * 
+	 * @param name
+	 *            of the country
+	 * @param countries
+	 *            that participated in a game
 	 * @return the Country if it exists, null if it doesn't
 	 */
 	private Country findCountryByName(String name, List<Country> countries) {
@@ -268,5 +433,30 @@ public class WarServiceImpl implements WarService {
 	@Override
 	public List<War> findByTurn(Turn turn) {
 		return warRep.findByTurn(turn);
+	}
+
+	/**
+	 * Deep copies a country map
+	 * @param map to copy
+	 * @return copied map
+	 */
+	private Map<String, Map<String, Map<String, Double>>> copyMap(
+			Map<String, Map<String, Map<String, Double>>> map) {
+		Map<String, Map<String, Map<String, Double>>> copy = new HashMap<>();
+		for (String subscenario : map.keySet()) {
+			Map<String, Map<String, Double>> subscenarioAttributes = map.get(subscenario);
+			Map<String, Map<String, Double>> copySubscenarioAttributes = new HashMap<>();
+			for (String type : subscenarioAttributes.keySet()) {
+				Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
+				Map<String, Double> copyTypeAttributes = new HashMap<>();
+				for (String key : typeAttributes.keySet()) {
+					Double d = new Double(typeAttributes.get(key));
+					copyTypeAttributes.put(key, d);
+				}
+				copySubscenarioAttributes.put(type, copyTypeAttributes);
+			}
+			copy.put(subscenario, copySubscenarioAttributes);
+		}
+		return copy;
 	}
 }

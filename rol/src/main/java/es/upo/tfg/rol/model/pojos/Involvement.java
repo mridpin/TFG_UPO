@@ -1,6 +1,7 @@
 package es.upo.tfg.rol.model.pojos;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -31,6 +32,8 @@ public class Involvement implements Serializable {
 	@Range(min = 0, max = 1)
 	@Column(name="involvement_percent")
 	private Double involvementPercent;
+	@Column(name="won_the_roll")
+	private Boolean wonTheRoll;
 
 	public Involvement() {
 		// TODO Auto-generated constructor stub
@@ -43,8 +46,6 @@ public class Involvement implements Serializable {
 		this.coalition = coalition;
 		this.involvementPercent = involvementPercent;
 	}
-
-
 
 	public Long getId() {
 		return id;
@@ -76,6 +77,14 @@ public class Involvement implements Serializable {
 
 	public void setInvolvementPercent(Double involvementPercent) {
 		this.involvementPercent = involvementPercent;
+	}		
+
+	public boolean isWonTheRoll() {
+		return wonTheRoll;
+	}
+
+	public void setWonTheRoll(boolean wonTheRoll) {
+		this.wonTheRoll = wonTheRoll;
 	}
 
 	@Override
