@@ -24,7 +24,8 @@
 			rules : {
 				nickname : {
 					minlength : 2,
-					maxlength : 32
+					maxlength : 32,
+					alphanumeric : true
 				},
 				name : {
 					minlength : 2,
@@ -40,6 +41,7 @@
 					required : "Especifica un apodo",
 					minlength : "El apodo debe tener 2 caracteres como mínimo",
 					maxlength : "Máximo 32 caracteres",
+					alphanumeric : "El apodo debe ser alfanumérico",
 				},
 				name : {
 					minlength : "El nombre debe tener 2 caracteres como mínimo",
@@ -67,147 +69,154 @@
 </head>
 <body>
 	<header th:replace="fragments/login_header :: header"></header>
-		<section class="section">
-			<h2 class="subtitle is-4">Introduce tu informaci&oacute;n</h2>
-			<div class="container has-text-centered">
-				<form
-					action="#"
-					id="register_form"
-					th:action="@{/register}"
-					th:object="${user}"
-					enctype="multipart/form-data"
-					method="post">
-					<div
-						class="notification is-danger"
-						th:if="${#fields.hasErrors('nickname')}">
-						<p th:errors="*{nickname}"></p>
-						<span class="icon is-small is-right"><i
-							class="fas fa-exclamation-triangle"></i></span>
+	<section class="section">
+		<h2 class="subtitle is-4">Introduce tu informaci&oacute;n</h2>
+		<div class="container has-text-centered">
+			<form
+				action="#"
+				id="register_form"
+				th:action="@{/register}"
+				th:object="${user}"
+				enctype="multipart/form-data"
+				method="post">
+				<div
+					class="notification is-danger"
+					th:if="${#fields.hasErrors('nickname')}">
+					<p th:errors="*{nickname}"></p>
+					<span class="icon is-small is-right"><i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div
+					class="notification is-danger"
+					th:if="${#fields.hasErrors('name')}">
+					<p th:errors="*{name}"></p>
+					<span class="icon is-small is-right"><i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div
+					class="notification is-danger"
+					th:if="${#fields.hasErrors('password')}">
+					<p th:errors="*{password}"></p>
+					<span class="icon is-small is-right"><i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div
+					class="notification is-danger"
+					th:if="${filesize != null}">
+					<p th:text="${filesize}"></p>
+					<span class="icon is-small is-right"><i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div class="field">
+					<label
+						for="nickname"
+						class="label">Apodo</label>
+					<div class="control has-icons-left">
+						<input
+							type="text"
+							th:field="*{nickname}"
+							id="nickname"
+							name="nickname"
+							class="input"
+							placeholder="Nickname"
+							required
+							autofocus>
+						<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
 					</div>
-					<div
-						class="notification is-danger"
-						th:if="${#fields.hasErrors('name')}">
-						<p th:errors="*{name}"></p>
-						<span class="icon is-small is-right"><i
-							class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div class="field">
+					<label
+						for="name"
+						class="label">Nombre</label>
+					<div class="control has-icons-left">
+						<input
+							type="text"
+							th:field="*{name}"
+							id="name"
+							name="name"
+							class="input"
+							placeholder="Name"
+							required>
+						<span class="icon is-small is-left"><i
+							class="fas fa-signature"></i></span>
 					</div>
-					<div
-						class="notification is-danger"
-						th:if="${#fields.hasErrors('password')}">
-						<p th:errors="*{password}"></p>
-						<span class="icon is-small is-right"><i
-							class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div class="field">
+					<label
+						for="avatar"
+						class="label">Avatar</label>
+					<div class="control has-icons-left">
+						<input
+							type="file"
+							name="avatar_image"
+							id="avatar"
+							accept="image/*"
+							class="input">
+						<span class="icon is-small is-left"><i
+							class="fas fa-file-image"></i></span>
 					</div>
-					<div class="field">
-						<label
-							for="nickname"
-							class="label">Apodo</label>
-						<div class="control has-icons-left">
-							<input
-								type="text"
-								th:field="*{nickname}"
-								id="nickname"
-								name="nickname"
-								class="input"
-								placeholder="Nickname"
-								required
-								autofocus>
-							<span class="icon is-small is-left"><i class="fas fa-user"></i></span>
-						</div>
+				</div>
+				<div class="field">
+					<label
+						for="inputPassword"
+						class="label">Contrase&ntilde;a</label>
+					<div class="control has-icons-left">
+						<input
+							type="password"
+							th:field="*{password}"
+							id="inputPassword"
+							name="password"
+							class="input"
+							placeholder="Password"
+							required>
+						<span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
 					</div>
-					<div class="field">
-						<label
-							for="name"
-							class="label">Nombre</label>
-						<div class="control has-icons-left">
-							<input
-								type="text"
-								th:field="*{name}"
-								id="name"
-								name="name"
-								class="input"
-								placeholder="Name"
-								required>
-							<span class="icon is-small is-left"><i
-								class="fas fa-signature"></i></span>
-						</div>
+				</div>
+				<div class="field">
+					<label
+						for="checkPassword"
+						class="label">Repite contrase&ntilde;a</label>
+					<div class="control has-icons-left">
+						<input
+							type="password"
+							name="checkPassword"
+							id="checkPassword"
+							class="input"
+							placeholder="Retype Password"
+							required>
+						<span class="icon is-small is-left"><i class="fas fa-lock"></i>
+							<i class="fas fa-lock"></i></span>
 					</div>
-					<div class="field">
-						<label
-							for="avatar"
-							class="label">Avatar</label>
-						<div class="control has-icons-left">
-							<input
-								type="file"
-								name="avatar_image"
-								id="avatar"
-								accept="image/*"
-								class="input">
-							<span class="icon is-small is-left"><i
-								class="fas fa-file-image"></i></span>
-						</div>
+				</div>
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-primary is-medium is-fullwidth"
+							type="submit"
+							value="Registrarse"
+							onclick="return matchPasswords()">
 					</div>
-					<div class="field">
-						<label
-							for="inputPassword"
-							class="label">Contrase&ntilde;a</label>
-						<div class="control has-icons-left">
-							<input
-								type="password"
-								th:field="*{password}"
-								id="inputPassword"
-								name="password"
-								class="input"
-								placeholder="Password"
-								required>
-							<span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
-						</div>
+				</div>
+			</form>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container has-text-centered">
+			<h3 class="subtitle is-5">¿Ya tienes una cuenta?</h3>
+			<form
+				th:action="@{/}"
+				method="get">
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-medium is-info is-outlined is-fullwidth"
+							type="submit"
+							value="Logu&eacute;ate">
 					</div>
-					<div class="field">
-						<label
-							for="checkPassword"
-							class="label">Repite contrase&ntilde;a</label>
-						<div class="control has-icons-left">
-							<input
-								type="password"
-								name="checkPassword"
-								id="checkPassword"
-								class="input"
-								placeholder="Retype Password"
-								required>
-							<span class="icon is-small is-left"><i class="fas fa-lock"></i>
-								<i class="fas fa-lock"></i></span>
-						</div>
-					</div>
-					<div class="field">
-						<div class="control">
-							<input
-								class="button is-primary is-medium is-fullwidth"
-								type="submit"
-								value="Registrarse"
-								onclick="return matchPasswords()">
-						</div>
-					</div>
-				</form>
-			</div>
-		</section>
-		<section class="section">
-			<div class="container has-text-centered">
-				<h3 class="subtitle is-5">¿Ya tienes una cuenta?</h3>
-				<form
-					th:action="@{/}"
-					method="get">
-					<div class="field">
-						<div class="control">
-							<input
-								class="button is-medium is-info is-outlined is-fullwidth"
-								type="submit"
-								value="Logu&eacute;ate">
-						</div>
-					</div>
-				</form>
-			</div>
-		</section>
+				</div>
+			</form>
+		</div>
+	</section>
 	<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

@@ -23,18 +23,38 @@
 				</h2>
 			</div>
 			<p>El recurso que estabas buscando no ha sido encontrado en
-				nuestro servidor.</p>
+				nuestro servidor. Si estabas subiendo un archivo, puede que este
+				sobrepasara el tama&ntilde;o m&aacute;ximo de 1 MB.</p>
 			<p>Prueba a cerrar la sesi&oacute;n y a intentarlo de nuevo. Si
 				el problema persiste, ponte en contacto con el administrador</p>
 			<form
 				action="#"
 				th:action="@{/landing}"
 				method="get">
-				<input
-					class="button is-fullwidth is-primary"
-					type="submit"
-					value="Volver a la p&aacute;gina principal">
+				<div class="field">
+					<div class="control">
+						<input
+							class="button is-fullwidth is-primary"
+							type="submit"
+							value="Volver a la p&aacute;gina principal">
+					</div>
+				</div>
 			</form>
+	</section>
+	<section class="section">
+		<form
+			action="#"
+			th:action="@{/logout}"
+			method="post">
+			<div class="field">
+				<div class="control">
+					<input
+						class="button is-fullwidth is-primary"
+						type="submit"
+						value="Cerrar sesi&oacute;n">
+				</div>
+			</div>
+		</form>
 		</div>
 	</section>
 	<footer th:replace="fragments/footer :: footer"></footer>

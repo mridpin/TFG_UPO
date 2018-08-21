@@ -89,18 +89,18 @@
 				<p th:text="${session.wrongPass}"></p>
 				<span class="icon is-small is-right"><i
 					class="fas fa-exclamation-triangle"></i></span>
-			<h3>Participantes</h3>
-			<table class="table is-striped is-narrow">
-				<tr>
-					<th>Jugador</th>
-					<th>Pa&iacute;s</th>
-				</tr>
-				<tr th:each="country, countryStat : ${countries}">
-					<td th:text="${country.player.nickname}"></td>
-					<td th:text="${country.name}"></td>
-				</tr>
-			</table>
-		</div>
+				<h3>Participantes</h3>
+				<table class="table is-striped is-narrow">
+					<tr>
+						<th>Jugador</th>
+						<th>Pa&iacute;s</th>
+					</tr>
+					<tr th:each="country, countryStat : ${countries}">
+						<td th:text="${country.player.nickname}"></td>
+						<td th:text="${country.name}"></td>
+					</tr>
+				</table>
+			</div>
 	</section>
 	<section class="section">
 		<div class="container">
@@ -116,12 +116,14 @@
 					</a>
 				</div>
 				<div class="level-item has-centered-text">
-					<button class="button is-fullwidth is-info is-outlined" onclick="showAll();">Abrir
-						todos</button>
+					<button
+						class="button is-fullwidth is-info is-outlined"
+						onclick="showAll();">Abrir todos</button>
 				</div>
 				<div class="level-item has-centered-text">
-					<button class="button is-fullwidth is-info is-outlined" onclick="hideAll();">Colapsar
-						todos</button>
+					<button
+						class="button is-fullwidth is-info is-outlined"
+						onclick="hideAll();">Colapsar todos</button>
 				</div>
 			</div>
 			<ul id="turn_list">
@@ -189,7 +191,7 @@
 															<table
 																id="last_attacker_result_table"
 																class="is-bordered table is-narrow"
-																style="display: table; width: 100%; table-layout: fixed;width: 100%;">
+																style="display: table; width: 100%; table-layout: fixed; width: 100%;">
 																<tr
 																	th:each="inv, invStats : ${roll.attacker.involvements}">
 																	<td
@@ -200,25 +202,25 @@
 																		th:text="${inv.involvementPercent}"></td>
 																</tr>
 															</table>
-													</td>
-													<td
-														style="display: table-cell"
-														colspan="2">
-														<table
-															id="last_defender_result_table"
-															border="1"
-															style="display: table; width: 100%; table-layout: fixed;width: 100%;">
-															<tr
-																th:each="inv, invStats : ${roll.defender.involvements}">
-																<td
-																	class="last_defender_country_name"
-																	th:text="${inv.country.name}"></td>
-																<td
-																	class="last_defender_country_percent"
-																	th:text="${inv.involvementPercent}"></td>
-															</tr>
-														</table>
-													</td>
+														</td>
+														<td
+															style="display: table-cell"
+															colspan="2">
+															<table
+																id="last_defender_result_table"
+																border="1"
+																style="display: table; width: 100%; table-layout: fixed; width: 100%;">
+																<tr
+																	th:each="inv, invStats : ${roll.defender.involvements}">
+																	<td
+																		class="last_defender_country_name"
+																		th:text="${inv.country.name}"></td>
+																	<td
+																		class="last_defender_country_percent"
+																		th:text="${inv.involvementPercent}"></td>
+																</tr>
+															</table>
+														</td>
 													</tr>
 													<tr>
 														<th
@@ -239,8 +241,7 @@
 																onclick="closeRoll(this.value)">Cerrar</button></td>
 													</tr>
 												</table>
-									</div>
-									</td>
+											</div></td>
 									</tr>
 								</th:block>
 								<tr class="total_score">
@@ -315,18 +316,28 @@
 				Turno siguiente: <span
 					th:text="${nextTurn==null ? 'Ya es el &uacute;ltimo turno' : nextTurn.subscenario}"></span>
 			</p>
-			<form
-				class="form"
-				action="#"
-				th:action="@{/nextTurn}"
-				method="post">
-				<input
-					class="button is-link is-medium is-fullwidth is-outlined"
-					id="next_turn_button"
-					type="submit"
-					value="Avanzar Turno"
-					th:disabled="${nextTurn==null}">
-			</form>
+			<div th:switch="${war==null}">
+				<form
+					class="form"
+					action="#"
+					th:action="@{/nextTurn}"
+					method="post"
+					th:case="${true}">
+					<input
+						class="button is-link is-medium is-fullwidth is-outlined"
+						id="next_turn_button"
+						type="submit"
+						value="Avanzar Turno"
+						th:disabled="${nextTurn==null}">
+				</form>
+				<div th:case="${false}">
+					<button
+						class="button is-link is-medium is-fullwidth is-outlined"
+						disabled>Avanzar Turno</button>
+					<p>Debes acabar o cerrar el enfrentamiento en curso antes de
+						avanzar turno</p>
+				</div>
+			</div>
 		</div>
 	</section>
 	<section

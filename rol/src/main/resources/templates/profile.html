@@ -36,7 +36,8 @@
 			rules : {
 				nickname : {
 					minlength : 2,
-					maxlength : 32
+					maxlength : 32,
+					alphanumeric : true,
 				},
 				name : {
 					minlength : 2,
@@ -52,6 +53,7 @@
 					required : "Especifica un apodo",
 					minlength : "El apodo debe tener 2 caracteres como mínimo",
 					maxlength : "Máximo 32 caracteres",
+					alphanumeric : "El apodo debe ser alfanumérico",
 				},
 				name : {
 					minlength : "El nombre debe tener 2 caracteres como mínimo",
@@ -113,6 +115,13 @@
 					class="notification is-danger"
 					th:if="${#fields.hasErrors('password')}">
 					<p th:errors="*{password}"></p>
+					<span class="icon is-small is-right"><i
+						class="fas fa-exclamation-triangle"></i></span>
+				</div>
+				<div
+					class="notification is-danger"
+					th:if="${filesize != null}">
+					<p th:text="${filesize}"></p>
 					<span class="icon is-small is-right"><i
 						class="fas fa-exclamation-triangle"></i></span>
 				</div>

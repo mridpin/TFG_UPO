@@ -83,6 +83,7 @@ public class Rules {
 	public static final List FALSE = Arrays.asList(new String[] {
 			"false", "no", "0", "0.0", "0.00"
 	});
+	public static final Long MAX_FILE_SIZE = 1000000L;
 	
 	public Rules() {
 		// TODO Auto-generated constructor stub

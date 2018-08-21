@@ -9,6 +9,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -24,9 +26,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.Game;
@@ -57,14 +62,14 @@ public class UserController {
 	public String logout(HttpSession session) {
 		session.removeAttribute("user");
 		session.invalidate();
-		return "index";
+		return "redirect:/";
 	}
 
 	@PostMapping("/login")
 	public String submitLogin(
 			@RequestParam(name = "nickname", required = true, defaultValue = "") String name,
-			@RequestParam(name = "pass", required = true, defaultValue = "") String pass, Model model,
-			HttpSession session) {
+			@RequestParam(name = "pass", required = true, defaultValue = "") String pass,
+			Model model, HttpSession session) {
 		User user = uServ.findByLogin(name, pass);
 		if (user == null) {
 			model.addAttribute("loginfail", "Credenciales incorrectas");
@@ -78,38 +83,35 @@ public class UserController {
 	@PostMapping("/register")
 	public String submitRegister(@ModelAttribute @Valid User user,
 			BindingResult bindingResult, HttpSession session,
-			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar,
+			Model model) {
 		// Check if the nickname is in use
+		if (avatar.getSize() >= Rules.MAX_FILE_SIZE) {
+			model.addAttribute("filesize", "El tamaño máximo de la imagen es de 1 MB");
+		}
 		boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
+		if (!user.getNickname().matches("^[\\p{L}0-9]*$")) {
+			bindingResult.rejectValue("nickname", "nickname.unavailable",
+					"El apodo solo puede contener caracteres alfanuméricos");
+		}
 		if (nicknameExists) {
 			bindingResult.rejectValue("nickname", "nickname.unavailable",
 					"El apodo ya existe");
 		}
 		// Reject used nicknames or bad formats
-		if (bindingResult.hasErrors()) {
+		if (bindingResult.hasErrors() || model.asMap().get("filesize") != null) {
 			return "register";
 		}
-		// Store user image in file system and save its path and name
-		String filename = System.currentTimeMillis() + "-"
-				+ StringUtils.cleanPath(avatar.getOriginalFilename());
-		Path avatarPath = Paths.get("userImages");
-		try (InputStream inputStream = avatar.getInputStream()) {
-			Files.copy(inputStream, avatarPath.resolve(filename),
-					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// Save user to database and session
-		user.setAvatar(filename);
-		uServ.saveUser(user);
-		session.setAttribute("user", user);
+		User registeredUser = uServ.register(user, avatar);
+		session.setAttribute("user", registeredUser);
 		return "redirect:/landing";
 	}
 
 	@PostMapping("/updateUser")
 	public String submitUpdate(@ModelAttribute @Valid User user,
 			BindingResult bindingResult, HttpSession session,
-			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar) {
+			@RequestParam(name = "avatar_image", required = true) MultipartFile avatar,
+			Model model) {
 		User currentUser = (User) session.getAttribute("user");
 		if (!Objects.equals(user.getNickname(), currentUser.getNickname())) {
 			boolean nicknameExists = (uServ.findByNickname(user.getNickname()) != null);
@@ -117,26 +119,30 @@ public class UserController {
 				bindingResult.rejectValue("nickname", "nickname.unavailable",
 						"El apodo ya está en uso");
 			}
-		}
-		if (bindingResult.hasErrors()) {
-			return "profile";
-		}
-		user.setId(((User) session.getAttribute("user")).getId());
-		if (!"".equals(avatar.getOriginalFilename())) {
-			String filename = ((User) session.getAttribute("user")).getAvatar();
-			Path avatarPath = Paths.get("userImages");
-			try (InputStream inputStream = avatar.getInputStream()) {
-				Files.copy(inputStream, avatarPath.resolve(filename),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (!user.getNickname().matches("^[\\p{L}0-9]*$")) {
+				bindingResult.rejectValue("nickname", "nickname.unavailable",
+						"El apodo solo puede contener caracteres alfanuméricos");
 			}
-			user.setAvatar(filename);
-		} else {
-			user.setAvatar(((User) session.getAttribute("user")).getAvatar());
 		}
-		uServ.saveUser(user);
-		session.setAttribute("user", user);
+		if (avatar.getSize() >= Rules.MAX_FILE_SIZE) {
+			model.addAttribute("filesize", "El tamaño máximo de la imagen es de 1 MB");
+		}
+		if (bindingResult.hasErrors() || model.asMap().get("filesize") != null) {
+			return "register";
+		}
+		user.setId(currentUser.getId());
+		User newUser = uServ.register(user, avatar);
+		session.setAttribute("user", newUser);
 		return "redirect:/landing";
 	}
+	//
+	// @Override
+	// public ModelAndView resolveException(HttpServletRequest request,
+	// HttpServletResponse response, Object handler, Exception ex) {
+	// ModelAndView mav = new ModelAndView();
+	// mav.addObject("filesize", "El tamaño máximo de la imagen es de 1 MB");
+	// mav.setViewName("register");
+	// User user = (User) request.getAttribute("user");
+	// return mav;
+	// }
 }
