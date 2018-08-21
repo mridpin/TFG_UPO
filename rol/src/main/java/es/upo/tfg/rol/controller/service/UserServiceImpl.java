@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public User register(@Valid User user, MultipartFile avatar) {
-
+		
 		// Store user image in file system and save its path and name
 		String filename = System.currentTimeMillis() + "-"
 				+ StringUtils.cleanPath(avatar.getOriginalFilename());

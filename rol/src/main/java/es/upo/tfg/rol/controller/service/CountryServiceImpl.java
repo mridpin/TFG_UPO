@@ -38,7 +38,6 @@ public class CountryServiceImpl implements CountryService {
 
 	@Override
 	public Country assembleCountry(User player, MultipartFile data) {
-		// TODO: Raise exceptions with non valid csvs or non utf8 ones
 		Country country = new Country();
 		country.setPlayer(player);
 		// Parse CSV file

@@ -196,9 +196,9 @@
 		// Balance the commitment
 		var newPercentInput = $(clone).find("input." + escapedName + "_percent_input");
 		var originalPercentInput = $(item).find("input." + escapedName + "_percent_input");
-		var originalPercent = $(originalPercentInput).val();
+		var originalPercent = parseFloat($(originalPercentInput).val());
 		var newPercent = 1 - originalPercent;
-		$(originalPercentInput).val(newPercent.toFixed(2));
+		$(originalPercentInput).val(originalPercent.toFixed(2));
 		$(newPercentInput).val(newPercent.toFixed(2));
 		balanceCommitment(name, name1, name2, originalPercent, newPercent);
 		swapButton(item, name);
@@ -1065,7 +1065,7 @@
 						th:id="${#strings.replace(country.name, ' ', '') + '_listitem'}"
 						th:name="${country.name}">
 						<span
-							th:class="'country_names ' + ${country.name}"
+							th:class="'country_names ' + ${#strings.replace(country.name, ' ', '')}"
 							th:text="${country.name}"></span>
 						<input
 							type="range"

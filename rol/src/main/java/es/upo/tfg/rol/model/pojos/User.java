@@ -42,6 +42,16 @@ public class User implements Serializable {
 	public User() {
 	}
 
+	public User(String avatar,
+			@NotNull(message = "{name.notnull}") @Size(min = 2, max = 64) String name,
+			@NotNull(message = "{nickname.notnull}") @Size(min = 2, max = 32, message = "{nickname.size}") String nickname,
+			@NotNull(message = "{password.notnull}") @Size(min = 5, max = 64, message = "{password.size}") String password) {
+		this.avatar = avatar;
+		this.name = name;
+		this.nickname = nickname;
+		this.password = password;
+	}
+
 	public Long getId() {
 		return this.id;
 	}
