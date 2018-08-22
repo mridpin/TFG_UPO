@@ -72,4 +72,6 @@ public interface CountryService {
 	void demapCountry(Map<String, Map<String, Map<String, Double>>> attributes,
 			Country country);
 
+	Country findById(Long id);
+
 }

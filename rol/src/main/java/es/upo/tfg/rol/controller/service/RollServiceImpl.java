@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.upo.tfg.rol.model.dao.RollRepository;
+import es.upo.tfg.rol.model.pojos.Coalition;
 import es.upo.tfg.rol.model.pojos.Roll;
 import es.upo.tfg.rol.model.pojos.War;
 
@@ -23,6 +24,17 @@ public class RollServiceImpl implements RollService {
 	@Override
 	public List<Roll> findByWar(War war) {
 		return rollRep.findByWar(war);
+	}
+
+	@Override
+	public Coalition getWinner(Roll lastRoll) {
+		if (lastRoll == null) {
+			return null;
+		}
+		if (lastRoll.getAttackerScore() > lastRoll.getDefenderScore()) {
+			return lastRoll.getAttacker();
+		}
+		return lastRoll.getDefender();
 	}
 
 }

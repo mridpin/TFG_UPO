@@ -27,6 +27,7 @@ import es.upo.tfg.rol.controller.service.RollService;
 import es.upo.tfg.rol.controller.service.ScenarioService;
 import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.WarService;
+import es.upo.tfg.rol.model.pojos.Coalition;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
@@ -72,6 +73,8 @@ public class WarController {
 			war = wServ.findById(warId);
 			rolls = rServ.findByWar(war);
 			lastRoll = rolls.get(rolls.size() - 1);
+			Coalition winner = rServ.getWinner(lastRoll);
+			model.addAttribute("winner", winner);
 		}
 		if (war == null) {
 			return Access.reject();
@@ -86,11 +89,13 @@ public class WarController {
 	}
 
 	@GetMapping("/endWar")
-	public String endWar(HttpSession session, RedirectAttributes redirectAttributes) {
+	public String endWar(Model model, HttpSession session,
+			RedirectAttributes redirectAttributes) {
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
 		wServ.endWar(war);
 		// TODO: Calculate and show the winning coalition
+		redirectAttributes.addAttribute("war_id", war.getId());
 		redirectAttributes.addAttribute("game_id", game.getId());
 		session.removeAttribute(Rules.ROLL_FAIL);
 		return "redirect:/openGame";
@@ -161,7 +166,8 @@ public class WarController {
 				if (errors == null) {
 					fails.setCountryNotRecognized("No se reconoce el país " + s[0] + ".");
 				} else {
-					fails.setCountryNotRecognized(errors + "No se reconoce el país " + s[0] + ".");
+					fails.setCountryNotRecognized(
+							errors + "No se reconoce el país " + s[0] + ".");
 				}
 			}
 		}
@@ -185,8 +191,7 @@ public class WarController {
 			return "redirect:/war";
 		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
-				attackerCountries, defenderCountries, defenderName, attackerName,
-				turn);
+				attackerCountries, defenderCountries, defenderName, attackerName, turn);
 		// TODO: Calculate and show the winning coalition
 		if (roll == null) {
 			fails.setGenericRollError(

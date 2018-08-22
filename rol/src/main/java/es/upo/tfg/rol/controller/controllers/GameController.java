@@ -1,5 +1,6 @@
 package es.upo.tfg.rol.controller.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -11,17 +12,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,6 +42,7 @@ import es.upo.tfg.rol.controller.service.TurnService;
 import es.upo.tfg.rol.controller.service.UserService;
 import es.upo.tfg.rol.controller.service.WarService;
 import es.upo.tfg.rol.exceptions.NotAuthorized;
+import es.upo.tfg.rol.model.pojos.Coalition;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
@@ -71,7 +79,8 @@ public class GameController {
 
 	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
-			@RequestParam(name = "game_id", required = true) String gameId) {
+			@RequestParam(name = "game_id", required = true) String gameId,
+			@RequestParam(name = "war_id", required = false) Long warId) {
 		User user = (User) session.getAttribute("user");
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
@@ -111,6 +120,13 @@ public class GameController {
 				model.addAttribute("war", war);
 			}
 			boolean access = Objects.equals(user, master);
+			// 5. Add the last war fought to the model
+			if (warId != null) {
+				War lastWar = (War) wServ.findById(warId.toString());
+				model.addAttribute("lastWar", lastWar);
+				Coalition winner = wServ.findWinner(lastWar);
+				model.addAttribute("winner", winner);
+			}
 			if (!access) {
 				return "game_main";
 			} else {
@@ -169,7 +185,7 @@ public class GameController {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			validator.setScenarioError("No se ha encontrado el escenario que buscabas");
-		}		
+		}
 		if (validator.validate()) {
 			Scenario scenario = scServ.findById(id);
 			if (scenario == null) {
@@ -204,7 +220,7 @@ public class GameController {
 		files.remove(index);
 		session.setAttribute("countries", countries);
 		session.setAttribute("files", files);
-		//session.removeAttribute(Rules.COUNTRY_FAIL);
+		// session.removeAttribute(Rules.COUNTRY_FAIL);
 		return "redirect:/create_game";
 	}
 
@@ -281,7 +297,7 @@ public class GameController {
 					"El apodo introducido no corresponde a ningún jugador");
 		}
 		if (!validator.validate()) {
-			session.setAttribute("playerName", nickname);			
+			session.setAttribute("playerName", nickname);
 			session.setAttribute(Rules.COUNTRY_FAIL, validator);
 			return "redirect:/create_game";
 		}
@@ -333,7 +349,7 @@ public class GameController {
 		// TODO: Show error message if incorrect password
 		User user = (User) session.getAttribute("user");
 		Game game = (Game) session.getAttribute("game");
-		if (Objects.equals(pass, user.getPassword())) {			
+		if (Objects.equals(pass, user.getPassword())) {
 			gServ.closeGame(game);
 			session.removeAttribute("game");
 			return "redirect:/landing";
@@ -352,5 +368,25 @@ public class GameController {
 		gServ.nextTurn(game);
 		redirectAttributes.addAttribute("game_id", game.getId());
 		return "redirect:/openGame";
+	}
+
+	@GetMapping(value = "/downloads/country", produces = MediaType.TEXT_PLAIN_VALUE)
+	@ResponseBody
+	public void downloadFile(Model model, @Param(value = "id") Long id,
+			HttpServletResponse response) {
+		Country country = cServ.findById(id);
+		if (country != null) {
+			String filename = Rules.COUNTRY_FILE_PATH + File.separator
+					+ country.getData();
+			FileSystemResource file = new FileSystemResource(filename);
+			response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+			response.setHeader("Content-disposition",
+					"attachment; filename=" + country.getName() + ".csv");
+			try {
+				StreamUtils.copy(file.getInputStream(), response.getOutputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

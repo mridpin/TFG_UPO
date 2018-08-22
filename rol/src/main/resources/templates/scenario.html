@@ -150,7 +150,106 @@
 							value="Crear Escenario">
 					</div>
 				</div>
+				<div class="field">
+					<p>
+						¿Es tu primera vez creando un escenario? <a href="#instrucciones">Revisa
+							las instrucciones abajo</a> o <a
+							th:href="@{/downloads/scenarios/template}"
+							download>descarga la plantilla<span
+							class="icon is-small is-left"><i class="fas fa-download"></i></span></a>
+					</p>
+				</div>
 			</form>
+		</div>
+	</section>
+	<section
+		class="section"
+		id="instrucciones">
+		<div class="container">
+			<h3 class="subtitle is-3">C&oacute;mo crear un escenario:</h3>
+			<ol>
+				<li>
+					Empieza por crear un fichero CSV con el block de notas, Notepad++ o
+					MS Excel. <a
+						href="https://soporte.newslettersoft.com/hc/es/articles/216592343-C%C3%B3mo-generar-un-fichero-CSV-codificado-en-UTF-8-en-Excel">
+						Asegúrate de que el set de caracteres es UTF-8</a>
+				</li>
+				<li>Los atributos deben ir organizados en tres niveles de
+					anidamiento: <strong>subescenario > tipo > atributo</strong>. Dentro de un tipo,
+					puede haber tantos atributos como desees, siempre que el número sea
+					consistente dentro del mismo tipo. Es decir, si creas un tipo
+					"económico" que tiene 3 atributos, ese tipo debe repetirse en los
+					demás subescenarios con los 3 mismos atributos. Lo mismo ocurre con
+					tipos y subescenarios: puede haber tantos como quieras, pero deben
+					ser consistentes al repetirse</li>
+				<li>Para designar los subescenarios y tipos, usa las palabras
+					reservadas <strong>Subescenario</strong> y <strong>Tipo</strong></li>
+				<li>No debe haber números negativos. Si quieres bonificar al
+					país con el valor más bajo, usa el valor inverso, por ejemplo 1/8 =
+					0.125</li>
+				<li>Existen <strong>palabras clave</strong> que los nombres de atributos y
+					tipos deben tener para que se apliquen las reglas del juego. Sólo
+					una de cada grupo es necesaria. Si falta alguna de ellas las reglas
+					del juego no se aplicarán a tu escenario y es posible que algunas
+					herramientas no funcionen correctamente.</li>
+				<li style="list-style: none;">
+					<ol>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).MILITARY_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como militar
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).ECONOMY_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como económico
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como naval
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).DEVELOPED_INFRAESTRUCTURE, ',')}"></em>:
+							identifica al atributo que designa a la infraestructura de un
+							país como desarrollada. El nombre debe coincidir exactamente y
+							debe estar en el tipo militar.
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_POWER, ',')}"></em>:
+							identifica al atributo que designa a un país como potencia naval.
+							El nombre debe coincidir exactamente y debe estar en el tipo
+							naval.
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).INFANTRY_ATTR_KEYWORDS, ',')}"></em>:
+							identifica a los atributos de infantería que serán penalizados en
+							el ataque y bonificados en la defensa. naval.
+						</li>
+						<li>
+							<em
+								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).RESERVES_ATTR_KEYWORDS, ',')}"></em>:
+							identifica al los atributos que marcan las reservas y no estarán
+							disponibles en la primera tirada.
+						</li>
+					</ol>
+				</li>
+				<li>
+					<a
+						th:href="@{/downloads/scenarios/template}"
+						download>Aquí puedes descargar un escenario de ejemplo.<span
+						class="icon is-small is-left"><i class="fas fa-download"></i></span></a>
+					Puedes añadir o eliminar atributos, tipos o subescenarios, o
+					modificar los ya existentes.
+				</li>
+				<li>La aplicación hará lo posible por validar tu escenario,
+					pero si este no cumple alguna condición, es probable que alguna
+					herramienta no funcione correctamenta y tu experiencia de juego se
+					vea afectada negativamente.</li>
+			</ol>
 		</div>
 	</section>
 	<footer th:replace="fragments/footer :: footer"></footer>

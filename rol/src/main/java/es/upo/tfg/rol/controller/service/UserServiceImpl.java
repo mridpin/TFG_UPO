@@ -26,22 +26,25 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRep;
-	
+
 	@Override
 	public User register(@Valid User user, MultipartFile avatar) {
-		
-		// Store user image in file system and save its path and name
-		String filename = System.currentTimeMillis() + "-"
-				+ StringUtils.cleanPath(avatar.getOriginalFilename());
-		Path avatarPath = Paths.get("userImages");
-		try (InputStream inputStream = avatar.getInputStream()) {
-			Files.copy(inputStream, avatarPath.resolve(filename),
-					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+		if ("".equals(avatar.getOriginalFilename())) {
+			user.setAvatar(Rules.DEFAULT_USER_IMAGE);
+		} else {
+			// Store user image in file system and save its path and name
+			String filename = System.currentTimeMillis() + "-"
+					+ StringUtils.cleanPath(avatar.getOriginalFilename());
+			Path avatarPath = Paths.get("userImages");
+			try (InputStream inputStream = avatar.getInputStream()) {
+				Files.copy(inputStream, avatarPath.resolve(filename),
+						StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+			user.setAvatar(filename);
 		}
-		user.setAvatar(filename);
 		userRep.save(user);
 		return user;
 	}
@@ -106,7 +109,7 @@ public class UserServiceImpl implements UserService {
 		if (user.isPresent()) {
 			return user.get();
 		}
-		return null;		
+		return null;
 	}
 
 }

@@ -1,6 +1,6 @@
 package es.upo.tfg.rol;
 
-
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +22,8 @@ public class Rules {
 	public final static String DEVELOPED_INFRAESTRUCTURE = "Infraestructura desarrollada";
 	public final static String NAVAL_POWER = "Potencia naval";
 	public final static String SEMICOLON = ";";
+	public static final String SCENARIO_TEMPLATE = STATIC_FILE_PATH + File.separator + "scenario_template.csv";
+	public static final String DEFAULT_USER_IMAGE = "default_user_image.png";
 	// Combat constants
 	public final static Double BLOCKADE_PENALTY = 0.75;
 	public final static Double INLAND_BATTLE_PENALTY = 0.75;
@@ -29,14 +31,20 @@ public class Rules {
 	public final static Double INFANTRY_ATTACK_PENALTY = 1 - 0.10;
 	public final static Double INFANTRY_DEFENSE_BONUS = 1 + 0.07;
 	// Attribute constants
-	// Keywords to look for to detect which attributes or types of attributes must be modified
+	// Keywords to look for to detect which attributes or types of attributes must
+	// be modified
 	public final static String[] INFANTRY_ATTR_KEYWORDS = { "infanteria", "infantería",
-			"soldados", "soldado", "reserva", "reservas", "reservistas", "caballeria", "caballería", "caballeros"};
-	public final static String[] RESERVES_ATTR_KEYWORDS = {"reserva", "reservas", "reservistas", "reservista"};
-	public final static String[] NAVAL_TYPE_KEYWORDS = {"navales", "naval", "marina", "armada"};
-	public final static String[] ECONOMY_TYPE_KEYWORDS = {"economía", "economia", "económicos", "económico", "economicos", "economico"};
-	public final static String[] MILITARY_TYPE_KEYWORDS = {"militar", "militares"};
-	// Used to tag relevant attributes and types so that the client can identify them and apply the logic
+			"soldados", "soldado", "reserva", "reservas", "reservistas", "caballeria",
+			"caballería", "caballeros" };
+	public final static String[] RESERVES_ATTR_KEYWORDS = { "reserva", "reservas",
+			"reservistas", "reservista" };
+	public final static String[] NAVAL_TYPE_KEYWORDS = { "navales", "naval", "marina",
+			"armada" };
+	public final static String[] ECONOMY_TYPE_KEYWORDS = { "economía", "economia",
+			"económicos", "económico", "economicos", "economico" };
+	public final static String[] MILITARY_TYPE_KEYWORDS = { "militar", "militares" };
+	// Used to tag relevant attributes and types so that the client can identify
+	// them and apply the logic
 	public final static String ECONOMY = "ECONOMY";
 	public final static String NAVAL = "NAVAL";
 	public final static String MILITARY = "MILITARY";
@@ -69,7 +77,7 @@ public class Rules {
 	public final static Double LOWEST_ROLL_MODIFIER = 0.95;
 	public final static Double COST_OF_WAR_LOSER = 0.05;
 	public final static Double COST_OF_WAR_WINNER = 0.02;
-	
+
 	// Validation rules
 	public final static String FAIL = "fail";
 	public final static String GAME_FAIL = "gamefail";
@@ -78,14 +86,12 @@ public class Rules {
 	public final static Integer MAX_TEXT_LENGTH = 511;
 	public static final String COUNTRY_FAIL = "countryfail";
 	public static final String ROLL_FAIL = "fail";
-	public static final List TRUE = Arrays.asList(new String[] {
-			"true", "sí", "yes", "si", "verdadero", "1", "1.0", "1.00"
-	});
-	public static final List FALSE = Arrays.asList(new String[] {
-			"false", "no", "0", "0.0", "0.00"
-	});
+	public static final List TRUE = Arrays.asList(
+			new String[] { "true", "sí", "yes", "si", "verdadero", "1", "1.0", "1.00" });
+	public static final List FALSE = Arrays
+			.asList(new String[] { "false", "no", "0", "0.0", "0.00" });
 	public static final Long MAX_FILE_SIZE = 1000000L;
-	
+
 	public Rules() {
 		// TODO Auto-generated constructor stub
 	}

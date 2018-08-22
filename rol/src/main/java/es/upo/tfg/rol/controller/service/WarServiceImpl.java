@@ -51,6 +51,8 @@ public class WarServiceImpl implements WarService {
 
 	@Autowired
 	private CountryService countryServ;
+	@Autowired
+	private RollService rollServ;
 
 	@Override
 	public War createWar(Game game) {
@@ -311,9 +313,12 @@ public class WarServiceImpl implements WarService {
 	 * Sums all the partitions of a country that participated in a war, plus all its
 	 * unused resources for that war
 	 * 
-	 * @param countryAttributes list of maps that represent country partitions
-	 * @param leftoverInvolvement percent of unused resources
-	 * @param currentAttributes original attributes at the start of the roll
+	 * @param countryAttributes
+	 *            list of maps that represent country partitions
+	 * @param leftoverInvolvement
+	 *            percent of unused resources
+	 * @param currentAttributes
+	 *            original attributes at the start of the roll
 	 * @return map which is a sum of the remaining resources from each partition
 	 */
 	private Map<String, Map<String, Map<String, Double>>> mergeCountryPartitions(
@@ -329,9 +334,6 @@ public class WarServiceImpl implements WarService {
 			for (String type : subscenarioAttributes.keySet()) {
 				Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
 				for (String key : typeAttributes.keySet()) {
-					// For each attr, sum all the partitions: Take the current value, add
-					// the other partitions' values, then add
-					// the unused resources
 					Double originalValue = typeAttributes.get(key);
 					Double currentValue = originalValue;
 					for (int i = 1; i < countryAttributes.size(); i++) {
@@ -339,41 +341,14 @@ public class WarServiceImpl implements WarService {
 								.get(type).get(key);
 						currentValue += valueToAdd;
 					}
-					// Get the attribute before the damage application and use it to
-					// calculate the remaining untouched resources (it can be 0 if
-					// involvement percent was 1)
 					Double valuesBeforeDamage = currentAttributes.get(subscenario)
 							.get(type).get(key);
 					Double newValue = currentValue
 							+ valuesBeforeDamage * leftoverInvolvement;
 					typeAttributes.put(key, newValue);
-					// TODO: RETOMAR AQUI: SUMAR LOS MAPAS
-					// Double currentValue = typeAttributes.get(key);
-					// Double valueToAdd =
-					// countryAttributes.get(i).get(subscenario).get(type).get(key);
-					// currentValue += valueToAdd;
 				}
 			}
 		}
-
-		// for (int i = 1; i<countryAttributes.size(); i++) {
-		// Map<String, Map<String, Map<String, Double>>> attributes =
-		// countryAttributes.get(i);
-		// for (String subscenario : attributes.keySet()) {
-		// Map<String, Map<String, Double>> subscenarioAttributes = attributes
-		// .get(subscenario);
-		// for (String type : subscenarioAttributes.keySet()) {
-		// Map<String, Double> typeAttributes = subscenarioAttributes.get(type);
-		// for (String key : typeAttributes.keySet()) {
-		// // TODO: RETOMAR AQUI: SUMAR LOS MAPAS
-		//// Double currentValue = typeAttributes.get(key);
-		//// Double valueToAdd =
-		// countryAttributes.get(i).get(subscenario).get(type).get(key);
-		//// currentValue += valueToAdd;
-		// }
-		// }
-		// }
-
 		return result;
 	}
 
@@ -435,12 +410,8 @@ public class WarServiceImpl implements WarService {
 		return warRep.findByTurn(turn);
 	}
 
-	/**
-	 * Deep copies a country map
-	 * @param map to copy
-	 * @return copied map
-	 */
-	private Map<String, Map<String, Map<String, Double>>> copyMap(
+	@Override
+	public Map<String, Map<String, Map<String, Double>>> copyMap(
 			Map<String, Map<String, Map<String, Double>>> map) {
 		Map<String, Map<String, Map<String, Double>>> copy = new HashMap<>();
 		for (String subscenario : map.keySet()) {
@@ -458,5 +429,24 @@ public class WarServiceImpl implements WarService {
 			copy.put(subscenario, copySubscenarioAttributes);
 		}
 		return copy;
+	}
+
+	@Override
+	public Coalition findWinner(War war) {
+		if (war == null) {
+			return null;
+		}
+		Double attackerScore = 0.0;
+		Double defenderScore = 0.0;
+		Coalition attacker = null;
+		Coalition defender = null;
+		for (Roll roll : war.getRolls()) {
+			attackerScore += roll.getAttackerScore();
+			defenderScore += roll.getDefenderScore();
+			// Returns the attacker and defender coalitions in their latest state
+			attacker = roll.getAttacker();
+			defender = roll.getDefender();
+		}
+		return (attackerScore > defenderScore) ? attacker : defender;
 	}
 }

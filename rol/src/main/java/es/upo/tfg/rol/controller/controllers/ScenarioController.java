@@ -139,6 +139,24 @@ public class ScenarioController {
 		return attributes;
 	}
 	
+	@GetMapping(value = "/downloads/scenarios/template", produces = MediaType.TEXT_PLAIN_VALUE)
+	@ResponseBody
+	public void downloadtemplate(Model model,
+			HttpServletResponse response) {
+
+			String filename = Rules.SCENARIO_FILE_PATH + File.separator
+					+ Rules.SCENARIO_TEMPLATE;
+			FileSystemResource file = new FileSystemResource(filename);
+			response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+			response.setHeader("Content-disposition",
+					"attachment; filename=plantilla_escenario.csv");
+			try {
+				StreamUtils.copy(file.getInputStream(), response.getOutputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+	
 	private boolean findMatches(String type, String[] keywords) {
 		for (String keyword : keywords) {
 			if (type.contains(keyword)) {

@@ -67,6 +67,15 @@
 	// const INFANTRY_DEFENSE_BONUS = 1 + 0.07;
 	const INFANTRY_DEFENSE_BONUS = "INFANTRY_DEFENSE_BONUS";
 
+	function hideModal() {
+		$("#modal_title").removeClass("has-text-white");
+		$("#modal_subtitle").removeClass("has-text-white");
+		var modal = $("#result_box");
+		$(modal).removeClass("is-active");
+		$("#last_result_div").append($("#modal_content_box"));
+		$("#modal_content_box").show();
+	}
+
 	function toggleTurns() {
 		$("ul#subscenario_list").toggle();
 	}
@@ -724,6 +733,16 @@
 
 		$("ul.coalition_lists").disableSelection();
 
+		// Modal options
+		$("#result_box").addClass("is-active");
+		$("#modal_title").addClass("has-text-white");
+		$("#modal_subtitle").addClass("has-text-white");
+		$("#modal_content_box").effect("slide", {direction: "up"}, function() {
+			$("#modal_background").on("click", function() {
+				hideModal();
+			});
+		});
+
 		$("#war_form").submit(function() {
 			// Submit the scores
 			$("#attacker_score").val($("#total_attack_score").text());
@@ -822,66 +841,90 @@
 			th:each="roll, rollStats : ${rolls}"
 			th:if="${rollStats.index == rollStats.size-1}"
 			id="last_roll_result">
-			<div class="container">
+			<div
+				class="container"
+				id="last_result_div">
 				<h3>Resultado de la &uacute;ltima tirada</h3>
-				<table
-					id="last_result"
-					class="table is-narrow is-bordered is-striped"
-					style="display: table; width: 100%; table-layout: fixed;">
-					<tr>
-						<th colspan="4">Puntuaci&oacute;n</th>
-					</tr>
-					<tr>
-						<th
-						style="display: table-cell"
-							colspan="2"
-							th:text="${roll.attacker.name}"></th>
-						<th
-						style="display: table-cell"
-							colspan="2"
-							th:text="${roll.defender.name}"></th>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<table
-								id="last_attacker_result_table"
-								class="table is-narrow is-bordered is-striped"
-								style="display: table; width: 100%; table-layout: fixed;width: 100%;">
-								<tr th:each="inv, invStats : ${roll.attacker.involvements}">
-									<td
-										class="last_attacker_country_name"
-										th:text="${inv.country.name}"></td>
-									<td
-										class="last_attacker_country_percent"
-										th:text="${inv.involvementPercent}"></td>
-								</tr>
-							</table>
-						</td>
-						<td colspan="2">
-							<table
-								id="last_defender_result_table"
-								class="table is-narrow is-bordered is-striped"
-								style="display: table; width: 100%; table-layout: fixed;width: 100%;">
-								<tr th:each="inv, invStats : ${roll.defender.involvements}">
-									<td
-										class="last_defender_country_name"
-										th:text="${inv.country.name}"></td>
-									<td
-										class="last_defender_country_percent"
-										th:text="${inv.involvementPercent}"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<th
-							colspan="2"
-							th:text="${#numbers.formatDecimal(roll.attackerScore, 0, 2)}"></th>
-						<th
-							colspan="2"
-							th:text="${#numbers.formatDecimal(roll.defenderScore, 0, 2)}"></th>
-					</tr>
-				</table>
+				<div
+					class="box modal"
+					id="result_box">
+					<div
+						class="modal-background"
+						id="modal_background"></div>
+					<div
+						class="modal-content"
+						id="modal_content_box">
+						<h3 class="title is-4" id="modal_title">
+							Vencedores: <em
+							id="modal_subtitle"
+								class="title is-2"
+								style="text-decoration: underline;"
+								th:text="${winner.name}"></em>
+						</h3>
+						<table
+							id="last_result"
+							class="table is-narrow is-bordered is-striped"
+							style="display: table; width: 100%; table-layout: fixed;">
+							<tr>
+								<th colspan="4">Puntuaci&oacute;n</th>
+							</tr>
+							<tr>
+								<th
+									style="display: table-cell"
+									colspan="2"
+									th:text="${roll.attacker.name}"></th>
+								<th
+									style="display: table-cell"
+									colspan="2"
+									th:text="${roll.defender.name}"></th>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<table
+										id="last_attacker_result_table"
+										class="table is-narrow is-bordered is-striped"
+										style="display: table; width: 100%; table-layout: fixed; width: 100%;">
+										<tr th:each="inv, invStats : ${roll.attacker.involvements}">
+											<td
+												class="last_attacker_country_name"
+												th:text="${inv.country.name}"></td>
+											<td
+												class="last_attacker_country_percent"
+												th:text="${inv.involvementPercent}"></td>
+										</tr>
+									</table>
+								</td>
+								<td colspan="2">
+									<table
+										id="last_defender_result_table"
+										class="table is-narrow is-bordered is-striped"
+										style="display: table; width: 100%; table-layout: fixed; width: 100%;">
+										<tr th:each="inv, invStats : ${roll.defender.involvements}">
+											<td
+												class="last_defender_country_name"
+												th:text="${inv.country.name}"></td>
+											<td
+												class="last_defender_country_percent"
+												th:text="${inv.involvementPercent}"></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<th
+									colspan="2"
+									th:text="${#numbers.formatDecimal(roll.attackerScore, 0, 2)}"></th>
+								<th
+									colspan="2"
+									th:text="${#numbers.formatDecimal(roll.defenderScore, 0, 2)}"></th>
+							</tr>
+						</table>
+					</div>
+					<button
+						class="modal-close is-large"
+						aria-label="close"
+						onclick="hideModal();"></button>
+				</div>
 			</div>
 		</section>
 	</th:block>
@@ -915,7 +958,7 @@
 				<li
 					th:if="${session.fail.countryNotRecognized != null}"
 					th:text="${session.fail.countryNotRecognized}"></li>
-									<li
+				<li
 					th:if="${session.fail.turnError != null}"
 					th:text="${session.fail.turnError}"></li>
 				<li
@@ -1169,7 +1212,7 @@
 				value="Tirar dado"
 				class="button is-fullwidth is-primary"
 				form="war_form">
-<!-- 				onclick="return validateDieRoll();"> -->
+			onclick="return validateDieRoll();">
 		</div>
 	</section>
 	<section
