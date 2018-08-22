@@ -52,5 +52,7 @@ public interface ScenarioService {
 	Map<String, Object> mapRules(Scenario scenario);
 
 	List<String> validateScenarioFile(MultipartFile data);
+
+	Scenario save(Scenario scenario);
 	
 }

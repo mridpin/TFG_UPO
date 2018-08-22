@@ -1,0 +1,13 @@
+Nombre;Alemania;
+Subescenario;1860;
+Tipo;economicos;
+PIB;1000;
+Tipo;militares;
+Soldados;1000;
+Infraestructura desarrollada;1.0;
+Subescenario;1870;
+Tipo;economicos;
+PIB;2000;
+Tipo;militares;
+Soldados;2000;
+Infraestructura desarrollada;1.0;

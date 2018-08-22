@@ -46,7 +46,6 @@ public class ScenarioServiceImpl implements ScenarioService {
 	@Override
 	public Scenario createScenario(String name, String description, MultipartFile data,
 			User user) {
-		// TODO: Raise exceptions with non valid csvs or non utf8 ones
 		Scenario scenario = new Scenario();
 		scenario.setName(name);
 		scenario.setDescription(description);
@@ -264,6 +263,12 @@ public class ScenarioServiceImpl implements ScenarioService {
 					+ n);
 		}
 		return res;
+	}
+
+	@Override
+	public Scenario save(Scenario scenario) {
+		scRep.save(scenario);
+		return scenario;
 	}
 
 }

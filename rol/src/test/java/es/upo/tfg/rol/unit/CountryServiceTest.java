@@ -63,25 +63,7 @@ public class CountryServiceTest {
 
 	@Test
 	public void mapCountryTest_ok() {
-		Map<String, Map<String, Map<String, Double>>> map = new HashMap<>();
-		Map<String, Map<String, Double>> sub1860Attributes = new HashMap<>();
-		Map<String, Map<String, Double>> sub1870Attributes = new HashMap<>();
-		Map<String, Double> eco1860Attributes = new HashMap<>();
-		Map<String, Double> eco1870Attributes = new HashMap<>();
-		Map<String, Double> mil1860Attributes = new HashMap<>();
-		Map<String, Double> mil1870Attributes = new HashMap<>();
-		eco1860Attributes.put("PIB", 1000.0);
-		eco1870Attributes.put("PIB", 2000.0);
-		mil1860Attributes.put("Infraestructura desarrollada", 1.0);
-		mil1860Attributes.put("Soldados", 1000.0);
-		mil1870Attributes.put("Infraestructura desarrollada", 1.0);
-		mil1870Attributes.put("Soldados", 2000.0);
-		sub1860Attributes.put("economicos", eco1860Attributes);
-		sub1860Attributes.put("militares", mil1860Attributes);
-		sub1870Attributes.put("militares", mil1870Attributes);
-		sub1870Attributes.put("economicos", eco1870Attributes);
-		map.put("1860", sub1860Attributes);
-		map.put("1870", sub1870Attributes);
+		Map<String, Map<String, Map<String, Double>>> map = this.generateMap();
 		Country country = new Country(null, "Alemania", TestUtils.TEST_COUNTRY_FILE_PATH, user, null);
 		Map<String, Map<String, Map<String, Double>>> newMap = cs.mapCountry(country);
 		
@@ -120,6 +102,36 @@ public class CountryServiceTest {
 			}
 	}
 	
-	// TODO: TEST DEMAP COUNTRY
+	@Test
+	public void demapCountryTest_ok() {
+		Map<String, Map<String, Map<String, Double>>> map = this.generateMap();
+		Country country = new Country(null, "Alemania", TestUtils.TEST_DEMAPCOUNTRY_FILE_PATH, user, null);
+		cs.demapCountry(map, country);
+		Map<String, Map<String, Map<String, Double>>> newMap = cs.mapCountry(country);
+		assertEquals(map, newMap);
+	}
+	
+	private Map<String, Map<String, Map<String, Double>>> generateMap() {
+		Map<String, Map<String, Map<String, Double>>> map = new HashMap<>();
+		Map<String, Map<String, Double>> sub1860Attributes = new HashMap<>();
+		Map<String, Map<String, Double>> sub1870Attributes = new HashMap<>();
+		Map<String, Double> eco1860Attributes = new HashMap<>();
+		Map<String, Double> eco1870Attributes = new HashMap<>();
+		Map<String, Double> mil1860Attributes = new HashMap<>();
+		Map<String, Double> mil1870Attributes = new HashMap<>();
+		eco1860Attributes.put("PIB", 1000.0);
+		eco1870Attributes.put("PIB", 2000.0);
+		mil1860Attributes.put("Infraestructura desarrollada", 1.0);
+		mil1860Attributes.put("Soldados", 1000.0);
+		mil1870Attributes.put("Infraestructura desarrollada", 1.0);
+		mil1870Attributes.put("Soldados", 2000.0);
+		sub1860Attributes.put("economicos", eco1860Attributes);
+		sub1860Attributes.put("militares", mil1860Attributes);
+		sub1870Attributes.put("militares", mil1870Attributes);
+		sub1870Attributes.put("economicos", eco1870Attributes);
+		map.put("1860", sub1860Attributes);
+		map.put("1870", sub1870Attributes);
+		return map;
+	}
 
 }
