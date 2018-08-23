@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -177,9 +179,12 @@ public class GameServiceImpl implements GameService {
 
 	/**
 	 * Restores the atributes to the values of the original file. Only countries
-	 * that didn't participate in any war in a turn will get restored	 * 
-	 * @param game in question
-	 * @param turn that has just been played
+	 * that didn't participate in any war in a turn will get restored *
+	 * 
+	 * @param game
+	 *            in question
+	 * @param turn
+	 *            that has just been played
 	 */
 	private void restoreCountries(Game game, Turn turn) {
 		List<Country> countries = countryService.findCountries(game);
@@ -212,7 +217,7 @@ public class GameServiceImpl implements GameService {
 		CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING,
 				StandardCopyOption.COPY_ATTRIBUTES };
 		try {
-			//Files.deleteIfExists(Paths.get(currFilename));
+			// Files.deleteIfExists(Paths.get(currFilename));
 			Files.copy(Paths.get(ogFilename), Paths.get(currFilename), options);
 		} catch (IOException e) {
 			// TODO: HANDLE THIS EXCEPTION? PRIORITY = 3
@@ -227,6 +232,35 @@ public class GameServiceImpl implements GameService {
 			result.add(i.getCountry());
 		}
 		return result;
+	}
+
+	@Override
+	public List<List<String>> getChartData(Game game) {
+		List<Country> countries = countryService.findCountries(game);
+		List<List<String>> data = new ArrayList<>();
+		for (Country c : countries) {
+			List<String> countryData = new ArrayList<>();
+			Double participation = 0.0;
+			Double victories = 0.0;
+			List<Roll> participatedRolls = rollService.findRollsFromCountry(c, game);
+			List<Roll> wonRolls = rollService.findWonRollsFromCountry(c, game);
+			List<Roll> allRolls = rollService.findByGame(game);
+			Integer parRoll = participatedRolls.size();
+			Integer nWonRolls = wonRolls.size();
+			Integer all = allRolls.size();
+			if (all.doubleValue() == 0) {
+				participation = 0.0;
+				victories = 0.0;
+			} else {
+				victories = nWonRolls.doubleValue() / all.doubleValue();
+				participation = parRoll.doubleValue() / all.doubleValue();
+			}			
+			countryData.add(c.getName());
+			countryData.add(participation.toString());
+			countryData.add("" + victories.toString());
+			data.add(countryData);
+		}
+		return data;
 	}
 
 }

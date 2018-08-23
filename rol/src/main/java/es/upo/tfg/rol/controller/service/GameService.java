@@ -1,6 +1,7 @@
 package es.upo.tfg.rol.controller.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,5 +92,7 @@ public interface GameService {
 	 *            to advance turn
 	 */
 	void nextTurn(Game game);
+
+	List<List<String>> getChartData(Game game);
 
 }

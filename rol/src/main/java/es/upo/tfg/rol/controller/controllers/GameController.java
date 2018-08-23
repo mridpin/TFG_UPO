@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
@@ -127,6 +128,9 @@ public class GameController {
 				Coalition winner = wServ.findWinner(lastWar);
 				model.addAttribute("winner", winner);
 			}
+			//6. Add the graph data
+			List<List<String>> data = gServ.getChartData(game);
+			model.addAttribute("data", data);
 			if (!access) {
 				return "game_main";
 			} else {

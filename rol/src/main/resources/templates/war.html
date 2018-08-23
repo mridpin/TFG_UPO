@@ -871,12 +871,14 @@
 							<tr>
 								<th
 									style="display: table-cell"
-									colspan="2"
 									th:text="${roll.attacker.name}"></th>
+									<th class="has-text-centered has-icons-left"><span class="icon is-small is-left"><i
+									class="fas fa-dice"></i></span> <span class="subtitle is-5" th:text="${roll.attackerRoll}"></span></th>
 								<th
 									style="display: table-cell"
-									colspan="2"
 									th:text="${roll.defender.name}"></th>
+									<th class="has-text-centered has-icons-left"><span class="icon is-small is-left"><i
+									class="fas fa-dice"></i></span> <span class="subtitle is-5" th:text="${roll.defenderRoll}"></span></th>
 							</tr>
 							<tr>
 								<td colspan="2">
@@ -1211,7 +1213,7 @@
 				type="submit"
 				value="Tirar dado"
 				class="button is-fullwidth is-primary"
-				form="war_form">
+				form="war_form"
 			onclick="return validateDieRoll();">
 		</div>
 	</section>

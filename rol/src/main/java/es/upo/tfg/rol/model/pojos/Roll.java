@@ -20,9 +20,13 @@ public class Roll implements Serializable {
 	@NotNull
 	@Column(name = "attacker_score")
 	private Double attackerScore;
+	@Column(name = "attacker_roll")
+	private Integer attackerRoll;
 	@NotNull
 	@Column(name = "defender_score")
 	private Double defenderScore;
+	@Column(name = "defender_roll")
+	private Integer defenderRoll;
 	@NotNull
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "attacker")
@@ -97,6 +101,22 @@ public class Roll implements Serializable {
 
 	public void setWar(War war) {
 		this.war = war;
+	}
+	
+	public Integer getAttackerRoll() {
+		return attackerRoll;
+	}
+
+	public void setAttackerRoll(Integer attackerRoll) {
+		this.attackerRoll = attackerRoll;
+	}
+
+	public Integer getDefenderRoll() {
+		return defenderRoll;
+	}
+
+	public void setDefenderRoll(Integer defenderRoll) {
+		this.defenderRoll = defenderRoll;
 	}
 
 	@Override

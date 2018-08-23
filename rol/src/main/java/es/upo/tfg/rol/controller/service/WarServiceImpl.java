@@ -158,6 +158,8 @@ public class WarServiceImpl implements WarService {
 		roll.setDefender(defender);
 		roll.setAttackerScore(attackerScore);
 		roll.setDefenderScore(defenderScore);
+		roll.setAttackerRoll(attackerRoll);
+		roll.setDefenderRoll(defenderRoll);
 		roll.setWar(war);
 		rollRep.save(roll);
 		// Cost of war penalty
@@ -190,11 +192,11 @@ public class WarServiceImpl implements WarService {
 		Map<String, List<Involvement>> involvements = this.arrangeInvolvements(winners,
 				losers);
 		for (Involvement i : winners) {
-			i.setWonTheRoll(true);
+			i.setWonTheRoll(new Boolean(true));
 			// this.damageCountry(Rules.COST_OF_WAR_WINNER, i);
 		}
 		for (Involvement i : losers) {
-			i.setWonTheRoll(false);
+			i.setWonTheRoll(new Boolean(false));
 			// this.damageCountry(Rules.COST_OF_WAR_LOSER, i);
 		}
 		for (String countryName : involvements.keySet()) {
@@ -278,25 +280,7 @@ public class WarServiceImpl implements WarService {
 							// partition
 							Double d = originalValue * involvement * (1 - costOfWar);
 							newAttributes.get(subscenario).get(type).put(key, d);
-							// Double remainingRes = (1 - involvement) * originalValue;
-							// Double newValue = d + remainingRes;
-							// newAttributes.get(subscenario).get(type).put(key,
-							// newValue);
 						}
-						// } else {
-						// // For the second and later involvements, add the calculation
-						// // to the current value to get the total value.
-						// Double originalValue = typeAttributes.get(key);
-						// Double involvement = i.getInvolvementPercent();
-						// Double currValue = newAttributes.get(subscenario).get(type)
-						// .get(key);
-						// Double d = originalValue * involvement * (1 - costOfWar);
-						// // These are the untouched resources (can be 0 if involvement
-						// // was 1 (ie all resources were commited to a war))
-						// Double remainingRes = (1 - involvement) * originalValue;
-						// Double newValue = d + remainingRes + currValue;
-						// newAttributes.get(subscenario).get(type).put(key, newValue);
-						// }
 					}
 				}
 			}
