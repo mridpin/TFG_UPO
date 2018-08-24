@@ -81,8 +81,8 @@ public class GameController {
 	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
 			@RequestParam(name = "game_id", required = true) String gameId,
-			@RequestParam(name = "war_id", required = false) Long warId) {
-		User user = (User) session.getAttribute("user");
+			@RequestParam(name = "war_id", required = false) Long warId, 
+			@RequestParam(name = "is_update", required = false) Boolean update) {
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
 			// values in the url, or F12 and changing the html. If they do, they'll be
@@ -92,7 +92,6 @@ public class GameController {
 			if (game == null) {
 				throw new NotAuthorized("Recurso no encontrado");
 			}
-			User master = game.getMaster();
 			// Add relevant info to the model:
 			// 1. Add the game
 			model.addAttribute("game", game);
@@ -120,7 +119,6 @@ public class GameController {
 			if (war != null) {
 				model.addAttribute("war", war);
 			}
-			boolean access = Objects.equals(user, master);
 			// 5. Add the last war fought to the model
 			if (warId != null) {
 				War lastWar = (War) wServ.findById(warId.toString());
@@ -128,11 +126,12 @@ public class GameController {
 				Coalition winner = wServ.findWinner(lastWar);
 				model.addAttribute("winner", winner);
 			}
-			//6. Add the graph data
+			// 6. Add the graph data
 			List<List<String>> data = gServ.getChartData(game);
 			model.addAttribute("data", data);
-			if (!access) {
-				return "game_main";
+			// 7. If its an ajax update call, only draw the war list fragment
+			if (update != null && update==true) {
+				return "game_main :: war_lists";
 			} else {
 				return "game_main";
 			}

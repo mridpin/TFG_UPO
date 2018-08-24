@@ -92,7 +92,6 @@
 				hideModal();
 			});
 		});
-
 	});
 </script>
 <script
@@ -102,7 +101,6 @@
 	type="text/javascript"
 	th:inline="javascript">
 	/* <![CDATA[ */
-
 	$(document).ready(function() {
 		// Load chart type and call draw function
 		google.charts.load('current', {
@@ -113,7 +111,34 @@
 		$(window).resize(function() {
 			drawVisualization();
 		});
+		
+		// Ajax call to update page content
+		setInterval(function(){
+			updateData();
+		}, 10000);
 
+		function updateLists(response) {
+			$("#turn_list").remove()
+			$("#results_container").append(response);
+			drawVisualization();
+		}
+
+		function updateData() {
+			$.ajax({
+				type : "GET",
+				url : "/openGame",
+				data : {
+					game_id: 13, 
+					is_update: true,
+				},
+				success : function(response) {
+					updateLists(response);
+					// Hide detail tables
+					$(".roll_detail").hide();
+				}
+			});
+		}
+		
 		function drawVisualization() {			
 			var data = [];
 			data.push(['País', '% Participación', '% Victorias']);
@@ -199,11 +224,12 @@
 				</tr>
 			</table>
 			<div class="container box">
-			<div
-				id="chart_div"
+				<div
+					id="chart_div"
 					class="is-desktop"
-				style="width: 100%; min-height: 700px;"></div>
-				</div>
+					style="width: 100%; min-height: 700px;"></div>
+			</div>
+		</div>
 	</section>
 	<section class="section">
 		<div
@@ -344,7 +370,9 @@
 					onclick="hideModal();"></button>
 			</div>
 		</div>
-		<div class="container">
+		<div
+			class="container"
+			id="results_container">
 			<h3 class="subtitle is-4">Enfrentamientos</h3>
 			<div class="level">
 				<div class="level-item has-centered-text">
@@ -367,7 +395,9 @@
 						onclick="hideAll();">Colapsar todos</button>
 				</div>
 			</div>
-			<ul id="turn_list">
+			<ul
+				th:fragment="war_lists"
+				id="turn_list">
 				<li th:each="turn, turnStats : ${turns}">
 					<a
 						th:name="${'turn' + turnStats.index}"
