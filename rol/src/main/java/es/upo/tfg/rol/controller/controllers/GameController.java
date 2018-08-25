@@ -112,7 +112,6 @@ public class GameController {
 				wars.add(turnWars);
 			}
 			model.addAttribute("wars", wars);
-			// TODO: UPDATE DESIGN DIAGRAM
 			// If there is no open war, "create war" button will show, else it will be a
 			// "open ongoing war" button
 			War war = wServ.findOpenWar(game);
