@@ -348,7 +348,6 @@ public class GameController {
 	@PostMapping("/closeGame")
 	public String closeGame(@RequestParam(name = "pass", required = true) String pass,
 			HttpSession session, RedirectAttributes redirectAttributes) {
-		// TODO: Show error message if incorrect password
 		User user = (User) session.getAttribute("user");
 		Game game = (Game) session.getAttribute("game");
 		if (Objects.equals(pass, user.getPassword())) {
@@ -365,7 +364,6 @@ public class GameController {
 	@PostMapping("/nextTurn")
 	public String endTurn(HttpSession session, Model model,
 			RedirectAttributes redirectAttributes) {
-		// TODO: POST REDIRECT GET THIS
 		Game game = (Game) session.getAttribute("game");
 		gServ.nextTurn(game);
 		redirectAttributes.addAttribute("game_id", game.getId());

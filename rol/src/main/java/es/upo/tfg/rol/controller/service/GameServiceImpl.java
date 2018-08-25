@@ -238,26 +238,30 @@ public class GameServiceImpl implements GameService {
 	public List<List<String>> getChartData(Game game) {
 		List<Country> countries = countryService.findCountries(game);
 		List<List<String>> data = new ArrayList<>();
+		List<Roll> allRolls = rollService.findByGame(game);
+		Integer all = allRolls.size();
 		for (Country c : countries) {
 			List<String> countryData = new ArrayList<>();
 			Double participation = 0.0;
 			Double victories = 0.0;
 			List<Roll> participatedRolls = rollService.findRollsFromCountry(c, game);
 			List<Roll> wonRolls = rollService.findWonRollsFromCountry(c, game);
-			List<Roll> allRolls = rollService.findByGame(game);
 			Integer parRoll = participatedRolls.size();
 			Integer nWonRolls = wonRolls.size();
-			Integer all = allRolls.size();
 			if (all.doubleValue() == 0) {
 				participation = 0.0;
 				victories = 0.0;
 			} else {
-				victories = nWonRolls.doubleValue() / all.doubleValue();
+				if (parRoll.intValue() == 0) {
+					victories = 0.0;
+				} else {
+					victories = nWonRolls.doubleValue() / parRoll.doubleValue();
+				}
 				participation = parRoll.doubleValue() / all.doubleValue();
-			}			
+			}
 			countryData.add(c.getName());
 			countryData.add(participation.toString());
-			countryData.add("" + victories.toString());
+			countryData.add(victories.toString());
 			data.add(countryData);
 		}
 		return data;
