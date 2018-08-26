@@ -23,8 +23,6 @@ public class RollServiceImpl implements RollService {
 	@Autowired
 	private RollRepository rollRep;
 
-	@Autowired
-	private WarService warService;
 
 	public RollServiceImpl() {
 	}

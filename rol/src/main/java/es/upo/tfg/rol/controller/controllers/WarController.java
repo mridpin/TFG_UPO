@@ -64,7 +64,6 @@ public class WarController {
 		List<Country> countries = cServ.findCountries(game);
 		List<Turn> turns = tServ.findTurns(game);
 		// If there is no id, it means a new war must be created
-		// TODO: UPDATE DESIGN DIAGRAM
 		War war;
 		List<Roll> rolls = new ArrayList<>();
 		if (warId == null || "".equals(warId)) {
@@ -94,7 +93,6 @@ public class WarController {
 		Game game = (Game) session.getAttribute("game");
 		War war = (War) session.getAttribute("war");
 		wServ.endWar(war);
-		// TODO: Calculate and show the winning coalition
 		redirectAttributes.addAttribute("war_id", war.getId());
 		redirectAttributes.addAttribute("game_id", game.getId());
 		session.removeAttribute(Rules.ROLL_FAIL);
@@ -192,7 +190,6 @@ public class WarController {
 		}
 		Roll roll = wServ.roll(game, war, name, attackerScore, defenderScore,
 				attackerCountries, defenderCountries, defenderName, attackerName, turn);
-		// TODO: Calculate and show the winning coalition
 		if (roll == null) {
 			fails.setGenericRollError(
 					"Se ha producido un error al crear la tirada. Prueba a cerrar sesión y ha intentarlo otra vez. Si el error persiste es posible que la información de tu partida esté corrupta");

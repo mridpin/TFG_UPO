@@ -24,7 +24,6 @@ public class Turn implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "game")
 	private Game game;
-	// TODO: SECURE THE ORDER BY ADDING A ORDER ATTRIBUTE
 
 	public Turn() {
 	}

@@ -51,8 +51,6 @@ public class WarServiceImpl implements WarService {
 
 	@Autowired
 	private CountryService countryServ;
-	@Autowired
-	private RollService rollServ;
 
 	@Override
 	public War createWar(Game game) {
@@ -78,7 +76,6 @@ public class WarServiceImpl implements WarService {
 		// If this is the first roll of the war, save it
 		if (war.getId() == null) {
 			if ("".equals(name)) {
-				// TODO: UPDATE DESIGN DIAGRAM TO REFLECT THESE CHANGES
 				int warNumber = warRep.findByTurn(turn).size();
 				String genericWarName = "Guerra " + warNumber + " de "
 						+ turn.getSubscenario();
@@ -88,7 +85,6 @@ public class WarServiceImpl implements WarService {
 			}
 			warRep.save(war);
 		} else {
-			// TODO: UPDATE DESIGN DIAGRAM TO REFLECT THESE CHANGES
 			List<Roll> rolls = rollRep.findByWar(war);
 			attackerName = rolls.get(rolls.size() - 1).getAttacker().getName();
 			defenderName = rolls.get(rolls.size() - 1).getAttacker().getName();
