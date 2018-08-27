@@ -87,7 +87,7 @@ public class WarServiceImpl implements WarService {
 		} else {
 			List<Roll> rolls = rollRep.findByWar(war);
 			attackerName = rolls.get(rolls.size() - 1).getAttacker().getName();
-			defenderName = rolls.get(rolls.size() - 1).getAttacker().getName();
+			defenderName = rolls.get(rolls.size() - 1).getDefender().getName();
 		}
 		// Create the coalitions
 		List<Country> countries = countryRep.findByGame(game);

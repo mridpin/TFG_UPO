@@ -48,6 +48,7 @@ public class ScenarioController {
 		Scenario scenario = (Scenario) session.getAttribute("scenario");
 		model.addAttribute("scenario", scenario);
 		model.addAttribute("map", map);
+		session.removeAttribute("scenario");
 		return "scenario-resumen";
 	}
 

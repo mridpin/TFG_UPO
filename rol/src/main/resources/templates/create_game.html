@@ -117,7 +117,9 @@
 					minlength : 2,
 					maxlength : 32,
 					validUser : true,
-					noPlayers : true,
+				}, 
+				country_data : {
+					required : true,
 				}
 			},
 			messages : {
@@ -126,6 +128,9 @@
 					minlength : "El apodo debe tener 2 caracteres como mínimo",
 					maxlength : "Máximo 32 caracteres",
 					validUser : "El usuario ya ha sido añadido a la partida"
+				},
+				country_data : {
+					required : "Adjunta un fichero para el jugador",
 				}
 			},
 			errorPlacement : function(error, element) {

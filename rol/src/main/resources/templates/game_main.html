@@ -99,18 +99,10 @@
 	src="https://www.gstatic.com/charts/loader.js"></script>
 <script
 	type="text/javascript"
-	th:inline="javascript">
+		th:inline="javascript" 
+			th:if="${game.master!=session.user and game.endDate == null}">
 	/* <![CDATA[ */
 	$(document).ready(function() {
-		// Load chart type and call draw function
-		google.charts.load('current', {
-			'packages' : [ 'corechart' ]
-		});
-		google.charts.setOnLoadCallback(drawVisualization);
-		
-		$(window).resize(function() {
-			drawVisualization();
-		});
 		
 		// Ajax call to update page content
 		setInterval(function(){
@@ -120,7 +112,6 @@
 		function updateLists(response) {
 			$("#turn_list").remove()
 			$("#results_container").append(response);
-			drawVisualization();
 		}
 
 		function updateData() {
@@ -128,7 +119,7 @@
 				type : "GET",
 				url : "/openGame",
 				data : {
-					game_id: 13, 
+					game_id: [[${session.game.id}]], 
 					is_update: true,
 				},
 				success : function(response) {
@@ -139,53 +130,70 @@
 			});
 		}
 		
-		function drawVisualization() {			
-			var data = [];
-			data.push(['País', '% Participación', '% Victorias']);
-			// Get the data directly from the model
-			var countries = [[${data}]];
-			// Parse the labels and the floats
-			for (var i = 0; i <countries.length; i++) {
-				var country = [];
-				for (var j = 0; j<countries[i].length; j++) {
-					if (isNaN(countries[i][j])) {
-						country.push(countries[i][j]);
-					} else {
-						country.push(parseFloat(countries[i][j]));
-					}
-				}
-				data.push(country);
-			}
-			// Give data to Google
-	        var data = google.visualization.arrayToDataTable(data);
-	        
-	        var options = {
-	        	      title : 'Porcentaje de participación y victorias en tiradas de cada país',
-	        	      vAxes: {
-	        	    	  0: {
-	        	    		  viewWindowMode:'explicit',
-	        	    		  viewWindow:{
-	                                  max:1,
-	                                  min:0
-	                          },
-	                          gridlines: {
-	                        	  color: 'black',
-		        	    		  count: 10,
-		        	    		  },
-		        	    	format: "#%",
-		        	    		  
-	                      	},
-	                  },
-	        	      hAxis: {title: 'Países'},
-	        	      seriesType: 'bars',
-	        	      // series: {5: {type: 'line'}}
-	        	    };
-	        // Draw chart
-    	    var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
-    	    chart.draw(data, options);	        	    
-		}
+		
 	});
 	/* ]]> */
+</script>
+<script type="text/javascript" 
+	th:inline="javascript" >
+/* <![CDATA[ */
+$(document).ready(function() {
+	// Load chart type and call draw function
+	google.charts.load('current', {
+		'packages' : [ 'corechart' ]
+	});
+	google.charts.setOnLoadCallback(drawVisualization);
+	
+	$(window).resize(function() {
+		drawVisualization();
+	});
+	function drawVisualization() {			
+		var data = [];
+		data.push(['País', '% Participación', '% Victorias']);
+		// Get the data directly from the model
+		var countries = [[${data}]];
+		// Parse the labels and the floats
+		for (var i = 0; i <countries.length; i++) {
+			var country = [];
+			for (var j = 0; j<countries[i].length; j++) {
+				if (isNaN(countries[i][j])) {
+					country.push(countries[i][j]);
+				} else {
+					country.push(parseFloat(countries[i][j]));
+				}
+			}
+			data.push(country);
+		}
+		// Give data to Google
+        var data = google.visualization.arrayToDataTable(data);
+        
+        var options = {
+        	      title : 'Porcentaje de participación y victorias en tiradas de cada país',
+        	      vAxes: {
+        	    	  0: {
+        	    		  viewWindowMode:'explicit',
+        	    		  viewWindow:{
+                                  max:1,
+                                  min:0
+                          },
+                          gridlines: {
+                        	  color: 'black',
+	        	    		  count: 10,
+	        	    		  },
+	        	    	format: "#%",
+	        	    		  
+                      	},
+                  },
+        	      hAxis: {title: 'Países'},
+        	      seriesType: 'bars',
+        	      // series: {5: {type: 'line'}}
+        	    };
+        // Draw chart
+	    var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+	    chart.draw(data, options);	        	    
+	}
+});
+/* ]]> */
 </script>
 </head>
 <body class="content">
