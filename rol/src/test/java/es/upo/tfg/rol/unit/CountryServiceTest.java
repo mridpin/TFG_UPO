@@ -36,9 +36,9 @@ public class CountryServiceTest {
 	CountryService cs;
 	@Autowired
 	UserService us;
-		
+
 	public User user;
-	
+
 	@Before
 	public void createUser() {
 		String nickname = TestUtils.createRandomString();
@@ -46,16 +46,18 @@ public class CountryServiceTest {
 		us.saveUser(user);
 		this.user = user;
 	}
-	
+
 	@Test
 	public void assembleCountryTest_ok() {
 		try {
-		File file = new File(Rules.STATIC_FILE_PATH + File.separator + "Alemania.csv");
-	    InputStream input = new FileInputStream(file);
-	    MultipartFile multipartFile = new MockMultipartFile("file",
-	            file.getName(), "text/plain", IOUtils.toByteArray(input));
-	    Country country = new Country(null, "Alemania", Rules.STATIC_FILE_PATH + File.separator + "Alemania.csv", user, null);
-	    assertEquals(country, cs.assembleCountry(user, multipartFile));
+			File file = new File(
+					Rules.STATIC_FILE_PATH + File.separator + "Alemania.csv");
+			InputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(),
+					"text/plain", IOUtils.toByteArray(input));
+			Country country = new Country(null, "Alemania",
+					Rules.STATIC_FILE_PATH + File.separator + "Alemania.csv", user, null);
+			assertEquals(country, cs.assembleCountry(user, multipartFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -64,53 +66,57 @@ public class CountryServiceTest {
 	@Test
 	public void mapCountryTest_ok() {
 		Map<String, Map<String, Map<String, Double>>> map = this.generateMap();
-		Country country = new Country(null, "Alemania", TestUtils.TEST_COUNTRY_FILE_PATH, user, null);
+		Country country = new Country(null, "Alemania", TestUtils.TEST_COUNTRY_FILE_PATH,
+				user, null);
 		Map<String, Map<String, Map<String, Double>>> newMap = cs.mapCountry(country);
-		
+
 		assertEquals(map, newMap);
 	}
-	
+
 	@Test
 	public void validateCountryFile_ok() {
-		Scenario scenario = new Scenario(null, "18thCent", "description", Rules.STATIC_FILE_PATH + File.separator + "TestScenario.csv", null, user);
-		
+		Scenario scenario = new Scenario(null, "18thCent", "description",
+				Rules.STATIC_FILE_PATH + File.separator + "TestScenario.csv", null, user);
+
 		try {
 			File file = new File(TestUtils.TEST_COUNTRY_FILE_PATH);
-		    InputStream input = new FileInputStream(file);
-		    MultipartFile multipartFile = new MockMultipartFile("file",
-		            file.getName(), "text/plain", IOUtils.toByteArray(input));
-		    List<String> errors = cs.validateCountryFile(scenario, multipartFile);
-		    assertEquals(0, errors.size());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			InputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(),
+					"text/plain", IOUtils.toByteArray(input));
+			List<String> errors = cs.validateCountryFile(scenario, multipartFile);
+			assertEquals(0, errors.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	@Test
 	public void validateCountryFile_2Errors() {
-		Scenario scenario = new Scenario(null, "18thCent", "description", TestUtils.TEST_SCENARIO_FILE_PATH, null, user);
-		
+		Scenario scenario = new Scenario(null, "18thCent", "description",
+				TestUtils.TEST_SCENARIO_FILE_PATH, null, user);
+
 		try {
 			File file = new File(TestUtils.TEST_COUNTRYERROR_FILE_PATH);
-		    InputStream input = new FileInputStream(file);
-		    MultipartFile multipartFile = new MockMultipartFile("file",
-		            file.getName(), "text/plain", IOUtils.toByteArray(input));
-		    List<String> errors = cs.validateCountryFile(scenario, multipartFile);
-		    assertEquals(2, errors.size());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			InputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(),
+					"text/plain", IOUtils.toByteArray(input));
+			List<String> errors = cs.validateCountryFile(scenario, multipartFile);
+			assertEquals(2, errors.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	@Test
 	public void demapCountryTest_ok() {
 		Map<String, Map<String, Map<String, Double>>> map = this.generateMap();
-		Country country = new Country(null, "Alemania", TestUtils.TEST_DEMAPCOUNTRY_FILE_PATH, user, null);
+		Country country = new Country(null, "Alemania",
+				TestUtils.TEST_DEMAPCOUNTRY_FILE_PATH, user, null);
 		cs.demapCountry(map, country);
 		Map<String, Map<String, Map<String, Double>>> newMap = cs.mapCountry(country);
 		assertEquals(map, newMap);
 	}
-	
+
 	private Map<String, Map<String, Map<String, Double>>> generateMap() {
 		Map<String, Map<String, Map<String, Double>>> map = new HashMap<>();
 		Map<String, Map<String, Double>> sub1860Attributes = new HashMap<>();
