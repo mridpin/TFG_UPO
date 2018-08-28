@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -21,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.controller.controllers.validators.RollValidator;
-import es.upo.tfg.rol.controller.controllers.validators.Validator;
 import es.upo.tfg.rol.controller.service.CountryService;
 import es.upo.tfg.rol.controller.service.RollService;
 import es.upo.tfg.rol.controller.service.ScenarioService;
@@ -31,7 +29,6 @@ import es.upo.tfg.rol.model.pojos.Coalition;
 import es.upo.tfg.rol.model.pojos.Country;
 import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Roll;
-import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.Turn;
 import es.upo.tfg.rol.model.pojos.User;
 import es.upo.tfg.rol.model.pojos.War;

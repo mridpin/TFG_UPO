@@ -4,6 +4,7 @@
 <head>
 <meta charset="utf-8">
 <title>Tu perfil</title>
+<link rel="shortcut icon" href="imgs/icon.ico">
 <link
 	rel="stylesheet"
 	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
@@ -83,7 +84,7 @@
 	<header th:replace="fragments/session_header :: header"></header>
 	<section class="section">
 		<div class="container">
-			<h3 class="subtitle is-3">Profile</h3>
+			<h3 class="subtitle is-3">Perfil</h3>
 			<div class="field">
 				<button
 					class="button is-fullwidth is-outlined is-warning"
@@ -128,7 +129,7 @@
 				<div class="field">
 					<label
 						for="nickname"
-						class="label">Nickname</label>
+						class="label">Apodo</label>
 					<div class="control has-icons-left">
 						<input
 							type="text"
@@ -181,7 +182,7 @@
 				<div class="field">
 					<label
 						for="inputPassword"
-						class="label">Password</label>
+						class="label">Contrase&ntilde;a</label>
 					<div class="control has-icons-left">
 						<input
 							type="password"
@@ -189,7 +190,7 @@
 							id="inputPassword"
 							name="password"
 							class="input editable"
-							placeholder="Insert password to confirm"
+							placeholder="Inserta contrase&ntilde;a para confirmar"
 							required
 							disabled="disabled"
 							readonly="readonly">
@@ -199,14 +200,14 @@
 				<div class="field">
 					<label
 						for="checkPassword"
-						class="label">Retype password</label>
+						class="label">Repite contrase&ntilde;a</label>
 					<div class="control has-icons-left">
 						<input
 							type="password"
 							name="checkPassword"
 							id="checkPassword"
 							class="input editable"
-							placeholder="Retype password for security"
+							placeholder="Repite contrase&ntilde;a para confirmar"
 							required
 							disabled="disabled"
 							readonly="readonly">
@@ -220,7 +221,7 @@
 							class="editable button is-primary is-medium is-fullwidth"
 							type="submit"
 							id="saveChanges"
-							value="Save Changes"
+							value="Guardar cambios"
 							disabled="disabled">
 					</div>
 				</div>

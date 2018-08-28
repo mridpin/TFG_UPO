@@ -17,18 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.mysql.fabric.xmlrpc.base.Array;
 
 import es.upo.tfg.rol.Rules;
 import es.upo.tfg.rol.model.dao.ScenarioRepository;
-import es.upo.tfg.rol.model.pojos.Game;
 import es.upo.tfg.rol.model.pojos.Scenario;
 import es.upo.tfg.rol.model.pojos.User;
 
