@@ -49,35 +49,16 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.upo.tfg.rol.controller.service.UserService#saveUser(es.upo.tfg.rol.model.
-	 * pojos.User)
-	 */
 	@Override
 	public void saveUser(User user) {
 		userRep.save(user);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see es.upo.tfg.rol.controller.service.UserService#findAllUsers()
-	 */
 	@Override
 	public Iterable<User> findAllUsers() {
 		return userRep.findAll();
-		// return StreamSupport.stream(dao.findAll().spliterator(),
-		// false).collect(Collectors.toList());
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see es.upo.tfg.rol.controller.service.UserService#findById(java.lang.Long)
-	 */
+	
 	@Override
 	public User findById(Long id) {
 		Optional<User> user = userRep.findById(id);
@@ -87,13 +68,6 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * es.upo.tfg.rol.controller.service.UserService#findByLogin(java.lang.String,
-	 * java.lang.String)
-	 */
 	@Override
 	public User findByLogin(String nickname, String password) {
 		Optional<User> user = userRep.findByNicknameAndPassword(nickname, password);

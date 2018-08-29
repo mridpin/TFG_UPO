@@ -34,12 +34,12 @@ import es.upo.tfg.rol.model.pojos.User;
 @Controller
 public class ScenarioController {
 
+	@Autowired
+	private ScenarioService scServ;
+	
 	public ScenarioController() {
 		// TODO Auto-generated constructor stub
 	}
-
-	@Autowired
-	private ScenarioService scServ;
 
 	@GetMapping("/scenario-resumen")
 	public String scenarioPRG(Model model, HttpSession session) {
