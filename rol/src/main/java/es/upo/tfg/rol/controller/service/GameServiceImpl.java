@@ -235,8 +235,7 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public List<List<String>> getChartData(Game game) {
-		List<Country> countries = countryService.findCountries(game);
+	public List<List<String>> getChartData(Game game, List<Country> countries) {
 		List<List<String>> data = new ArrayList<>();
 		List<Roll> allRolls = rollService.findByGame(game);
 		Integer all = allRolls.size();

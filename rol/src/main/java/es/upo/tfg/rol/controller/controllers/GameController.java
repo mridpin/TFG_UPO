@@ -81,7 +81,7 @@ public class GameController {
 	@GetMapping("/openGame")
 	public String openGame(HttpSession session, Model model,
 			@RequestParam(name = "game_id", required = true) String gameId,
-			@RequestParam(name = "war_id", required = false) Long warId, 
+			@RequestParam(name = "war_id", required = false) Long warId,
 			@RequestParam(name = "is_update", required = false) Boolean update) {
 		try {
 			// Prevents users from spying or modifying other user's games by guessing
@@ -107,14 +107,28 @@ public class GameController {
 			model.addAttribute("nextTurn", nextTurn);
 			// 4. Add the wars
 			List<List<War>> wars = new ArrayList<>();
+			// List<War> gameWars = new ArrayList<>();
+			List<War> gameWars = wServ.findByGame(game);
+			// for (Turn t : turns) {
+			// List<War> turnWars = wServ.findByTurn(t);
+			// wars.add(turnWars);
+			// gameWars.addAll(turnWars);
+			// }
+			// Double loop allows us to do this with just one database call to get all
+			// wars
 			for (Turn t : turns) {
-				List<War> turnWars = wServ.findByTurn(t);
+				List<War> turnWars = new ArrayList<>();
+				for (War w : gameWars) {
+					if (Objects.equals(w.getTurn(), t)) {
+						turnWars.add(w);
+					}
+				}
 				wars.add(turnWars);
 			}
 			model.addAttribute("wars", wars);
 			// If there is no open war, "create war" button will show, else it will be a
 			// "open ongoing war" button
-			War war = wServ.findOpenWar(game);
+			War war = wServ.findOpenWar(gameWars);
 			if (war != null) {
 				model.addAttribute("war", war);
 			}
@@ -126,10 +140,10 @@ public class GameController {
 				model.addAttribute("winner", winner);
 			}
 			// 6. Add the graph data
-			List<List<String>> data = gServ.getChartData(game);
+			List<List<String>> data = gServ.getChartData(game, countries);
 			model.addAttribute("data", data);
 			// 7. If its an ajax update call, only draw the war list fragment
-			if (update != null && update==true) {
+			if (update != null && update == true) {
 				return "game_main :: war_lists";
 			} else {
 				return "game_main";
@@ -334,6 +348,11 @@ public class GameController {
 			} else {
 				session.removeAttribute(Rules.GAME_FAIL);
 				session.removeAttribute(Rules.COUNTRY_FAIL);
+				session.removeAttribute("scenario");
+				session.removeAttribute("turns");
+				session.removeAttribute("countries");
+				session.removeAttribute("newGameName");
+				session.removeAttribute("playerName");
 				session.setAttribute("game", game);
 				redirect.addAttribute("game_id", game.getId());
 			}

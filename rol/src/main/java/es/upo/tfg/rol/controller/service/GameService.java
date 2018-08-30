@@ -93,6 +93,8 @@ public interface GameService {
 	 */
 	void nextTurn(Game game);
 
-	List<List<String>> getChartData(Game game);
+	//List<List<String>> getChartData(Game game);
+
+	List<List<String>> getChartData(Game game, List<Country> countries);
 
 }

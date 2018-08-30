@@ -1,11 +1,5 @@
 package es.upo.tfg.rol.controller.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +34,6 @@ public class WarServiceImpl implements WarService {
 	private WarRepository warRep;
 	@Autowired
 	private RollRepository rollRep;
-	@Autowired
-	private TurnRepository turnRep;
-	@Autowired
-	private CountryRepository countryRep;
 	@Autowired
 	private InvolvementRepository invRep;
 	@Autowired
@@ -90,7 +80,7 @@ public class WarServiceImpl implements WarService {
 			defenderName = rolls.get(rolls.size() - 1).getDefender().getName();
 		}
 		// Create the coalitions
-		List<Country> countries = countryRep.findByGame(game);
+		List<Country> countries = countryServ.findCountries(game);
 		Coalition attacker = new Coalition();
 		attacker.setName("".equals(attackerName) ? "Coalición Atacante" : attackerName);
 		Coalition defender = new Coalition();
@@ -364,8 +354,8 @@ public class WarServiceImpl implements WarService {
 	}
 
 	@Override
-	public War findOpenWar(Game game) {
-		List<War> wars = this.findByGame(game);
+	public War findOpenWar(List<War> wars) {
+		//List<War> wars = this.findByGame(game, turns);
 		for (War w : wars) {
 			if (!Rules.CLOSED_WAR.equals(w.getStatus())) {
 				return w;
@@ -374,15 +364,21 @@ public class WarServiceImpl implements WarService {
 		return null;
 	}
 
+//	@Override
+//	public List<War> findByGame(Game game, List<Turn> turns) {
+//		//List<Turn> turns = turnRep.findByGame(game);
+//		List<War> wars = new ArrayList<>();
+//		for (Turn t : turns) {
+//			List<War> turnWars = warRep.findByTurn(t);
+//			wars.addAll(turnWars);
+//		}
+//		return wars;
+//	}
+	
+	// Optimized version
 	@Override
 	public List<War> findByGame(Game game) {
-		List<Turn> turns = turnRep.findByGame(game);
-		List<War> wars = new ArrayList<>();
-		for (Turn t : turns) {
-			List<War> turnWars = warRep.findByTurn(t);
-			wars.addAll(turnWars);
-		}
-		return wars;
+		return warRep.findByGame(game);
 	}
 
 	@Override

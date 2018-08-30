@@ -57,8 +57,3 @@ String.prototype.replaceAll = function(search, replace) {
     return this.split(search).join(replace);
 }
 
-$.validator.addMethod('alphanumeric', function (value) { 
-	var regex = RegExp(/^[a-z0-9]+$/i);
-	return regex.test(value);
-});
-

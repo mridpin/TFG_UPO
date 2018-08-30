@@ -4,7 +4,9 @@
 <head>
 <meta charset="utf-8">
 <title>Tu perfil</title>
-<link rel="shortcut icon" href="imgs/icon.ico">
+<link
+	rel="shortcut icon"
+	href="imgs/icon.ico">
 <link
 	rel="stylesheet"
 	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
@@ -22,6 +24,10 @@
 	src="js/customjslib.js"
 	type="text/javascript"></script>
 <script type="text/javascript">
+	$.validator.addMethod('alphanumeric', function(value) {
+		var regex = RegExp(/^[a-z0-9]+$/i);
+		return regex.test(value);
+	});
 	$(document).ready(function() {
 		$("#editButton").on("click", function() {
 			makeEditable();
