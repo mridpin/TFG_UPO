@@ -17,6 +17,10 @@ public interface WarService {
 
 	War findById(String warId);
 
+	War findOpenWar(List<War> wars);
+	
+	List<War> findByGame(Game game);
+
 	//War findOpenWar(Game game);
 
 	List<War> findByTurn(Turn t);
@@ -35,10 +39,7 @@ public interface WarService {
 
 	Coalition findWinner(War war);
 
-	List<War> findByGame(Game game);
-
 	//War findOpenWar(Game game, List<Turn> turns);
 
-	War findOpenWar(List<War> wars);
 	
 }
