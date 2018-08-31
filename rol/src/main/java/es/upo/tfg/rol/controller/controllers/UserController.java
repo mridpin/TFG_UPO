@@ -111,7 +111,7 @@ public class UserController {
 			model.addAttribute("filesize", "El tamaño máximo de la imagen es de 1 MB");
 		}
 		if (bindingResult.hasErrors() || model.asMap().get("filesize") != null) {
-			return "register";
+			return "profile";
 		}
 		user.setId(currentUser.getId());
 		User newUser = uServ.register(user, avatar);

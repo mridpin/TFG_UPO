@@ -19,7 +19,7 @@ function matchPasswords() {
 	if (pass.length > 0 && checkPass.length > 0 && pass === checkPass) {
 		return true;
 	} else {
-		alert("Passwords don't match!");
+		alert("Las contraseñas no coinciden!");
 		return false;
 	}
 }

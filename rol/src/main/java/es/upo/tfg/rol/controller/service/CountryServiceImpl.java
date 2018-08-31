@@ -43,46 +43,47 @@ public class CountryServiceImpl implements CountryService {
 		country.setPlayer(player);
 		// Parse CSV file
 		String line;
-//		String subscenario;
-//		String type;
+		String subscenario;
+		String type;
 		// List<List<Double>> attributeList = new ArrayList<List<Double>>();
 		// List<Double> subscenarioAttributeList = new ArrayList<Double>();
-//		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
-//		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
-//		Map<String, Double> typeAttributes = new HashMap<>();
+		Map<String, Map<String, Map<String, Double>>> attributes = new HashMap<>();
+		Map<String, Map<String, Double>> subscenarioAttributes = new HashMap<>();
+		Map<String, Double> typeAttributes = new HashMap<>();
 
 		try {
 			InputStream is = data.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-			while (((line = br.readLine()) != null) && country.getName() == null) {
+			//  && country.getName() == null
+			while (((line = br.readLine()) != null)) {
 				String[] dataline = line.split(";");
 				String whatDo = dataline[0].trim().toLowerCase();
 				switch (whatDo) {
 				case "nombre":
 					country.setName(dataline[1]);
 					break;
-//				case "subescenario":
-//					subscenario = dataline[1];
-//					// subscenarioAttributeList = new ArrayList<Double>();
-//					subscenarioAttributes = new HashMap<>();
-//					// attributeList.add(subscenarioAttributeList);
-//					attributes.put(subscenario, subscenarioAttributes);
-//					break;
-//				case "tipo":
-//					type = dataline[1];
-//					typeAttributes = new HashMap<>();
-//					subscenarioAttributes.put(type, typeAttributes);
-//					break;
+				case "subescenario":
+					subscenario = dataline[1];
+					// subscenarioAttributeList = new ArrayList<Double>();
+					subscenarioAttributes = new HashMap<>();
+					// attributeList.add(subscenarioAttributeList);
+					attributes.put(subscenario, subscenarioAttributes);
+					break;
+				case "tipo":
+					type = dataline[1];
+					typeAttributes = new HashMap<>();
+					subscenarioAttributes.put(type, typeAttributes);
+					break;
 				default:
-//					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
-//					if ("true".equals(dataline[1]) || "sí".equals(dataline[1])
-//							|| "si".equals(dataline[1]) || "yes".equals(dataline[1])) {
-//						typeAttributes.put(dataline[0], 1.0);
-//					} else if ("false".equals(dataline[1])) {
-//						typeAttributes.put(dataline[0], 0.0);
-//					} else {
-//						typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
-//					}
+					// subscenarioAttributeList.add(Double.parseDouble(dataline[1]));
+					if ("true".equals(dataline[1]) || "sí".equals(dataline[1])
+							|| "si".equals(dataline[1]) || "yes".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 1.0);
+					} else if ("false".equals(dataline[1])) {
+						typeAttributes.put(dataline[0], 0.0);
+					} else {
+						typeAttributes.put(dataline[0], Double.parseDouble(dataline[1]));
+					}
 					break;
 				}
 			}
@@ -90,7 +91,7 @@ public class CountryServiceImpl implements CountryService {
 			e.printStackTrace();
 		}
 		// country.setAttributes(attributeList);
-//		country.setAttributes(attributes);
+		country.setAttributes(attributes);
 		return country;
 	}
 
