@@ -126,10 +126,10 @@ public class WarServiceImpl implements WarService {
 		Double defenderRollScore = Rules.DIE.get(defenderRoll);
 		attackerScore = (attackerScore + attackerRollScore) * Rules.ROLL_SCORE.get(nRoll);
 		if (attackerRoll.doubleValue() == Rules.HIGHEST_ROLL) {
-			attackerRollScore *= Rules.HIGHEST_ROLL_MODIFIER;
+			attackerScore *= Rules.HIGHEST_ROLL_MODIFIER;
 		}
 		if (attackerRoll.doubleValue() == Rules.LOWEST_ROLL) {
-			attackerRollScore *= Rules.LOWEST_ROLL_MODIFIER;
+			attackerScore *= Rules.LOWEST_ROLL_MODIFIER;
 		}
 		defenderScore = (defenderScore + defenderRollScore) * Rules.ROLL_SCORE.get(nRoll);
 		if (defenderRoll.doubleValue() == Rules.HIGHEST_ROLL) {

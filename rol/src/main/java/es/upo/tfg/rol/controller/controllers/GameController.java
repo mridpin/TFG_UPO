@@ -167,6 +167,7 @@ public class GameController {
 		session.removeAttribute(Rules.GAME_FAIL);
 		session.removeAttribute(Rules.COUNTRY_FAIL);
 		session.removeAttribute(Rules.ROLL_FAIL);
+		session.removeAttribute("wrongPass");
 		return "landing";
 	}
 
@@ -385,6 +386,7 @@ public class GameController {
 			RedirectAttributes redirectAttributes) {
 		Game game = (Game) session.getAttribute("game");
 		gServ.nextTurn(game);
+		session.removeAttribute("wrongPass");
 		redirectAttributes.addAttribute("game_id", game.getId());
 		return "redirect:/openGame";
 	}

@@ -75,6 +75,7 @@ public class WarController {
 		if (war == null) {
 			return Access.reject();
 		}
+		session.removeAttribute("wrongPass");
 		session.setAttribute("war", war);
 		model.addAttribute("war", war);
 		model.addAttribute("rolls", rolls);

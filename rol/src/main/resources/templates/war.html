@@ -180,11 +180,11 @@
 		if (text === "Dividir") {
 			$(button).text("Borrar");
 			$(button).attr("onclick",
-					"deletePartition(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+					"deletePartition(this.value);updateCountryNavies();updateCoalitionNavies();updateCountryPoints()");
 		} else if (text === "Borrar") {
 			$(button).text("Dividir");
 			$(button).attr("onclick",
-					"splitCountry(this.value);updateCountryNavies();updateCoalitionNavies;updateCountryPoints()");
+					"splitCountry(this.value);updateCountryNavies();updateCoalitionNavies();updateCountryPoints()");
 		}
 	}
 
@@ -344,10 +344,12 @@
 		if (rollNumber == 1) {
 			res[rules[MILITARY]][rules[RESERVES]] = 0.0;
 		}
-		// Penalize reserves for underdeveloped countries
-		if (Math.round(res[rules[MILITARY]][rules[DEVELOPED_INFRAESTRUCTURE]]) === 0) {
-			if (rollNumber < rules[DEVELOPED_INFRAESTRUCTURE_ROLL]) {
-				res[rules[MILITARY]][rules[RESERVES]] = 0.0;
+		if (Math.round(country[rules[MILITARY]][rules[DEVELOPED_INFRAESTRUCTURE]]) === 0) {
+			// Penalize reserves for underdeveloped countries
+			if (Math.round(res[rules[MILITARY]][rules[DEVELOPED_INFRAESTRUCTURE]]) === 0) {
+				if (rollNumber < rules[DEVELOPED_INFRAESTRUCTURE_ROLL]) {
+					res[rules[MILITARY]][rules[RESERVES]] = 0.0;
+				}
 			}
 		}
 		return res;

@@ -480,7 +480,7 @@
 	</section>
 	<section
 		class="section"
-		th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and !session.countries.empty}">
+		th:if="${session.scenario != null and session.turns!=null and !session.turns.empty and session.countries != null and #lists.size(session.countries) > 1}">
 		<div class="container">
 			<h3 class="subtitle is-4">¿Ya est&aacute; todo el mundo?</h3>
 			<form
