@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -184,10 +186,8 @@ public class GameController {
 	}
 
 	@PostMapping("/addScenario")
-	public String addScenario(
-			@RequestParam(name = "scenario_id", required = true) String idString,
-			@RequestParam(name = "name", required = true) String name,
-			HttpSession session) {
+	public String addScenario(@RequestParam(name = "scenario_id", required = true) String idString,
+			@RequestParam(name = "name", required = true) String name, HttpSession session) {
 		// Perform validation
 		GameValidator validator = new GameValidator();
 		if (name.length() < 2 || name.length() > Rules.MAX_NAME_LENGTH) {
@@ -206,8 +206,7 @@ public class GameController {
 		if (validator.validate()) {
 			Scenario scenario = scServ.findById(id);
 			if (scenario == null) {
-				validator.setScenarioError(
-						"No se ha encontrado el escenario que buscabas");
+				validator.setScenarioError("No se ha encontrado el escenario que buscabas");
 				return "redirect:/create_game";
 			} else {
 				// Add the scenario to the session
@@ -227,9 +226,7 @@ public class GameController {
 	}
 
 	@PostMapping("/removePlayer")
-	public String removePlayer(
-			@RequestParam(name = "countryIndex", required = true) String stat,
-			HttpSession session) {
+	public String removePlayer(@RequestParam(name = "countryIndex", required = true) String stat, HttpSession session) {
 		int index = Integer.parseInt(stat);
 		List<Country> countries = (List<Country>) session.getAttribute("countries");
 		List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
@@ -257,10 +254,8 @@ public class GameController {
 	 * @return to the same page to keep adding players
 	 */
 	@PostMapping("/addCountry")
-	public String createCountry(
-			@RequestParam(name = "player_nickname", required = true) String nickname,
-			@RequestParam(name = "country_data", required = true) MultipartFile data,
-			HttpSession session) {
+	public String createCountry(@RequestParam(name = "player_nickname", required = true) String nickname,
+			@RequestParam(name = "country_data", required = true) MultipartFile data, HttpSession session) {
 		// Assemble country with data from file
 		User player = uServ.findByNickname(nickname);
 		GameValidator validator = new GameValidator();
@@ -273,10 +268,8 @@ public class GameController {
 			List<String> fileErrors = cServ.validateCountryFile(scenario, data);
 			if (fileErrors.isEmpty()) {
 				Country country = cServ.assembleCountry(player, data);
-				List<Country> countries = (List<Country>) session
-						.getAttribute("countries");
-				List<MultipartFile> files = (List<MultipartFile>) session
-						.getAttribute("files");
+				List<Country> countries = (List<Country>) session.getAttribute("countries");
+				List<MultipartFile> files = (List<MultipartFile>) session.getAttribute("files");
 				// Create lists in session if they don't exist. if they do, store the data
 				// there
 				if (countries == null) {
@@ -291,12 +284,10 @@ public class GameController {
 						players.add(c.getPlayer());
 					}
 					if (players.contains(country.getPlayer())) {
-						validator.setDuplicatePlayerError(
-								"Ese jugador ya ha sido añadido a la partida");
+						validator.setDuplicatePlayerError("Ese jugador ya ha sido añadido a la partida");
 					}
 					if (countries.contains(country)) {
-						validator.setDuplicateCountryError(
-								"Ese país ya ha sido añadido a la partida");
+						validator.setDuplicateCountryError("Ese país ya ha sido añadido a la partida");
 					}
 					if (validator.validate()) {
 						players.add(country.getPlayer());
@@ -310,8 +301,7 @@ public class GameController {
 				validator.setCountryFileError(fileErrors);
 			}
 		} else {
-			validator.setPlayerDoesntExistError(
-					"El apodo introducido no corresponde a ningún jugador");
+			validator.setPlayerDoesntExistError("El apodo introducido no corresponde a ningún jugador");
 		}
 		if (!validator.validate()) {
 			session.setAttribute("playerName", nickname);
@@ -366,11 +356,20 @@ public class GameController {
 	}
 
 	@PostMapping("/closeGame")
-	public String closeGame(@RequestParam(name = "pass", required = true) String pass,
-			HttpSession session, RedirectAttributes redirectAttributes) {
+	public String closeGame(@RequestParam(name = "pass", required = true) String pass, HttpSession session,
+			RedirectAttributes redirectAttributes) {
 		User user = (User) session.getAttribute("user");
 		Game game = (Game) session.getAttribute("game");
-		if (Objects.equals(pass, user.getPassword())) {
+		// Hash password
+		String hashPassword = "";
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			hashPassword = this.hashPassword(md, pass);
+		} catch (NoSuchAlgorithmException e) {
+			session.setAttribute("wrongPass", "Contraseña no válida");
+			e.printStackTrace();
+		}
+		if (Objects.equals(hashPassword, user.getPassword())) {
 			gServ.closeGame(game);
 			session.removeAttribute("game");
 			return "redirect:/landing";
@@ -382,8 +381,7 @@ public class GameController {
 	}
 
 	@PostMapping("/nextTurn")
-	public String endTurn(HttpSession session, Model model,
-			RedirectAttributes redirectAttributes) {
+	public String endTurn(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 		Game game = (Game) session.getAttribute("game");
 		gServ.nextTurn(game);
 		session.removeAttribute("wrongPass");
@@ -393,21 +391,29 @@ public class GameController {
 
 	@GetMapping(value = "/downloads/country", produces = MediaType.TEXT_PLAIN_VALUE)
 	@ResponseBody
-	public void downloadFile(Model model, @Param(value = "id") Long id,
-			HttpServletResponse response) {
+	public void downloadFile(Model model, @Param(value = "id") Long id, HttpServletResponse response) {
 		Country country = cServ.findById(id);
 		if (country != null) {
-			String filename = Rules.COUNTRY_FILE_PATH + File.separator
-					+ country.getData();
+			String filename = Rules.COUNTRY_FILE_PATH + File.separator + country.getData();
 			FileSystemResource file = new FileSystemResource(filename);
 			response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-			response.setHeader("Content-disposition",
-					"attachment; filename=" + country.getName() + ".csv");
+			response.setHeader("Content-disposition", "attachment; filename=" + country.getName() + ".csv");
 			try {
 				StreamUtils.copy(file.getInputStream(), response.getOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private String hashPassword(MessageDigest md, String password) {
+		String generatedPassword = null;
+		byte[] bytes = md.digest(password.getBytes());
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+		}
+		generatedPassword = sb.toString();
+		return generatedPassword;
 	}
 }
