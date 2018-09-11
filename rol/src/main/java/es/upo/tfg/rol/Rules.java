@@ -23,6 +23,7 @@ public class Rules {
 	public final static String NAVAL_POWER = "Potencia naval";
 	public final static String SEMICOLON = ";";
 	public static final String SCENARIO_TEMPLATE = STATIC_FILE_PATH + File.separator + "scenario_template.csv";
+	public static final String COUNRTY_TEMPLATE = STATIC_FILE_PATH + File.separator + "country_template.csv";
 	public static final String DEFAULT_USER_IMAGE = "default_user_image.png";
 	// Combat constants
 	public final static Double BLOCKADE_PENALTY = 0.75;
@@ -91,6 +92,7 @@ public class Rules {
 	public static final List FALSE = Arrays
 			.asList(new String[] { "false", "no", "0", "0.0", "0.00" });
 	public static final Long MAX_FILE_SIZE = 1000000L;
+	
 
 	public Rules() {
 		// TODO Auto-generated constructor stub

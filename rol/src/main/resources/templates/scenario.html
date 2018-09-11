@@ -4,22 +4,15 @@
 <meta charset="utf-8">
 <title>Crea un escenario</title>
 <link rel="shortcut icon" href="imgs/icon.png">
-<link
-	rel="stylesheet"
+<link rel="stylesheet"
 	href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
 	integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
 	crossorigin="anonymous">
-<link
-	href="css/bulma.css"
-	rel="stylesheet">
+<link href="css/bulma.css" rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script
-	src="js/customjslib.js"
-	type="text/javascript"></script>
-<script
-	type="text/javascript"
-	src="js/jquery.validate.js"></script>
+<script src="js/customjslib.js" type="text/javascript"></script>
+<script type="text/javascript" src="js/jquery.validate.js"></script>
 <script>
 	$(document).ready(function() {
 		$("#scenario_form").validate({
@@ -65,22 +58,15 @@
 </head>
 <body class="content">
 	<header th:replace="fragments/session_header :: header"></header>
-	<section
-		class="section"
+	<section class="section"
 		th:if="${failname != null or faildesc != null or failfile != null}">
 		<div class="container box is-danger">
 			<h3 class="notification is-danger">Se han encontrado los
 				siguientes errores:</h3>
 			<ul>
-				<li
-					th:if="${failname}"
-					th:text="${failname}"></li>
-				<li
-					th:if="${faildesc}"
-					th:text="${faildesc}"></li>
-				<li
-					th:if="${datafail}"
-					th:text="${datafail}"></li>
+				<li th:if="${failname}" th:text="${failname}"></li>
+				<li th:if="${faildesc}" th:text="${faildesc}"></li>
+				<li th:if="${datafail}" th:text="${datafail}"></li>
 				<li th:if="${failfile}">
 					<ul th:each="error : ${failfile}">
 						<li th:text="${error}"></li>
@@ -91,165 +77,130 @@
 	<section class="section">
 		<div class="container">
 			<h3 class="subtitle is-3">Crear escenario</h3>
-			<form
-				class="form"
-				action="#"
-				id="scenario_form"
-				th:action="@{/createScenarioSubmit}"
-				method="post"
+			<form class="form" action="#" id="scenario_form"
+				th:action="@{/createScenarioSubmit}" method="post"
 				enctype="multipart/form-data">
 				<div class="field">
-					<label
-						for="name"
-						class="label">Nombre</label>
+					<label for="name" class="label">Nombre</label>
 					<div class="control">
-						<input
-							type="text"
-							id="name"
-							name="name"
-							class="input"
-							placeholder="Nombre del escenario"
-							required
-							autofocus
-							maxlength="256"
-							th:value="${name}">
+						<input type="text" id="name" name="name" class="input"
+							placeholder="Nombre del escenario" required autofocus
+							maxlength="256" th:value="${name}">
 					</div>
 				</div>
 				<div class="field">
-					<label
-						for="description"
-						class="label">Etiquetas</label>
+					<label for="description" class="label">Etiquetas</label>
 					<div class="control">
-						<input
-							type="text"
-							id="description"
-							name="description"
+						<input type="text" id="description" name="description"
 							class="input"
 							placeholder="Etiquetas que ayuden a la b&uacute;squeda..."
 							th:value="${description}">
 					</div>
 				</div>
 				<div class="field">
-					<label
-						for="data"
-						class="label">Reglas</label>
+					<label for="data" class="label">Reglas</label>
 					<div class="control">
-						<input
-							type="file"
-							id="data"
-							name="data"
-							class="input"
-							accept=".csv"
-							required>
+						<input type="file" id="data" name="data" class="input"
+							accept=".csv" required>
 					</div>
 				</div>
 				<div class="field">
 					<div class="control">
-						<input
-							class="button is-primary is-medium is-fullwidth"
-							type="submit"
-							value="Crear Escenario">
+						<input class="button is-primary is-medium is-fullwidth"
+							type="submit" value="Crear Escenario">
 					</div>
 				</div>
 				<div class="field">
 					<p>
 						¿Es tu primera vez creando un escenario? <a href="#instrucciones">Revisa
 							las instrucciones abajo</a> y <a
-							th:href="@{/downloads/scenarios/template}"
-							download>descarga la plantilla<span
-							class="icon is-small is-left"><i class="fas fa-download"></i></span></a>
+							th:href="@{/downloads/scenarios/template}" download>descarga
+							la plantilla<span class="icon is-small is-left"><i
+								class="fas fa-download"></i></span>
+						</a>
 					</p>
 				</div>
 			</form>
 		</div>
 	</section>
-	<section
-		class="section"
-		id="instrucciones">
+	<section class="section" id="instrucciones">
 		<div class="container">
 			<h3 class="subtitle is-3">C&oacute;mo crear un escenario:</h3>
 			<ol>
-				<li>
-					Empieza por crear un fichero CSV con el block de notas, Notepad++ o
-					MS Excel. <a
-						href="https://soporte.newslettersoft.com/hc/es/articles/216592343-C%C3%B3mo-generar-un-fichero-CSV-codificado-en-UTF-8-en-Excel">
+				<li>Empieza por crear un fichero CSV con el block de notas,
+					Notepad++ o MS Excel. <a
+					href="https://soporte.newslettersoft.com/hc/es/articles/216592343-C%C3%B3mo-generar-un-fichero-CSV-codificado-en-UTF-8-en-Excel">
 						Asegúrate de que el set de caracteres es UTF-8</a>
 				</li>
 				<li>Los atributos deben ir organizados en tres niveles de
-					anidamiento: <strong>subescenario > tipo > atributo</strong>. Dentro de un tipo,
-					puede haber tantos atributos como desees, siempre que el número sea
-					consistente dentro del mismo tipo. Es decir, si creas un tipo
-					"económico" que tiene 3 atributos, ese tipo debe repetirse en los
-					demás subescenarios con los 3 mismos atributos. Lo mismo ocurre con
-					tipos y subescenarios: puede haber tantos como quieras, pero deben
-					ser consistentes al repetirse</li>
+					anidamiento: <strong>subescenario > tipo > atributo</strong>.
+					Dentro de un tipo, puede haber tantos atributos como desees,
+					siempre que el número sea consistente dentro del mismo tipo. Es
+					decir, si creas un tipo "económico" que tiene 3 atributos, ese tipo
+					debe repetirse en los demás subescenarios con los 3 mismos
+					atributos. Lo mismo ocurre con tipos y subescenarios: puede haber
+					tantos como quieras, pero deben ser consistentes al repetirse
+				</li>
 				<li>Para designar los subescenarios y tipos, usa las palabras
-					reservadas <strong>Subescenario</strong> y <strong>Tipo</strong></li>
+					reservadas <strong>Subescenario</strong> y <strong>Tipo</strong>
+				</li>
 				<li>No debe haber números negativos. Si quieres bonificar al
 					país con el valor más bajo, usa el valor inverso, por ejemplo 1/8 =
 					0.125</li>
-				<li>Existen <strong>palabras clave</strong> que los nombres de atributos y
-					tipos deben tener para que se apliquen las reglas del juego. Sólo
-					una de cada grupo es necesaria. Si falta alguna de ellas las reglas
-					del juego no se aplicarán a tu escenario y es posible que algunas
-					herramientas no funcionen correctamente.</li>
+				<li>Existen <strong>palabras clave</strong> que los nombres de
+					atributos y tipos deben tener para que se apliquen las reglas del
+					juego. Sólo una de cada grupo es necesaria. Si falta alguna de
+					ellas las reglas del juego no se aplicarán a tu escenario y es
+					posible que algunas herramientas no funcionen correctamente.
+				</li>
 				<li style="list-style: none;">
 					<ol>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).MILITARY_TYPE_KEYWORDS, ',')}"></em>:
-							identifican un tipo como militar
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).ECONOMY_TYPE_KEYWORDS, ',')}"></em>:
-							identifican un tipo como económico
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_TYPE_KEYWORDS, ',')}"></em>:
-							identifican un tipo como naval
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).DEVELOPED_INFRAESTRUCTURE, ',')}"></em>:
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).MILITARY_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como militar</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).ECONOMY_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como económico</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_TYPE_KEYWORDS, ',')}"></em>:
+							identifican un tipo como naval</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).DEVELOPED_INFRAESTRUCTURE, ',')}"></em>:
 							identifica al atributo que designa a la infraestructura de un
 							país como desarrollada. El nombre debe coincidir exactamente y
-							debe estar en el tipo militar.
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_POWER, ',')}"></em>:
+							debe estar en el tipo militar.</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).NAVAL_POWER, ',')}"></em>:
 							identifica al atributo que designa a un país como potencia naval.
 							El nombre debe coincidir exactamente y debe estar en el tipo
-							naval.
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).INFANTRY_ATTR_KEYWORDS, ',')}"></em>:
+							naval.</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).INFANTRY_ATTR_KEYWORDS, ',')}"></em>:
 							identifica a los atributos de infantería que serán penalizados en
-							el ataque y bonificados en la defensa. naval.
-						</li>
-						<li>
-							<em
-								th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).RESERVES_ATTR_KEYWORDS, ',')}"></em>:
+							el ataque y bonificados en la defensa. naval.</li>
+						<li><em
+							th:text="${#strings.arrayJoin(T(es.upo.tfg.rol.Rules).RESERVES_ATTR_KEYWORDS, ',')}"></em>:
 							identifica al los atributos que marcan las reservas y no estarán
-							disponibles en la primera tirada.
-						</li>
+							disponibles en la primera tirada.</li>
 					</ol>
 				</li>
-				<li>
-					<a
-						th:href="@{/downloads/scenarios/template}"
-						download>Aquí puedes descargar un escenario de ejemplo.<span
-						class="icon is-small is-left"><i class="fas fa-download"></i></span></a>
-					Puedes añadir o eliminar atributos, tipos o subescenarios, o
-					modificar los ya existentes.
-				</li>
+				<li><a th:href="@{/downloads/scenarios/template}" download>Aqu&iacute;
+						puedes descargar un escenario de ejemplo.<span
+						class="icon is-small is-left"><i class="fas fa-download"></i></span>
+				</a> Puedes añadir o eliminar atributos, tipos o subescenarios, o
+					modificar los ya existentes.</li>
 				<li>La aplicación hará lo posible por validar tu escenario,
 					pero si este no cumple alguna condición, es probable que alguna
 					herramienta no funcione correctamente y tu experiencia de juego se
 					vea afectada negativamente.</li>
+				<li>Para crear un pa&iacute;s a partir de un escenario,
+					a&ntilde;ade la l&iacute;nea <em>Nombre;Nombrepa&iacute;s;</em> al
+					principio del fichero, y cambia los valores de la puntuaci&oacute;n
+					por los atributos del pa&iacute;s. <a th:href="@{/downloads/country/template}" download>Aqu&iacute;
+						puedes descargar un pa&iacute;s de ejemplo.<span
+						class="icon is-small is-left"><i class="fas fa-download"></i></span>
+				</a>
+				</li>
 			</ol>
 		</div>
 	</section>

@@ -158,6 +158,24 @@ public class ScenarioController {
 			}
 	}
 	
+	@GetMapping(value = "/downloads/country/template", produces = MediaType.TEXT_PLAIN_VALUE)
+	@ResponseBody
+	public void downloadCountryTemplate(Model model,
+			HttpServletResponse response) {
+
+			String filename = Rules.COUNTRY_FILE_PATH + File.separator
+					+ Rules.COUNRTY_TEMPLATE;
+			FileSystemResource file = new FileSystemResource(filename);
+			response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+			response.setHeader("Content-disposition",
+					"attachment; filename=plantilla_pais.csv");
+			try {
+				StreamUtils.copy(file.getInputStream(), response.getOutputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+	
 	private boolean findMatches(String type, String[] keywords) {
 		for (String keyword : keywords) {
 			if (type.contains(keyword)) {

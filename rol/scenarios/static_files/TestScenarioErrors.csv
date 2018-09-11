@@ -1,0 +1,12 @@
+Subescenario;1860;
+Tipo,economicos;
+PIB;ok;
+Tipo;militares;
+Soldados;8;
+Infraestructura desarrollada;1.0;
+Subescenario;1870;
+Tipo;economicos;
+PIB;10;
+Tipo;militares;
+Soldados;8;
+Infraestructura desarrollada;1.0;
